@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>考勤确认进度统计</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'PingFang SC','Microsoft YaHei',Arial,sans-serif; background: #F4F7FE; min-height: 100vh; padding: 24px; }
+  .container { max-width: 1400px; margin: 0 auto; }
+
+  /* ---- header ---- */
+  .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+  .header h1 { color: #000819; font-size: 20px; font-weight: 600; }
+  .header .meta { color: #8C9097; font-size: 12px; margin-top: 4px; }
+  .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+  .btn-row { display: flex; gap: 8px; }
+  .btn { border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; }
+  .btn-primary { background: #0E66FB; color: #fff; }
+  .btn-primary:hover { background: #0a52d4; }
+  .btn-outline { background: #fff; color: #0E66FB; border: 1px solid #0E66FB; }
+  .btn-outline:hover { background: #F0F6FF; }
+  .loading { color: #8C9097; font-size: 12px; }
+
+  /* ---- 加载遮罩 ---- */
+  #loadingOverlay { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.8); z-index: 999; justify-content: center; align-items: center; flex-direction: column; gap: 12px; }
+  #loadingOverlay.active { display: flex; }
+  .spinner { width: 36px; height: 36px; border: 3px solid #E5E5E5; border-top-color: #0E66FB; border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ---- 汇总卡片 ---- */
+  .summary-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 28px; }
+  .card { background: #fff; border-radius: 8px; padding: 20px 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); text-align: center; }
+  .card .num { font-size: 38px; font-weight: 700; color: #0E66FB; line-height: 1; }
+  .card.success .num { color: #12CC7E; }
+  .card.warning .num { color: #FFAA0E; }
+  .card.danger .num { color: #D9001B; }
+  .card .label { font-size: 12px; color: #8C9097; margin-top: 6px; }
+  .card .sub { font-size: 11px; color: #B8B8B8; margin-top: 2px; }
+
+  /* ---- 部门汇总表 ---- */
+  .section { margin-bottom: 32px; }
+  .section h2 { color: #000819; font-size: 15px; font-weight: 600; margin-bottom: 12px; }
+  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  th { background: #F4F7FE; padding: 11px 12px; text-align: left; font-size: 12px; color: #666; font-weight: 500; border-bottom: 1px solid #E5E5E5; }
+  td { padding: 10px 12px; font-size: 13px; color: #333; border-bottom: 1px solid #F0F0F0; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #FAFBFC; cursor: pointer; }
+  .text-center { text-align: center; }
+  .text-right { text-align: right; }
+
+  /* ---- 异常检测面板 ---- */
+  .anomaly-panel { background: #fff; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); overflow: hidden; margin-bottom: 32px; }
+  .anomaly-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid #F0F0F0; }
+  .anomaly-header h2 { font-size: 15px; font-weight: 600; color: #000819; }
+  .anomaly-count { background: #D9001B; color: #fff; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+  .anomaly-count.ok { background: #12CC7E; }
+  .anomaly-list { max-height: 300px; overflow-y: auto; }
+  .anomaly-item { display: grid; grid-template-columns: 120px 100px 1fr 200px 120px; padding: 10px 16px; border-bottom: 1px solid #F5F5F5; font-size: 13px; align-items: center; }
+  .anomaly-item:last-child { border-bottom: none; }
+  .anomaly-item .emp { font-weight: 600; color: #000819; }
+  .anomaly-item .name { color: #666; }
+  .anomaly-item .dept { color: #8C9097; }
+  .anomaly-item .reason { color: #D9001B; font-size: 12px; }
+  .anomaly-item .time { color: #8C9097; font-size: 12px; }
+  .anomaly-empty { padding: 24px; text-align: center; color: #8C9097; font-size: 13px; }
+  .anomaly-empty.ok { color: #12CC7E; }
+
+  /* ---- 筛选栏 ---- */
+  .filter-bar { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
+  .filter-bar label { font-size: 13px; color: #666; }
+  select, input { border: 1px solid #ccced1; border-radius: 6px; padding: 6px 10px; font-size: 13px; outline: none; color: #333; }
+  select { min-width: 150px; background: #fff; }
+  input#searchInput { min-width: 200px; }
+  .filter-meta { margin-left: auto; font-size: 12px; color: #8C9097; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+  .badge-success { background: #E6F9F1; color: #12CC7E; }
+  .badge-warning { background: #FFF8E6; color: #FFAA0E; }
+  .badge-danger { background: #FEE6E6; color: #D9001B; }
+  .badge-gray { background: #F0F0F0; color: #8C9097; }
+
+  /* ---- 员工明细表 ---- */
+  .detail-table-wrap { background: #fff; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); overflow: hidden; }
+  .detail-table { width: 100%; border-collapse: collapse; }
+  .detail-table th { background: #F4F7FE; padding: 10px 12px; text-align: left; font-size: 12px; color: #666; font-weight: 500; border-bottom: 1px solid #E5E5E5; white-space: nowrap; }
+  .detail-table td { padding: 9px 12px; font-size: 13px; color: #333; border-bottom: 1px solid #F0F0F0; white-space: nowrap; }
+  .detail-table tr:last-child td { border-bottom: none; }
+  .detail-table tr:hover td { background: #FAFBFC; }
+  .detail-table .emp-id { font-family: 'Courier New',monospace; font-size: 12px; color: #0E66FB; font-weight: 600; }
+  .objection-text { color: #D9001B; font-size: 12px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* ---- 分页 ---- */
+  .pagination { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #fff; border-top: 1px solid #F0F0F0; }
+  .pagination .info { font-size: 12px; color: #8C9097; }
+  .pagination .btns { display: flex; gap: 6px; }
+  .pagination button { padding: 5px 12px; border: 1px solid #ccced1; background: #fff; border-radius: 5px; font-size: 12px; cursor: pointer; color: #333; }
+  .pagination button:hover { background: #F4F7FE; }
+  .pagination button:disabled { color: #B8B8B8; cursor: not-allowed; }
+
+  /* ---- 详情弹窗 ---- */
+  #detailModal { display: none; position: fixed; inset: 0; z-index: 1000; justify-content: center; align-items: center; background: rgba(0,0,0,0.4); }
+  #detailModal.active { display: flex; }
+  .modal-box { background: #fff; border-radius: 10px; width: 560px; max-height: 80vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #F0F0F0; }
+  .modal-header h3 { font-size: 15px; color: #000819; }
+  .modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: #8C9097; line-height: 1; padding: 0; width: 28px; height: 28px; text-align: center; border-radius: 4px; }
+  .modal-close:hover { background: #F4F7FE; }
+  .modal-body { padding: 20px; }
+  .modal-field { display: grid; grid-template-columns: 100px 1fr; gap: 8px 12px; margin-bottom: 12px; font-size: 13px; }
+  .modal-field .label { color: #8C9097; }
+  .modal-field .value { color: #333; word-break: break-all; }
+  .modal-field .value.red { color: #D9001B; }
+  .modal-field .value.green { color: #12CC7E; }
+
+  /* ---- 无数据 ---- */
+  .no-data { text-align: center; padding: 40px; color: #8C9097; font-size: 14px; }
+</style>
+</head>
+<body>
+<div id="loadingOverlay"><div class="spinner"></div><div class="loading">正在加载飞书数据...</div></div>
+
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <h1>📋 考勤确认进度统计</h1>
+      <div class="meta" id="meta">正在加载...</div>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-outline" onclick="exportFiltered()">📥 导出当前筛选结果</button>
+      <button class="btn btn-primary" onclick="refreshData()">🔄 刷新数据</button>
+    </div>
+  </div>
+
+  <!-- 汇总卡片 -->
+  <div class="summary-cards">
+    <div class="card">
+      <div class="num" id="cardTotal">-</div>
+      <div class="label">总人数</div>
+      <div class="sub" id="cardDepts">- 个部门</div>
+    </div>
+    <div class="card success">
+      <div class="num" id="cardConfirmed">-</div>
+      <div class="label">已确认</div>
+      <div class="sub" id="cardConfirmedPct">-</div>
+    </div>
+    <div class="card warning">
+      <div class="num" id="cardPending">-</div>
+      <div class="label">待确认</div>
+      <div class="sub" id="cardPendingPct">-</div>
+    </div>
+    <div class="card danger">
+      <div class="num" id="cardObjection">-</div>
+      <div class="label">有异议</div>
+      <div class="sub" id="cardObjectionPct">-</div>
+    </div>
+  </div>
+
+  <!-- 部门汇总表 -->
+  <div class="section">
+    <h2>📊 部门维度汇总</h2>
+    <table id="deptTable">
+      <thead>
+        <tr>
+          <th>三级部门</th>
+          <th class="text-center">总人数</th>
+          <th class="text-center">已确认</th>
+          <th class="text-center">待确认</th>
+          <th class="text-center">有异议</th>
+          <th class="text-center">确认率</th>
+        </tr>
+      </thead>
+      <tbody id="deptBody"></tbody>
+    </table>
+  </div>
+
+  <!-- 异常检测面板 -->
+  <div class="anomaly-panel">
+    <div class="anomaly-header">
+      <h2>🚨 异常检测 <span id="anomalyHint" style="font-size:12px;color:#8C9097;font-weight:normal;margin-left:6px;">（已确认无时间 / 有异议无原因）</span></h2>
+      <span class="anomaly-count ok" id="anomalyCount">0</span>
+    </div>
+    <div class="anomaly-list" id="anomalyList">
+      <div class="anomaly-empty ok">✅ 暂无异常，数据正常</div>
+    </div>
+  </div>
+
+  <!-- 员工明细 -->
+  <div class="section">
+    <h2>👥 员工明细</h2>
+    <div class="filter-bar">
+      <label>部门</label>
+      <select id="deptFilter" onchange="applyFilter()">
+        <option value="">全部部门</option>
+      </select>
+      <label>状态</label>
+      <select id="statusFilter" onchange="applyFilter()">
+        <option value="">全部状态</option>
+        <option value="待确认">待确认</option>
+        <option value="已确认">已确认</option>
+        <option value="有异议">有异议</option>
+      </select>
+      <input type="text" id="searchInput" placeholder="🔍 搜索工号或姓名..." oninput="applyFilter()">
+      <span class="filter-meta" id="filterMeta"></span>
+    </div>
+    <div class="detail-table-wrap">
+      <table class="detail-table">
+        <thead>
+          <tr>
+            <th>工号</th>
+            <th>姓名</th>
+            <th>三级部门</th>
+            <th>四级部门</th>
+            <th>五级部门</th>
+            <th>确认状态</th>
+            <th>异议原因</th>
+            <th>确认时间</th>
+          </tr>
+        </thead>
+        <tbody id="recordBody"></tbody>
+      </table>
+    </div>
+    <div class="pagination">
+      <div class="info" id="pageInfo">-</div>
+      <div class="btns">
+        <button id="btnPrev" onclick="prevPage()" disabled>上一页</button>
+        <button id="btnNext" onclick="nextPage()" disabled>下一页</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 详情弹窗 -->
+<div id="detailModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>📄 员工确认详情</h3>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+// ---------- 配置 ----------
+const APP_ID    = 'cli_aa8ef6308ae41cb6';
+const APP_SECRET = 'qVdoVV7M4QMPsBAhm5ETucG6VVwIcAja';
+const BASE_URL  = 'https://open.feishu.cn';
+const BASE_ID   = 'YwaAbg2lfaBDhhsCkVAcBvwhnMf';
+const TABLE_ID  = 'tbl8OzPzqY8Xdzyo';
+const PAGE_SIZE = 50;
+
+// ---------- 全局状态 ----------
+let allRecords  = [];
+let filtered    = [];
+let page        = 1;
+let totalPages = 1;
+
+// ---------- 工具函数 ----------
+function formatTs(val) {
+  if (!val) return '—';
+  try {
+    let s = String(val);
+    if (s.length === 13) s = s.slice(0, 10);
+    if (s.length === 10) s = String(Math.abs(Number(s)));
+    return new Date(Number(s) * 1000).toLocaleString('zh-CN', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).replace(/\//g, '-');
+  } catch(e) { return val; }
+}
+
+function badge(status) {
+  const m = {'已确认':'badge-success','待确认':'badge-warning','有异议':'badge-danger'};
+  return `<span class="badge ${m[status]||'badge-gray'}">${status}</span>`;
+}
+
+// ---------- 本地代理 API ----------
+async function fetchRecords() {
+  const r = await fetch('http://localhost:8765/api/records', { cache: 'no-store' });
+  const res = await r.json();
+  if (res.code !== 0) throw new Error(res.msg || JSON.stringify(res));
+  return res.data; // 直接是 extractFields 后的数组
+}
+
+function extractFields(rec) {
+  const f = rec.fields || {};
+  return {
+    record_id: rec.record_id || '',
+    工号:      f['工号']      || '',
+    姓名:      f['姓名']      || '',
+    三级部门:  f['三级部门']  || '',
+    四级部门:  f['四级部门']  || '',
+    五级部门:  f['五级部门']  || '',
+    确认状态:  f['确认状态']  || '待确认',
+    异议原因:  f['异议原因']  || '',
+    确认时间:  f['确认时间']  || '',
+    周期明细:  f['周期明细']  || '',
+  };
+}
+
+// ---------- 数据处理 ----------
+function computeStats(records) {
+  const total = records.length;
+  const byStatus = {};
+  const byDept   = {};
+  const byDeptStatus = {};
+
+  for (const r of records) {
+    const s = r['确认状态'];
+    const d = r['三级部门'] || '未知';
+    byStatus[s] = (byStatus[s] || 0) + 1;
+    byDept[d]    = (byDept[d] || 0) + 1;
+    const k = d + '||' + s;
+    byDeptStatus[k] = (byDeptStatus[k] || 0) + 1;
+  }
+  return { total, byStatus, byDept, byDeptStatus };
+}
+
+function detectAnomalies(records) {
+  const anomalies = [];
+  for (const r of records) {
+    const issues = [];
+    if (r['确认状态'] === '已确认' && !r['确认时间']) {
+      issues.push('已确认但无确认时间');
+    }
+    if (r['确认状态'] === '有异议' && !r['异议原因']) {
+      issues.push('有异议但未填写原因');
+    }
+    if (r['确认状态'] === '已确认' && r['异议原因']) {
+      issues.push('已确认但仍有异议内容');
+    }
+    if (issues.length > 0) {
+      anomalies.push({ ...r, issues });
+    }
+  }
+  return anomalies;
+}
+
+// ---------- 渲染 ----------
+function renderStats(records) {
+  const { total, byStatus, byDept, byDeptStatus } = computeStats(records);
+
+  document.getElementById('cardTotal').textContent = total;
+  document.getElementById('cardDepts').textContent = Object.keys(byDept).length + ' 个部门';
+  document.getElementById('cardConfirmed').textContent = byStatus['已确认'] || 0;
+  document.getElementById('cardPending').textContent   = byStatus['待确认'] || 0;
+  document.getElementById('cardObjection').textContent = byStatus['有异议'] || 0;
+  document.getElementById('cardConfirmedPct').textContent = total ? ((byStatus['已确认']||0)/total*100).toFixed(1) + '%' : '-';
+  document.getElementById('cardPendingPct').textContent   = total ? ((byStatus['待确认']||0)/total*100).toFixed(1) + '%' : '-';
+  document.getElementById('cardObjectionPct').textContent = total ? ((byStatus['有异议']||0)/total*100).toFixed(1) + '%' : '-';
+
+  // 部门表
+  const sortedDepts = Object.keys(byDept).sort((a,b) => byDept[b] - byDept[a]);
+  let deptHtml = '';
+  for (const d of sortedDepts) {
+    const t  = byDept[d];
+    const c  = byDeptStatus[d + '||已确认'] || 0;
+    const p  = byDeptStatus[d + '||待确认'] || 0;
+    const o  = byDeptStatus[d + '||有异议'] || 0;
+    const pct = t ? (c/t*100).toFixed(1) + '%' : '-';
+    deptHtml += `<tr onclick="filterByDept('${d}')" title="点击筛选该部门">
+      <td>${d}</td>
+      <td class="text-center">${t}</td>
+      <td class="text-center" style="color:#12CC7E;font-weight:600">${c}</td>
+      <td class="text-center" style="color:#FFAA0E;font-weight:600">${p}</td>
+      <td class="text-center" style="color:#D9001B;font-weight:600">${o}</td>
+      <td class="text-center">${pct}</td>
+    </tr>`;
+  }
+  document.getElementById('deptBody').innerHTML = deptHtml;
+
+  // 部门筛选下拉
+  const deptSel = document.getElementById('deptFilter');
+  const cur = deptSel.value;
+  deptSel.innerHTML = '<option value="">全部部门</option>' + sortedDepts.map(d => `<option value="${d}">${d} (${byDept[d]})</option>`).join('');
+  deptSel.value = cur;
+
+  // 状态下拉
+  const statSel = document.getElementById('statusFilter');
+  const sc = statSel.value;
+  statSel.innerHTML = '<option value="">全部状态</option>'
+    + `<option value="待确认">待确认 (${byStatus['待确认']||0})</option>`
+    + `<option value="已确认">已确认 (${byStatus['已确认']||0})</option>`
+    + `<option value="有异议">有异议 (${byStatus['有异议']||0})</option>`;
+  statSel.value = sc;
+
+  return { byStatus };
+}
+
+function renderAnomalies(records) {
+  const anomalies = detectAnomalies(records);
+  const countEl = document.getElementById('anomalyCount');
+  const listEl  = document.getElementById('anomalyList');
+
+  if (anomalies.length === 0) {
+    countEl.className = 'anomaly-count ok';
+    countEl.textContent = '0';
+    listEl.innerHTML = '<div class="anomaly-empty ok">✅ 暂无异常，数据正常</div>';
+    return;
+  }
+
+  countEl.className = 'anomaly-count';
+  countEl.textContent = anomalies.length;
+  let html = '';
+  for (const a of anomalies) {
+    html += `<div class="anomaly-item" onclick="openModal('${a.record_id}')">
+      <span class="emp">${a['工号']}</span>
+      <span class="name">${a['姓名']}</span>
+      <span class="dept">${a['三级部门']}</span>
+      <span class="reason">⚠️ ${a.issues.join('；')}</span>
+      <span class="time">${formatTs(a['确认时间'])}</span>
+    </div>`;
+  }
+  listEl.innerHTML = html;
+}
+
+function applyFilter() {
+  const dept   = document.getElementById('deptFilter').value;
+  const status  = document.getElementById('statusFilter').value;
+  const search  = document.getElementById('searchInput').value.toLowerCase().trim();
+
+  filtered = allRecords.filter(r => {
+    if (dept   && r['三级部门'] !== dept)   return false;
+    if (status && r['确认状态'] !== status) return false;
+    if (search) {
+      const text = (r['工号'] + r['姓名']).toLowerCase();
+      if (!text.includes(search)) return false;
+    }
+    return true;
+  });
+
+  page = 1;
+  totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  renderPage();
+  document.getElementById('filterMeta').textContent = `共 ${filtered.length} 条${filtered.length !== allRecords.length ? '（已筛选）' : ''}`;
+}
+
+function filterByDept(dept) {
+  document.getElementById('deptFilter').value = dept;
+  applyFilter();
+  window.scrollTo({ top: document.querySelector('.detail-table-wrap').offsetTop - 80, behavior: 'smooth' });
+}
+
+function renderPage() {
+  const start = (page - 1) * PAGE_SIZE;
+  const pageRecords = filtered.slice(start, start + PAGE_SIZE);
+
+  let html = '';
+  for (const r of pageRecords) {
+    const objectionDisplay = r['异议原因']
+      ? `<span class="objection-text" title="${r['异议原因']}">⚠️ ${r['异议原因']}</span>`
+      : '—';
+    html += `<tr onclick="openModal('${r.record_id}')">
+      <td class="emp-id">${r['工号']}</td>
+      <td>${r['姓名']}</td>
+      <td>${r['三级部门']}</td>
+      <td>${r['四级部门']}</td>
+      <td>${r['五级部门']}</td>
+      <td>${badge(r['确认状态'])}</td>
+      <td>${objectionDisplay}</td>
+      <td>${formatTs(r['确认时间'])}</td>
+    </tr>`;
+  }
+  if (!html) {
+    html = `<tr><td colspan="8" class="no-data">暂无数据</td></tr>`;
+  }
+  document.getElementById('recordBody').innerHTML = html;
+
+  document.getElementById('pageInfo').textContent = `第 ${page} / ${totalPages} 页，共 ${filtered.length} 条`;
+  document.getElementById('btnPrev').disabled = page <= 1;
+  document.getElementById('btnNext').disabled = page >= totalPages;
+}
+
+function prevPage() { if (page > 1) { page--; renderPage(); } }
+function nextPage() { if (page < totalPages) { page++; renderPage(); } }
+
+// ---------- 详情弹窗 ----------
+function openModal(recordId) {
+  const r = allRecords.find(x => x.record_id === recordId);
+  if (!r) return;
+
+  const fields = [
+    ['工号',      r['工号'],      ''],
+    ['姓名',      r['姓名'],      ''],
+    ['三级部门',  r['三级部门'],  ''],
+    ['四级部门',  r['四级部门'],  ''],
+    ['五级部门',  r['五级部门'],  ''],
+    ['确认状态',  r['确认状态'],  r['确认状态'] === '已确认' ? 'green' : r['确认状态'] === '有异议' ? 'red' : ''],
+    ['异议原因',  r['异议原因']  || '（无）', r['异议原因'] ? 'red' : ''],
+    ['确认时间',  formatTs(r['确认时间']), ''],
+    ['周期明细',  r['周期明细']  || '（无）', ''],
+  ];
+
+  const anomalyIssues = detectAnomalies([r]);
+  let anomalyHtml = '';
+  if (anomalyIssues.length > 0) {
+    anomalyHtml = '<div style="margin-top:16px;padding:12px;background:#FFF5F5;border-radius:6px;border:1px solid #FFDEDE;">'
+      + '<div style="font-size:12px;font-weight:600;color:#D9001B;margin-bottom:6px;">⚠️ 异常信息</div>'
+      + anomalyIssues.map(a => `<div style="font-size:12px;color:#D9001B;">· ${a.issues.join('；')}</div>`).join('')
+      + '</div>';
+  }
+
+  document.getElementById('modalBody').innerHTML = '<div class="modal-field">'
+    + fields.map(([label, value, cls]) => `<div class="label">${label}</div><div class="value ${cls}">${value}</div>`).join('')
+    + '</div>' + anomalyHtml;
+
+  document.getElementById('detailModal').classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('detailModal').classList.remove('active');
+}
+
+// 点击遮罩关闭
+document.getElementById('detailModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ---------- 导出 ----------
+function exportFiltered() {
+  const cols = ['工号','姓名','三级部门','四级部门','五级部门','确认状态','异议原因','确认时间','周期明细'];
+  const header = cols.join(',');
+  const rows = filtered.map(r => cols.map(c => {
+    let v = (r[c] || '').toString().replace(/"/g, '""');
+    return v.includes(',') || v.includes('\n') ? '"' + v + '"' : v;
+  }).join(','));
+  const csv = '\uFEFF' + [header, ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '考勤确认_筛选结果_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+}
+
+// ---------- 主流程 ----------
+async function refreshData() {
+  const overlay = document.getElementById('loadingOverlay');
+  overlay.classList.add('active');
+  try {
+    const records = await fetchRecords();
+    // fetchRecords 已返回提取后的字段数组，无需再 extractFields
+    allRecords = records;
+    filtered   = [...allRecords];
+    page       = 1;
+    totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+
+    document.getElementById('meta').textContent =
+      `数据来源：飞书多维表格　｜　更新于：${new Date().toLocaleString('zh-CN')}　｜　共 ${allRecords.length} 条记录`;
+
+    renderStats(allRecords);
+    renderAnomalies(allRecords);
+    renderPage();
+    document.getElementById('filterMeta').textContent = '';
+  } catch(e) {
+    alert('刷新失败：' + e.message);
+    console.error(e);
+  } finally {
+    overlay.classList.remove('active');
+  }
+}
+
+// 初始化
+refreshData();
+</script>
+</body>
+</html>
