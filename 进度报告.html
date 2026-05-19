@@ -3,13 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>签字报表确认进度 - 2026/05/16 16:11</title>
+<title>签字报表确认进度 - 2026/05/19 14:13</title>
 <style>
   body { font-family:'PingFang SC','微软雅黑',Arial,sans-serif; background:#F4F7FE; margin:0; padding:24px; }
   .container { max-width:900px; margin:0 auto; }
   h1 { color:#000819; font-size:20px; margin-bottom:20px; }
-  .summary { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:24px; }
-  .card { background:#fff; border-radius:8px; padding:20px; box-shadow:0 1px 4px rgba(0,0,0,0.08); text-align:center; }
+  .summary {
+    display:grid; grid-template-columns:repeat(4,1fr); gap:12px;
+    margin-bottom:24px;
+  }
+  .card {
+    background:#fff; border-radius:8px; padding:20px;
+    box-shadow:0 1px 4px rgba(0,0,0,0.08); text-align:center;
+  }
   .card .num { font-size:32px; font-weight:bold; color:#0E66FB; }
   .card .label { font-size:12px; color:#8C9097; margin-top:4px; }
   .card.danger .num { color:#D9001B; }
@@ -26,168 +32,2477 @@
 <body>
 <div class="container">
   <h1>📋 签字报表确认进度</h1>
+
   <div class="summary">
-    <div class="card"><div class="num">304</div><div class="label">总人数</div></div>
-    <div class="card success"><div class="num">0</div><div class="label">已确认 (0%)</div></div>
-    <div class="card danger"><div class="num">0</div><div class="label">有异议</div></div>
-    <div class="card warn"><div class="num">304</div><div class="label">待确认</div></div>
+    <div class="card">
+      <div class="num">304</div>
+      <div class="label">总人数</div>
+    </div>
+    <div class="card success">
+      <div class="num">0</div>
+      <div class="label">已确认 (0%)</div>
+    </div>
+    <div class="card danger">
+      <div class="num">0</div>
+      <div class="label">有异议</div>
+    </div>
+    <div class="card warn">
+      <div class="num">304</div>
+      <div class="label">待确认</div>
+    </div>
   </div>
-  
   <div class="section">
     <h2>⏳ 待确认（304 人）</h2>
     <table>
-      <tr><th>工号</th><th>姓名</th><th>部门</th><th>状态</th><th>异议原因</th><th>回复时间</th></tr>
       <tr>
+        <th>工号</th><th>姓名</th><th>部门</th><th>状态</th><th>异议原因</th><th>回复时间</th>
+      </tr>
+      
+        <tr>
             <td style="padding:8px;border:1px solid #E5E5E5;">GL501793</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">Alejandro Banuelos</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/操作组</td>
             <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
-            <td style="padding:8px;border:1px solid #E5E5E5;"></td>
-        </tr><tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
             <td style="padding:8px;border:1px solid #E5E5E5;">GL500434</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">Alfaro, Walter Jessie（Alfaro, Walter Jessie）</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/操作组</td>
             <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
-            <td style="padding:8px;border:1px solid #E5E5E5;"></td>
-        </tr><tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
             <td style="padding:8px;border:1px solid #E5E5E5;">GL502177</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">Benjamin Alejandro Zendejas</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SC 南加片区/FAT01</td>
             <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
-            <td style="padding:8px;border:1px solid #E5E5E5;"></td>
-        </tr><tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
             <td style="padding:8px;border:1px solid #E5E5E5;">GL500500</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">Chavez William（Chavez William）</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/操作组</td>
             <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
-            <td style="padding:8px;border:1px solid #E5E5E5;"></td>
-        </tr><tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
             <td style="padding:8px;border:1px solid #E5E5E5;">GL502172</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">Cristobal Ybarra（Cristobal）</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/DS 丹佛·盐湖城片区/ABQ01</td>
             <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
-            <td style="padding:8px;border:1px solid #E5E5E5;"></td>
-        </tr><tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
             <td style="padding:8px;border:1px solid #E5E5E5;">GL500389</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">Daniel Z Rodriguez（Daniel Z Rodriguez）</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SC 南加片区/SFV01</td>
             <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
-            <td style="padding:8px;border:1px solid #E5E5E5;"></td>
-        </tr><tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
             <td style="padding:8px;border:1px solid #E5E5E5;">GL502291</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">Darwin Rafael Stephens Navarro</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/WG 西大湖片区/ORD01</td>
             <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
-            <td style="padding:8px;border:1px solid #E5E5E5;"></td>
-        </tr><tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
             <td style="padding:8px;border:1px solid #E5E5E5;">GL502087</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">Ethan Thomas</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/DS 丹佛·盐湖城片区/DEN.H</td>
             <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
-            <td style="padding:8px;border:1px solid #E5E5E5;"></td>
-        </tr><tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
             <td style="padding:8px;border:1px solid #E5E5E5;">GL501201</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">Francisco Espinoza（Francisco Espinoza）</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/操作组</td>
             <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
-            <td style="padding:8px;border:1px solid #E5E5E5;"></td>
-        </tr><tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
             <td style="padding:8px;border:1px solid #E5E5E5;">GL500499</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">Garcia Keith Joseph（Garcia Keith Joseph）</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/操作组</td>
             <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
-            <td style="padding:8px;border:1px solid #E5E5E5;"></td>
-        </tr><tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
             <td style="padding:8px;border:1px solid #E5E5E5;">GL502812</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">Garcia Kyle Joshua</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/操作组</td>
             <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
-            <td style="padding:8px;border:1px solid #E5E5E5;"></td>
-        </tr><tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
             <td style="padding:8px;border:1px solid #E5E5E5;">GL502840</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">Itzel Azucena Lopez Banuelos</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/分拣组</td>
             <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
-            <td style="padding:8px;border:1px solid #E5E5E5;"></td>
-        </tr><tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
             <td style="padding:8px;border:1px solid #E5E5E5;">GL501761</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">Jareier Eduardo Lopez</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/操作组</td>
             <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
-            <td style="padding:8px;border:1px solid #E5E5E5;"></td>
-        </tr><tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
             <td style="padding:8px;border:1px solid #E5E5E5;">GL500262</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">Jasmine Dong（Jasmine Dong）</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/运营支持部/区域支持组</td>
             <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
-            <td style="padding:8px;border:1px solid #E5E5E5;"></td>
-        </tr><tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
             <td style="padding:8px;border:1px solid #E5E5E5;">GL502514</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">Jerry Liang You（Jerry）</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/CM 中西部中心片区/CMH01</td>
             <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
-            <td style="padding:8px;border:1px solid #E5E5E5;"></td>
-        </tr><tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
             <td style="padding:8px;border:1px solid #E5E5E5;">GL501103</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">Johnathan Edward Ladson Jr（Johnathan Edward Ladson</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/操作组</td>
             <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
-            <td style="padding:8px;border:1px solid #E5E5E5;"></td>
-        </tr><tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
             <td style="padding:8px;border:1px solid #E5E5E5;">GL501916</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">Jose G Esquivias Terraza</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/操作组</td>
             <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
-            <td style="padding:8px;border:1px solid #E5E5E5;"></td>
-        </tr><tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
             <td style="padding:8px;border:1px solid #E5E5E5;">GL500498</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">Juan Carlos Jr Vargas（Juan Carlos Jr Vargas）</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/操作组</td>
             <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
-            <td style="padding:8px;border:1px solid #E5E5E5;"></td>
-        </tr><tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
             <td style="padding:8px;border:1px solid #E5E5E5;">GL500226</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">Kelvin Siu（Kelvin Siu）</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SC 南加片区/SFV01</td>
             <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
-            <td style="padding:8px;border:1px solid #E5E5E5;"></td>
-        </tr><tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
             <td style="padding:8px;border:1px solid #E5E5E5;">GL502740</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">Leo Schauer</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/WG 西大湖片区/MSN01</td>
             <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
             <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
-            <td style="padding:8px;border:1px solid #E5E5E5;"></td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500603</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">Man Yee Yolanda Yip（Man Yee Yolanda Yip）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501850</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">Mendbayar Darkhi</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/DS 丹佛·盐湖城片区/DEN.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502416</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">Miguel Angel Correa</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/运营支持部/区域支持组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502778</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">Nehemiah Angelo Cortinas</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/DS 丹佛·盐湖城片区/DEN.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501807</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">Omar Aguirre</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/操作组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502620</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">Oscar Coronado</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H/分拣组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502451</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">PEDRO MUÑOZ</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/WG 西大湖片区/ORD01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500509</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">Qianqian Li</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/合流合包组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501500</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">Richard Anthony Munoz（Richard Anthony Munoz）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/操作组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500497</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">SANCHEZ RODOLFO SALVADOR（SANCHEZ RODOLFO SALVADOR）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/操作组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501586</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">Uriel Aguirre (Uriel Aguirre）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/操作组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501905</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">Waldemar Torres Rodriguez</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/操作组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500810</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">Wei Deng（Wei Deng）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500387</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">乔晓艳Lois（Xiaoyan Qiao）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SC 南加片区</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500069</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">于成龙Lucas（Chenglong Yu）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501265</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">于淼Maggie（Miao Yu）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501567</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">仇鹏博（Pengbo Qiu）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/LM 中西部南片区/STL01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500040</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">任传兵（Chuanbing Ren）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SP 西雅图·波特兰片区/PDX01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502652</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">伦伟华Alan (Weihua Lun)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SP 西雅图·波特兰片区/PDX01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500158</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">何东海（Donghai He）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/DS 丹佛·盐湖城片区/DEN01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501290</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">何昊源Hank（Haoyuan He）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LA揽收部/揽收调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501400</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">何洋Yang（Yang He）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/NC 北加片区/SFO.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501790</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">余伟能William (Weineng Yu)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/NC 北加片区/SFO01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500795</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">余傲（Ao Yu）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/NC 北加片区/SMF01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500013</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">侯菲菲（Feifei Hou）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/异常处理组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502867</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">侴雅婷Taylor (Yating Chou)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H/分拣组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502301</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">傅耀辉Kris (Yaohui Fu)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/分拣组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502271</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">兰鹏Peng（Peng Lan）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/DS 丹佛·盐湖城片区/DEN.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502019</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">刘书睿Daniel (Shurui Liu)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/分拣组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501495</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">刘佳琪Maggie (Jiaqi Liu)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/运营支持部/区域支持组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500338</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">刘季阳Zoe (Jiyang Liu)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SC 南加片区/LA揽收部</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501853</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">刘家骏 Jun (Jiajun Liu)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H/分拣组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502516</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">刘庭均（Tingjun Liu）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SC 南加片区/LAX01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501485</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">刘强强（Kimi）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/WG 西大湖片区/MSN01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502458</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">刘成龙Chris (Chenglong Liu)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/维保组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501029</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">刘朝臣（Chaochen Liu）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/维保组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502518</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">刘松Liam (Song Liu)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SP 西雅图·波特兰片区/SEA01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500866</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">刘梓宸 James (Zichen Liu)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501257</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">刘祥栋 Brian (Xiangdong Liu)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/MCI01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502091</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">刘鼎威 （Dingwei Liu）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500998</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">卢鹭（Lu Lu）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/操作组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500236</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">危坦然（Tanran Wei）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SP 西雅图·波特兰片区/PDX01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500914</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">史健琦Eason（Jianqi Shi）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SP 西雅图·波特兰片区</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500184</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">史成圆Alexia (Chengyuan Shi)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500314</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">史春伟David（Chunwei Shi）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SP 西雅图·波特兰片区/SEA01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502090</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">叶珍萌Aria (Zhenmeng Ye)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500517</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">司徒群娣（Qundi Situ）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501704</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">吕晓茵 Celine (Xiaoyin Lyu)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SC 南加片区/SAN01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502587</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">吴亚玲Tina (Yaling Wu)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SP 西雅图·波特兰片区/SEA.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502490</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">吴毅 (Yi Wu)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SP 西雅图·波特兰片区/SEA.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501327</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">唐睿雯Raven (Ruiwen Tang)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502457</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">商兆军Shawn（Zhaojun Shang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/NC 北加片区/SFO.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502419</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">夏天淼 Alex（Tianmiao Xia）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/CVG.H/调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500954</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">姚尧（Yao Yao）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/分拣组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500155</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">姚约瑟Joseph（Yuese Yao）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SC 南加片区/CNO01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500833</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">姜承佑Mike（Chengyou Jiang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/维保组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502628</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">姜飞伯Jackson (Feibo Jiang)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501310</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">孙伟鹏Will（Weipeng Sun）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/IND01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501031</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">孙国瑜Tony（Guoyu Sun）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/异常处理组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501298</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">孙士皓（Shihao Sun）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/操作组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502372</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">孙皓晨Harlan（Haochen Sun）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/DS 丹佛·盐湖城片区/SLC01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500872</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">孙芃（Peng Sun）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/运营支持部/区域支持组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502261</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">宁殿龙Leo（Dianlong Ning）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/NC 北加片区/SFO.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500390</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">宋晓光David (Xiaoguang Song)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500128</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">宋智力Sheng（Zhili Song）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/NC 北加片区/SMF01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501614</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">尚青蓓 Suki （Qingbei Shang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H/综办组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500317</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">尤梦楠Yuko（Mengnan You）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/运营支持部</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501097</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">岳奕辰（Yichen Yue）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501564</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">崔飞飞Grace（Feifei Cui）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/NC 北加片区/SFO.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501604</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">干宇轩 (Yuxuan Gan)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/DS 丹佛·盐湖城片区/SLC01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502436</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">廖诗辰（Shichen Liao）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/NC 北加片区/SFO.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501012</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">廖鑫磊 Leo (Xinlei Liao)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/IND01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502148</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">张一怡 Elena (Yiyi Zhang)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H/调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500050</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">张世霞Eunice（Shixia Zhang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/合流合包组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500326</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">张传胤（Chuanyin Zhang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/分拣组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501014</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">张佩敏 Carmen （Carmen pei min Zhang)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H/调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501137</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">张利Nick（Li Zhang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/操作组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502626</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">张华Leah（Hua Zhang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/分拣组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501679</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">张可欣 Kexin (Kexin Zhang)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/运营支持部/区域支持组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501338</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">张子夜Sabrina（Ziye Zhang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/运营支持部/区域支持组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502060</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">张容 （Rong Zhang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/揽收部/揽收支持组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500946</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">张建平Grace（Jianping Zhang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/综办组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501399</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">张建辉Mario（Jianhui Zhang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502216</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">张恩泽Vincent（Enze Zhang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/运营支持部/区域支持组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500751</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">张悦Mia（Yue Zhang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501740</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">张旭 (Xu Zhang)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/LM 中西部南片区/MCI01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500211</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">张晓婉Christy（Xiaowan Zhang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SC 南加片区/LA揽收部</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501819</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">张景博 (Jingbo Zhang)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/操作组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502711</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">张林萱 Charlotte （Linxuan Zhang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502553</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">张瀚文 John （Hanwen Zhang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H/操作组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501153</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">张玉田Silvia（Yutian Zhang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/综办组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501011</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">张琪Jet（Qi Zhang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500298</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">张琳枫Arthur（Linfeng Zhang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/车辆管理部</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500459</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">张磊（Lei Zhang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/操作组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500999</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">张翠英Journey (Cuiying Zhang)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H/异常处理组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502591</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">张艺宁（Yining Zhang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SC 南加片区/HNL01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502878</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">张译心Fiona (Yixin Zhang)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SP 西雅图·波特兰片区/SEA.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502742</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">张馨匀 Zoe（Xinyun Zhang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501427</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">彭昕亮Bruce（Xinliang Peng）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/CLE01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501602</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">徐易航 Henry (Yihang Xu)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H/异常处理组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502304</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">徐绍伦Shawn (Shaolun Xu)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/WG 西大湖片区/ORD01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502256</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">徐韵蕾 Leila (Yunlei Xu)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/运营支持部/区域支持组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501093</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">恽思成Ashley（Sicheng Yun）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LA揽收部/揽收调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL000440</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">戴钰芝</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/运营支持部</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501832</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">施志鹏 Rick (Zhipeng Shi)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/MKE01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500233</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">易至聪Zac (Zhicong Yi)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/WG 西大湖片区</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502645</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">曹宇芳Sunny (Yufang Cao)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/分拣组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501222</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">朱行健 Jason (Xingjian Zhu)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H/维保组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501243</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">李万杰Tim  (Wanjie Li)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H/调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501037</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">李仲儒John（Zhongru Li）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502113</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">李佳慧Holly（Jiahui Li）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/NM 中西部北片区/STL01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502030</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">李信南 (Xinnan Li）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SC 南加片区/SAN01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502763</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">李士龙 (Shilong Li)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/WG 西大湖片区/GRR01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501326</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">李家蕙Krystal（Jiahui Li）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500676</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">李政航Ken(Zhenghang Li)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/揽收部</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501013</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">李文旭 Leo  (WENXU LI)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H/操作组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501189</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">李明Lawrence（Ming Li）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/操作组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501347</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">李步耕Ryder（Bugeng Li）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/分拣组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502282</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">李泽森Biu（Zesen Li）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SC 南加片区/LAX01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501181</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">李海洋（Haiyang Li)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/操作组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502176</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">李煜桐 Sherry （Yutong Li）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SC 南加片区/LAX01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501639</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">李爱女Amy (Ainyu)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/CVG.H/调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502215</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">李珂 Barnett (Ke Li)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H/操作组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502648</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">李睿馨Ori（Ruixin Li）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/运营支持部/区域支持组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500788</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">李翔之Benson（Benson Lee）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/操作组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502300</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">李胜君Cathy (Shengjun Li)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/分拣组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502811</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">李莹(Ying Li)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H/异常处理组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500485</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">李钟鸣Zhongming（Zhongming Li）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502573</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">杜彤Alex (Tong Du)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/CVG.H/调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502459</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">杨东旭Jessie (Dongxu Yang)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/操作组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501280</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">杨凯钦（Kaiqin Yang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/分拣组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501766</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">杨帆（Fan Yang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/操作组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501757</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">杨广斌Guangbin Yang</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SP 西雅图·波特兰片区/SEA01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501311</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">杨梓涵 Harry (Zihan Yang)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/运营支持部/区域支持组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501739</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">杨洁敏 Jeremy (Jiemin Yang)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H/调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502709</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">杨英Esther (Ying Yang)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/异常处理组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501408</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">林唯伟 Weiwei （Weiwei Lin）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/揽收部/揽收调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500352</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">林圣贤Alex（Alex Lin）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SC 南加片区/SAN01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500247</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">林美浚（Meijun Lin）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/NC 北加片区/SFO01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502156</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">柯乃嘉Nyjah（Naijia Ke）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/操作组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500848</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">柳建顺（Jianshun Liu）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/分拣组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502735</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">梁海龙Ruben (Ruben Liang Huang)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/分拣组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502545</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">梅村May（Chun Mei）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SC 南加片区/LAS01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501784</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">梅雨润 (Yurun Mei)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/合流合包组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500188</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">欧阳溢巍 Nathan (Yiwei Ouyang)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/CM 中西部中心片区</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501215</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">武子璇Zoe（Zixuan Wu）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/操作组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500091</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">武杰 Jay（Jie Wu）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/NM 中西部北片区</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501576</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">汤洁雯Angel（Jiewen Tang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/WG 西大湖片区/MKE01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502758</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">沈慧珮 Branda（Huipei Shen）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/操作组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500024</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">沈玲（Ling Shen）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/DS 丹佛·盐湖城片区/DEN01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501481</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">温宝鹰（Baoying）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/NC 北加片区/SFO.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502014</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">湛梓誉 (Ziyu Zhan)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/分拣组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501867</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">滕哲骏Tim (Zhejun Teng)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/车辆管理部</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502656</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">潘典夏Erron (Dianxia Pan)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/综办组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502440</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">潘明珠Mitzi (Mingzhu Pan)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LA揽收部/揽收调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502169</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">潘梓璇 （Zixuan Pan）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SC 南加片区/PHX01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502698</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">濮子臻Zeon (Zizhen Pu)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501714</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">焦述乾 Eureka (Shuqian Jiao)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H/分拣组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500006</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">王一凡（Yifan Wang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SP 西雅图·波特兰片区/SEA01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502736</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">王凯源 (Kaiyuan Wang)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/NM 中西部北片区/MCI01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501363</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">王叶峰yefeng（Yefeng Wang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/CMH01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501906</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">王嘉慧Jasmine (Jiahui Wang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/综办组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501357</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">王奕扬Yiyang (Yiyang Wang)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500847</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">王婷Emily（Ting Wang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/异常处理组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502453</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">王子键 Jackson（Zijian Wang)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SP 西雅图·波特兰片区/SEA.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501676</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">王建棋 Alan (Jianqi Wang)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/CM 中西部中心片区/CVG01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501821</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">王志泽Yoyo(Zhize Wang)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H/分拣组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502589</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">王成槐Richard(Chenghuai Wang)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/NC 北加片区/SFO.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502254</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">王振先Charles（Zhenxian Wang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/维保组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500235</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">王文博 Jane (Wenbo Wang)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500090</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">王欣 Henry (Xin Wang)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/MSP01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500955</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">王濮睿Rachel（Purui Wang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/NC 北加片区/SFO01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500367</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">王磊Lei（Lei Wang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SC 南加片区/LAX01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500861</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">王立彬 Martin (Martin Wang)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H/分拣组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500796</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">王艳萍（Yanping Wang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/NC 北加片区/SFO.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502793</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">王越Aubrey (Yue Wang)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H/异常处理组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500324</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">王鑫（Xin Wang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SC 南加片区/LAS01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500726</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">王雪铭Vivian（Xueming Wang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500234</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">王馨悦Wendy（Xinyue Wang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501931</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">田原Rye (Yuan Tian)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LA揽收部/揽收调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500917</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">申素然（Suran Shen）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501345</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">白悦新（Yuexin Bai）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502191</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">盖文莉Gina（Wenli Gai）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/运营支持部/区域支持组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501104</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">盛嘉楠Jenny（Jianan Sheng）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/操作组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502821</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">秦宗华David（Zonghua Qin）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/NC 北加片区/SFO.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502212</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">简圣尧Rhea (Shengyao Jian)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/WG 西大湖片区/MSN01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502548</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">缪逸舟 Kartal（Yizhou Miao）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/运营支持部/区域支持组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502058</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">罗永泰（Yongtai Luo）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/NC 北加片区/SFO.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500054</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">罗筱（Xiao Luo）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/车辆管理部</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502555</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">聂文成Winston（Wencheng Nie）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SC 南加片区/LAX01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500023</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">肖姝宸Lucy（Shuchen Xiao）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LA揽收部/揽收支持组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502146</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">肖正邦Justin (Zhengbang Xiao)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SC 南加片区/LAX01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500051</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">肖泓杰 Leo （hongjie Xiao）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/EG 东大湖片区</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500675</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">胡丹妮Danni（Danni Hu）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/车辆管理部</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501461</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">胡嘉楠 (Jianan)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/NM 中西部北片区/MSP01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501695</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">胡楠 (Nan Hu)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H/调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502584</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">舒伟明 (Weiming Shu)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/NC 北加片区/SFO.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501096</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">花玉幸Elke（Hang Ngoc Hoa）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500667</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">苏凯文（Kaiwen Su）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LA揽收部/揽收支持组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502096</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">苏博宇 Edison (Boyu Su)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/EG 东大湖片区/DTW01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502413</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">苏海日文 (Hairiwen Su)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/NC 北加片区/SFO.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502412</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">苏雁妮Rita（Yanni Su）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SC 南加片区/LAX01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500600</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">范宸瑞Carlos（Chenrui Fan）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/运营支持部/区域支持组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502308</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">莫熙荣Simon（Xirong Mo）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/WG 西大湖片区/ORD01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502400</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">蒋佩纹Klein (Peiwen Jiang)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/揽收部/揽收支持组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501046</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">蔡娜 （Lana）（Na Cai）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SC 南加片区/PHX01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501275</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">蔡钧玮 Magnus (Chun W Tsai)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/WG 西大湖片区/ORD01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502513</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">袁乐芸 (Leyun Yuan)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/揽收部/揽收支持组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502677</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">袁伟（Wei Yuan）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/NC 北加片区/SFO.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501432</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">覃超群Jessica（Chaoqun Qin）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/综办组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502700</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">许名一Danny（Mingyi Xu）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501297</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">许红（Hong Xu）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/合流合包组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502848</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">谭一鸣 Jack （Yiming Tan）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SP 西雅图·波特兰片区/SEA01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502401</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">谭元豪Alan (Yuanhao Tan)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SC 南加片区/FAT01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502259</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">费宏翔Jason（Hongxiang Fei)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/运营支持部/区域支持组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501883</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">赵悦含Hannah (Yuehan Zhao)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/综办组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500260</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">赵犇Ben（Ben Zhao）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/NC 北加片区</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501926</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">赵玥棋 (Yueqi Zhao)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SC 南加片区/LAS01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502042</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">赵蓓蓓Amber（Beibei Zhao）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/综办组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502152</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">迟海潮Harper(Haichao Chi)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/DS 丹佛·盐湖城片区/DEN.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502463</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">邓嘉纬 (Jiawei Deng)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/DS 丹佛·盐湖城片区/DEN.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500266</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">邓飞（Fei Deng）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/DS 丹佛·盐湖城片区</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500103</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">邢飞（Fei Xing）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/维保组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500248</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">邱文萍Christine（Wenping Qiu）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SC 南加片区/CNO01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501359</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">邹妍Yanny（Yan Zou）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/运营支持部/区域支持组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502171</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">郑旭雯Phoebe（Xuwen Zheng)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/分拣组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502789</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">郑江山Johnson (Jiangshan Zheng)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/分拣组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501024</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">郑雅洁Sarah （Yajie Zheng</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H/综办组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502749</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">郝宇轩Jimmy (Yuxuan Hao)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H/分拣组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501207</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">郭亚伦 Alan （Alan Quach）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H/分拣组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501871</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">郭健（Jian Guo）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/维保组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501108</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">郭岩yan（yanguo）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H/操作组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501894</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">郭春亮Michael (Chunliang Guo)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/维保组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500465</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">郭静Anna（Jing Guo）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/操作组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501339</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">金川Jullian（Chuan Jin）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501038</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">金燕Anna（Yan Jin）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/分拣组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500905</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">金赛帅Jason（Saishuai Jin）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SC 南加片区/LAX01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501384</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">钟露珍（Luzhen Zhong）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/异常处理组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500918</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">阎硕Sam（Shuo Yan）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LA揽收部/揽收调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501462</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">阿里（Ali Alsoufi）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/EG 东大湖片区/DTW01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500315</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">陆冠宇（Guanyu Lu）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/NC 北加片区/SFO01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501866</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">陆铃Cassie（Ling Lu）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/运营支持部/区域支持组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502659</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">陈华建Eric (Huajian Chen)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H/调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502621</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">陈天Tiana(Tian Chen)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/运营支持部/区域支持组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502452</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">陈家欣Kirk（Jiaxin Chen）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H/调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502654</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">陈少光（Shaoguang Chen）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/DS 丹佛·盐湖城片区/DEN.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500674</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">陈尔东 Oliver（Erdong Chen）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/WG 西大湖片区/ORD01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501965</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">陈德伦 (Delun Chen)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/操作组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502070</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">陈敏思Minsi (Minsi Chen)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H/调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500746</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">陈灿荣Cameron (Canrong Chen)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/IND01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500066</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">陈翔 Ben （Xiang Chen）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/EG 东大湖片区/CLE01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502523</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">陈舒 Sushu (Shu Chen)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/NM 中西部北片区/OMA01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500747</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">陈达强 David (Daqiang Chen)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H/调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502266</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">陈青华Lucy (Qinghua Chen)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H/异常处理组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500556</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">陳玥妡 Selina (Yueh Hsin Chen)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/运营支持部/区域支持组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501915</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">霍世行Shawn (Shihang Huo)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H/综办组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502561</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">梁景悦</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SP 西雅图·波特兰片区/SEA.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501822</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">韩潇 Jessica (Xiao Han)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/运营支持部/区域支持组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502178</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">韩雨扬（Yuyang Han）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/调度组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501939</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">韩鹏飞Frank (Pengfei Han)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/维保组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500196</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">顾强（Qiang Gu）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/维保组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502296</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">顾文杰Jack (Wenjie Gu)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/车辆管理部</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500529</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">颜家谱Jeff (Jiapu Yan)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/MCI01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501028</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">颜鲁东（Ludong Yan）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/LAV.H/合流合包组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501324</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">马学莉Sherry ( Xueli Ma)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/CM 中西部中心片区/CMH01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502574</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">马旭平Muhammad (Xuping Ma)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H/分拣组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502007</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">马显俊（Xianjun Ma）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/NC 北加片区/SFO.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501728</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">马驹Aaron（Ju Ma）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/分拣组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502405</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">马骏Ruby（Jun Ma）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/ORD.H/分拣组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501940</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">高子淳 Alex (Zichun Gao)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/CM 中西部中心片区/CVG01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500956</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">魏函栖Cici（Hanxi Wei）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/NC 北加片区/SFO01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501792</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">魏博 (Bo Wei)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/NC 北加片区/SFO.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502593</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">黄一言（Yiyan Huang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/NC 北加片区/SFO.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501631</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">黄伟杰Jeremy（Weijie Huang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/操作组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502687</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">黄兆雯Kelly (Zhaowen Huang)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/EG 东大湖片区/DTW01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502522</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">黄永杰Ricky (Yongjie Huang)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/NC 北加片区/SFO.H</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL501527</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">黄浩 (Hao Huang)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/EG 东大湖片区/DTW01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502474</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">黄满（Man Huang）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/NC 北加片区/SMF01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502556</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">黄燕宇(Yanyu Huang)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/CM 中西部中心片区/CVG01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL502657</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">黄玲Linda (Ling Huang)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/操作组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500116</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">黄翊霆 Johnny (Yiting Huang)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL 大湖大区/MKE01</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500542</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">黎泽麒Martin (Zeqi Li)</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/SC 南加片区/LA揽收部</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500193</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">黎经林Leiland（Jinglin Li）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/CNO.H/操作组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;border:1px solid #E5E5E5;">GL500316</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">齐瀚飞（Hanfei Qi）</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">WE 美西大区/运营支持部/区域支持组</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;color:#8C9097;">待确认</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
+            <td style="padding:8px;border:1px solid #E5E5E5;">—</td>
         </tr>
     </table>
   </div>
   <div class="section">
     <h2>✅ 已确认（0 人）</h2>
     <table>
-      <tr><th>工号</th><th>姓名</th><th>部门</th><th>状态</th><th>异议原因</th><th>回复时间</th></tr>
+      <tr>
+        <th>工号</th><th>姓名</th><th>部门</th><th>状态</th><th>异议原因</th><th>回复时间</th>
+      </tr>
       
     </table>
   </div>
-  <div class="updated">页面更新时间：2026/05/16 16:11　｜　数据来源：飞书考勤确认系统</div>
+
+  <div class="updated">页面更新时间：2026/05/19 14:13　｜　数据来源：飞书考勤确认系统</div>
 </div>
 </body>
 </html>
