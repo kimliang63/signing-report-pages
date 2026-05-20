@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>签字报表确认系统 - 综合看板</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js" onerror="document.write('\u003Cscript src=\x22https://unpkg.com/papaparse@5.4.1/papaparse.min.js\x22\u003E\u003C/script\u003E')"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" onerror="document.write('\u003Cscript src=\x22https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js\x22\u003E\u003C/script\u003E')"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;background:#f0f2f5;color:#333;min-height:100vh;padding:20px}
@@ -270,9 +270,8 @@ function openFilePicker(){
   fileInput.click();
 }
 document.getElementById('dropZoneV').addEventListener('click', openFilePicker);
-document.getElementById('dropZoneC').addEventListener('click', openFilePicker);
 
-['dropZoneV','dropZoneC'].forEach(id=>{
+['dropZoneV'].forEach(id=>{
   const el=document.getElementById(id);
   el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('dragover')});
   el.addEventListener('dragleave',()=>el.classList.remove('dragover'));
@@ -287,14 +286,13 @@ function loadFiles(files){
   document.getElementById('dataStatus').textContent='加载中...';
   document.getElementById('dataStatus').className='badge badge-info';
   document.getElementById('uploadLoadingV').style.display='block';
-  document.getElementById('uploadLoadingC').style.display='block';
+
   let pending = files.length;
 
   function done(){
     pending--;
     if(pending === 0){
       document.getElementById('uploadLoadingV').style.display='none';
-      document.getElementById('uploadLoadingC').style.display='none';
       document.getElementById('dataStatus').textContent='已上传';
       document.getElementById('dataStatus').className='badge badge-success';
       updateFileUI();
@@ -356,12 +354,12 @@ function updateFileUI(){
   document.getElementById('actionBarV').style.display = hasFile ? 'flex' : 'none';
   document.getElementById('actionBarC').style.display = hasFile ? 'flex' : 'none';
 
-  ['dropZoneV','dropZoneC'].forEach(id=>{
+  ['dropZoneV'].forEach(id=>{
     const el=document.getElementById(id);
     if(hasFile) el.classList.add('has-data'); else el.classList.remove('has-data');
   });
 
-  ['fileStatusV','fileStatusC'].forEach(id=>{
+  ['fileStatusV'].forEach(id=>{
     const el=document.getElementById(id);
     el.innerHTML='';
     Object.keys(state.files).forEach(name=>{
