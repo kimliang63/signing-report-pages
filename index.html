@@ -779,7 +779,7 @@ function startValidation(){
         });
 
         state.validation.data = results;
-        state._signEmp = signEmp; // save for confirmation list
+        state._signEmp = signEmp; state._signRows = signRows;
 
         // Enrich results with employee info + signing report raw data
         const signReportFields = ['考勤日期','姓名','工号','三级部门','四级部门','五级部门',
@@ -1078,10 +1078,16 @@ function buildConfirmationList(){
       dept3: emp.dept3 || '',
       dept4: emp.dept4 || '',
       dept5: emp.dept5 || '',
+      reg: emp.reg || 0,
+      ot15: emp.ot15 || 0,
+      ot20: emp.ot20 || 0,
+      home_off: emp.home_off || 0,
+      days: emp.days || [],
       count: a ? a.count : 0,
       status: a ? '待确认' : '无异常',
       rules: a ? a.rules : [],
-      errors: a ? a.errors : []
+      errors: a ? a.errors : [],
+      dailyRows: (state._signRows && state._signRows[eid]) ? state._signRows[eid].slice(0, 31) : []
     };
     delete anomalyMap[eid]; // remove handled
   });
@@ -1219,33 +1225,76 @@ const FEISHU_CONFIG = {
 function buildCardContent(emp){
   const totalPeople = state.confirmation?.rows?.length || 0;
   const dept = [emp.dept3, emp.dept4, emp.dept5].filter(Boolean).join(' / ');
-  const isClean = emp.status === '无异常';
-  const errors = emp.errors || [];
-  const rules = emp.rules || [];
-  const errorHtml = isClean ? '本周期考勤无异常' : errors.map((e, i) => '规则 '+rules[i]+': '+e).join('\\n');
+
+  // Build daily rows table (limit 15 for card size)
+  let dailyRowsText = '';
+  if(emp.dailyRows && emp.dailyRows.length){
+    const rows = emp.dailyRows.slice(0, 15);
+    dailyRowsText = rows.map(dr => {
+      const r = dr._rawRow || {};
+      const date = dr.date || '';
+      const reg = r['计薪出勤时长合计(REG)'] || r['REG'] || r['计薪出勤'] || '-';
+      const ot15 = r['OT1.5合计'] || r['OT1.5'] || '-';
+      const ot20 = r['OT2.0合计'] || r['OT2.0'] || '-';
+      return date+'  REG:'+reg+'  1.5x:'+ot15+'  2.0x:'+ot20;
+    }).join('\\n');
+    if(emp.dailyRows.length > 15) dailyRowsText += '\\n...等'+emp.dailyRows.length+'条记录';
+  }
+
+  const totalReg = typeof emp.reg === 'number' ? emp.reg.toFixed(1)+'h' : (emp.reg || '-');
+  const totalOt15 = typeof emp.ot15 === 'number' ? emp.ot15.toFixed(1)+'h' : (emp.ot15 || '-');
+  const totalOt20 = typeof emp.ot20 === 'number' ? emp.ot20.toFixed(1)+'h' : (emp.ot20 || '-');
+  const totalHome = typeof emp.home_off === 'number' ? emp.home_off.toFixed(1)+'h' : (emp.home_off || '-');
+
+  // Build body elements
+  const elements = [
+    { tag: 'div', text: { tag: 'lark_md', content: '**'+emp.name+'** ('+emp.emp_id+')\\n部门：'+dept } },
+    { tag: 'hr' },
+    { tag: 'div', text: { tag: 'lark_md', content: '📋 **考勤确认通知**' } }
+  ];
+
+  // Anomaly section if any
+  if(emp.count > 0){
+    elements.push({ tag: 'div', text: { tag: 'lark_md', content: '⚠️ 异常 **'+emp.count+'** 条\\n'+emp.errors.map((e,i)=>'['+emp.rules[i]+'] '+e).join('\\n') } });
+    elements.push({ tag: 'hr' });
+  } else {
+    elements.push({ tag: 'div', text: { tag: 'lark_md', content: '本周期考勤无异常 ✅' } });
+    elements.push({ tag: 'hr' });
+  }
+
+  // Monthly summary
+  elements.push({ tag: 'div', text: { tag: 'lark_md',
+    content: '**— 月度合计 —**\\nREG: '+totalReg+' | OT1.5: '+totalOt15+' | OT2.0: '+totalOt20+' | 居家: '+totalHome
+  }});
+
+  // Daily details
+  if(dailyRowsText){
+    elements.push({ tag: 'div', text: { tag: 'lark_md',
+      content: '**— 每日明细（最近15天） —**\\n'+dailyRowsText
+    }});
+  } else {
+    elements.push({ tag: 'div', text: { tag: 'lark_md', content: '每日明细：无签字报表明细数据' } });
+  }
+
+  elements.push({ tag: 'hr' });
+  elements.push({ tag: 'div', text: { tag: 'lark_md', content: '👥 本考勤周期共 **'+totalPeople+'** 人参与确认' } });
+  elements.push({ tag: 'div', text: { tag: 'lark_md', content: '请确认以上考勤数据是否正确。如有疑问请联系HR。' } });
+  elements.push({ tag: 'hr' });
+  elements.push({
+    tag: 'action',
+    actions: [
+      { tag: 'button', text: { tag: 'plain_text', content: '✅ 已确认' }, type: 'primary', value: { action: 'confirm', emp_id: emp.emp_id } },
+      { tag: 'button', text: { tag: 'plain_text', content: '⚠️ 有异议' }, type: 'danger', value: { action: 'object', emp_id: emp.emp_id } }
+    ]
+  });
+
   return {
     config: { wide_screen_mode: true },
     header: {
-      title: { tag: 'plain_text', content: isClean ? '✅ 考勤确认通知' : '⚠️ 考勤异常确认通知' },
-      template: isClean ? 'green' : (emp.count > 1 ? 'red' : 'yellow')
+      title: { tag: 'plain_text', content: '📋 考勤确认通知' },
+      template: 'blue'
     },
-    elements: [
-      { tag: 'div', text: { tag: 'lark_md', content: '**'+emp.name+'** ('+emp.emp_id+')' } },
-      { tag: 'div', text: { tag: 'lark_md', content: '部门：'+dept } },
-      { tag: 'div', text: { tag: 'lark_md', content: isClean ? '本周期考勤无异常，请确认' : '异常条数：**'+emp.count+'** 条' } },
-      { tag: 'hr' },
-      { tag: 'div', text: { tag: 'lark_md', content: '**'+(isClean?'确认状态：':'异常明细：')+'**\\n'+errorHtml } },
-      { tag: 'hr' },
-      { tag: 'div', text: { tag: 'lark_md', content: '👥 本考勤周期共 **'+totalPeople+'** 人参与确认' } },
-      { tag: 'hr' },
-      {
-        tag: 'action',
-        actions: [
-          { tag: 'button', text: { tag: 'plain_text', content: '✅ 已确认' }, type: 'primary', value: { action: 'confirm', emp_id: emp.emp_id } },
-          { tag: 'button', text: { tag: 'plain_text', content: '⚠️ 有异议' }, type: 'danger', value: { action: 'object', emp_id: emp.emp_id } }
-        ]
-      }
-    ]
+    elements: elements
   };
 }
 
@@ -1254,59 +1303,91 @@ function showCardPreview(eid){
   const emp = rows.find(r => r.emp_id === eid);
   if(!emp) return;
   const idx = rows.indexOf(emp);
-  const totalPeople = rows.length;
-  // Count stats
-  const clean = rows.filter(r => r.status === '无异常').length;
-  const confirmed = rows.filter(r => r.status === '已确认').length;
-  const pending = rows.filter(r => r.status === '待确认').length;
-  const objection = rows.filter(r => r.status === '有异议').length;
-  // Build card preview
+  // Build card preview - employee's signing report data only
   const overlay = document.createElement('div');
   overlay.className = 'modal-overlay';
   overlay.onclick = function(e){if(e.target===overlay) overlay.remove()};
-  // Stats card at the top
-  const statsRow =
-    '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:14px;padding:10px 14px;background:#f8f9fa;border-radius:8px;font-size:12px">'+
-    '<span style="font-weight:600;color:#333;font-size:13px">👥 '+totalPeople+'</span>'+
-    '<span class="v-divider"></span>'+
-    '<span style="color:#D9001B">⏳ 待确认 '+pending+'</span>'+
-    '<span class="v-divider"></span>'+
-    '<span style="color:#27AE60">✅ 已确认 '+confirmed+'</span>'+
-    '<span class="v-divider"></span>'+
-    '<span style="color:#E67E22">⚠️ 有异议 '+objection+'</span>'+
-    '<span class="v-divider"></span>'+
-    '<span style="color:#2ECC71">✅ 无异常 '+clean+'</span>'+
-    '</div>';
   overlay.innerHTML =
-    '<div class="modal-box" style="max-width:520px">'+
+    '<div class="modal-box" style="max-width:620px">'+
     '<button class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</button>'+
-    statsRow+
-    '<div style="font-size:14px;font-weight:600;margin-bottom:12px;color:#333">'+esc(emp.name)+' 的飞书卡片预览</div>'+
-    renderCardPreview(emp, idx)+
+    '<div style="font-size:14px;font-weight:600;margin-bottom:12px;color:#333">📨 '+esc(emp.name)+' 的考勤确认卡片预览</div>'+
+    renderCardContent(emp)+
     '</div>';
   document.body.appendChild(overlay);
 }
 
-function renderCardPreview(emp, index){
+function renderCardContent(emp){
   const dept = [emp.dept3, emp.dept4, emp.dept5].filter(Boolean).join(' / ');
   const isClean = emp.status === '无异常';
-  const errorsHtml = isClean ? '<div style="padding:6px 0;font-size:12px;color:#27AE60">本周期考勤无异常</div>'
-    : emp.errors.map((e, i) =>
-      '<div style="padding:3px 0;font-size:12px;color:#555">'+
-      '<span class="badge '+(emp.count>1?'badge-error':'badge-warning')+'" style="margin-right:4px">规则 '+emp.rules[i]+'</span>'+
-      esc(e)+'</div>'
-    ).join('');
+
+  // Build daily attendance rows from signing report data
+  let dailyHtml = '';
+  if(emp.dailyRows && emp.dailyRows.length){
+    emp.dailyRows.forEach(dr => {
+      const r = dr._rawRow || {};
+      const date = dr.date || '';
+      const reg = r['计薪出勤时长合计(REG)'] || r['REG'] || r['计薪出勤'] || '-';
+      const ot15 = r['OT1.5合计'] || r['OT1.5'] || '-';
+      const ot20 = r['OT2.0合计'] || r['OT2.0'] || '-';
+      const home_off = r['居家办公合计'] || r['居家'] || '-';
+      dailyHtml +=
+        '<div style="display:flex;gap:8px;font-size:11px;padding:3px 0;border-bottom:1px solid #f0f0f0">'+
+        '<span style="width:95px;color:#555">'+esc(date)+'</span>'+
+        '<span style="width:75px;color:#333">REG: '+esc(reg)+'</span>'+
+        '<span style="width:75px;color:#333">OT1.5: '+esc(ot15)+'</span>'+
+        '<span style="width:75px;color:#333">OT2.0: '+esc(ot20)+'</span>'+
+        '<span style="width:75px;color:#333">居家: '+esc(home_off)+'</span>'+
+        '</div>';
+    });
+  } else {
+    dailyHtml = '<div style="font-size:11px;color:#999;padding:4px 0">无签字报表明细数据</div>';
+  }
+
+  // Monthly totals
+  const totalReg = typeof emp.reg === 'number' ? emp.reg.toFixed(1) : (emp.reg || '-');
+  const totalOt15 = typeof emp.ot15 === 'number' ? emp.ot15.toFixed(1) : (emp.ot15 || '-');
+  const totalOt20 = typeof emp.ot20 === 'number' ? emp.ot20.toFixed(1) : (emp.ot20 || '-');
+  const totalHome = typeof emp.home_off === 'number' ? emp.home_off.toFixed(1) : (emp.home_off || '-');
+
   return '<div class="card-preview-item'+(isClean?' card-preview-clean':'')+'">'+
     '<div class="card-preview-header">'+
-      '<span class="badge badge-info" style="margin-right:8px">#'+(index+1)+'</span>'+
       '<strong>'+esc(emp.name)+'</strong> ('+esc(emp.emp_id)+')'+
       '<span style="margin-left:auto;font-size:12px;color:#888">'+esc(dept)+'</span>'+
     '</div>'+
     '<div class="card-preview-body">'+
-      (isClean ? '<div style="margin-bottom:4px;color:#27AE60">✅ 本周期考勤无异常</div>'
-        : '<div style="margin-bottom:4px">异常条数：<strong style="color:#D9001B">'+emp.count+'</strong> 条</div>')+
-      '<div style="border-top:1px solid #eee;padding-top:4px;margin-top:4px">'+
-        errorsHtml +
+      // Anomaly section
+      (isClean
+        ? '<div style="margin-bottom:6px;color:#27AE60;font-size:12px">✅ 本周期考勤无异常</div>'
+        : '<div style="margin-bottom:6px;font-size:12px;color:#D9001B">⚠️ 异常条数：<strong>'+emp.count+'</strong> 条</div>'+
+          '<div style="font-size:11px;margin-bottom:6px">'+
+            emp.errors.map((e, i) =>
+              '<div style="padding:2px 0"><span class="badge '+(emp.count>1?'badge-error':'badge-warning')+'" style="margin-right:4px">规则 '+emp.rules[i]+'</span>'+esc(e)+'</div>'
+            ).join('')+
+          '</div>'
+      )+
+      // Divider
+      '<div style="border-top:1px solid #eee;margin:6px 0"></div>'+
+      // Section: 签字报表明细
+      '<div style="font-size:12px;font-weight:600;color:#333;margin-bottom:4px">📋 签字报表明细</div>'+
+      '<div style="font-size:11px;color:#888;margin-bottom:4px">考勤日期范围: ' +
+        (emp.days && emp.days.length ? emp.days[0] + ' ~ ' + emp.days[emp.days.length-1] : '-') +
+      ' &middot; 共 ' + (emp.days ? emp.days.length : 0) + ' 天</div>'+
+      // Column header
+      '<div style="display:flex;gap:8px;font-size:11px;font-weight:600;color:#666;padding:3px 0;border-bottom:1px solid #ddd;margin-bottom:2px">'+
+      '<span style="width:95px">考勤日期</span>'+
+      '<span style="width:75px">REG</span>'+
+      '<span style="width:75px">OT1.5</span>'+
+      '<span style="width:75px">OT2.0</span>'+
+      '<span style="width:75px">居家</span>'+
+      '</div>'+
+      dailyHtml+
+      // Monthly total row
+      '<div style="display:flex;gap:8px;font-size:11px;font-weight:600;color:#333;padding:4px 0;border-top:2px solid #ddd;margin-top:2px">'+
+      '<span style="width:95px">📊 合计</span>'+
+      '<span style="width:75px">'+esc(totalReg)+'</span>'+
+      '<span style="width:75px">'+esc(totalOt15)+'</span>'+
+      '<span style="width:75px">'+esc(totalOt20)+'</span>'+
+      '<span style="width:75px">'+esc(totalHome)+'</span>'+
       '</div>'+
     '</div>'+
   '</div>';
@@ -1331,7 +1412,7 @@ function sendAllFeishuCards(){
   overlay.id = 'cardPreviewOverlay';
   overlay.onclick = function(e){if(e.target===overlay) overlay.remove()};
 
-  const previewCards = toSend.map((emp, i) => renderCardPreview(emp, i)).join('');
+  const previewCards = toSend.map((emp, i) => renderCardContent(emp)).join('');
 
   overlay.innerHTML =
     '<div class="modal-box" style="max-width:800px;max-height:90vh;overflow-y:auto">'+
