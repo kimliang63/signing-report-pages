@@ -100,6 +100,7 @@ tr:hover td{background:#fafbfc}
 .progress-bar .seg.success{background:#12CC7E}
 .progress-bar .seg.warning{background:#FFAA0E}
 .progress-bar .seg.danger{background:#D9001B}
+.progress-bar .seg.clean{background:#27AE60}
 .progress-labels{display:flex;justify-content:space-between;font-size:11px;color:#888;margin-top:2px}
 .empty{text-align:center;padding:30px;color:#999;font-size:13px}
 .panel{display:none}
@@ -217,6 +218,7 @@ tr:hover td{background:#fafbfc}
       <div class="stat-card green"><div class="num" id="confirmedCount">0</div><div class="label">已确认</div></div>
       <div class="stat-card orange"><div class="num" id="pendingCount">0</div><div class="label">待确认</div></div>
       <div class="stat-card red"><div class="num" id="objectionCount">0</div><div class="label">有异议</div></div>
+      <div class="stat-card" style="background:#eafaf1;border-color:#27AE60"><div class="num" id="cleanCount" style="color:#27AE60">0</div><div class="label">无异常</div></div>
     </div>
 
     <div id="progressSection" style="display:none;margin-bottom:12px">
@@ -774,6 +776,7 @@ function startValidation(){
         });
 
         state.validation.data = results;
+        state._signEmp = signEmp; // save for confirmation list
 
         // Enrich results with employee info + signing report raw data
         const signReportFields = ['考勤日期','姓名','工号','三级部门','四级部门','五级部门',
@@ -1044,28 +1047,54 @@ function buildConfirmationList(){
     return;
   }
 
-  // 从校验结果去重
-  const all = state.validation.data;
-  const empMap = {};
-  all.forEach(r => {
+  // 从签字报表获取全部员工
+  const signEmp = state._signEmp || {};
+  const allEmps = Object.keys(signEmp);
+
+  // 从校验结果统计异常
+  const anomalyMap = {};
+  state.validation.data.forEach(r => {
     const key = r.emp_id;
     if(!key) return;
-    if(!empMap[key]){
-      empMap[key] = {
-        emp_id: key,
-        name: r.name || '',
-        dept3: r.dept3 || '',
-        dept4: r.dept4 || '',
-        dept5: r.dept5 || '',
-        count: 0,
+    if(!anomalyMap[key]){
+      anomalyMap[key] = { count: 0, rules: [], errors: [] };
+    }
+    anomalyMap[key].count++;
+    anomalyMap[key].rules.push(r.rule || '未知');
+    anomalyMap[key].errors.push(r.message || r.detail || '');
+  });
+
+  // 合并：所有签字报表员工 + 有异常但不在签字报表中的员工（兜底）
+  const empMap = {};
+  allEmps.forEach(eid => {
+    const emp = signEmp[eid];
+    const a = anomalyMap[eid];
+    empMap[eid] = {
+      emp_id: eid,
+      name: emp.name || '',
+      dept3: emp.dept3 || '',
+      dept4: emp.dept4 || '',
+      dept5: emp.dept5 || '',
+      count: a ? a.count : 0,
+      status: a ? '待确认' : '无异常',
+      rules: a ? a.rules : [],
+      errors: a ? a.errors : []
+    };
+    delete anomalyMap[eid]; // remove handled
+  });
+  // 添加有异常但不在签字报表中的（兜底）
+  Object.entries(anomalyMap).forEach(([eid, a]) => {
+    if(!empMap[eid] && eid){
+      empMap[eid] = {
+        emp_id: eid,
+        name: '',
+        dept3: '', dept4: '', dept5: '',
+        count: a.count,
         status: '待确认',
-        rules: [],
-        errors: []
+        rules: a.rules,
+        errors: a.errors
       };
     }
-    empMap[key].count++;
-    empMap[key].rules.push(r.rule || '未知');
-    empMap[key].errors.push(r.message || r.detail || '');
   });
 
   state.confirmation.rows = Object.values(empMap);
@@ -1083,44 +1112,49 @@ function renderConfirmation(){
   const total = rows.length;
   const confirmed = rows.filter(r => r.status === '已确认').length;
   const objection = rows.filter(r => r.status === '有异议').length;
-  const pending = total - confirmed - objection;
+  const clean = rows.filter(r => r.status === '无异常').length;
+  const pending = total - confirmed - objection - clean;
 
   document.getElementById('totalEmp').textContent = total;
   document.getElementById('confirmedCount').textContent = confirmed;
   document.getElementById('pendingCount').textContent = pending;
   document.getElementById('objectionCount').textContent = objection;
+  document.getElementById('cleanCount').textContent = clean;
   document.getElementById('statsC').style.display = 'grid';
 
   document.getElementById('confirmBadge').textContent = pending + ' 个待确认员工';
 
   // progress bar
   const pb = document.getElementById('progressBar');
-  const pc = [confirmed/total*100, pending/total*100, objection/total*100];
-  pb.innerHTML = '<div class="seg success" style="width:'+pc[0]+'%"></div><div class="seg warning" style="width:'+pc[1]+'%"></div><div class="seg danger" style="width:'+pc[2]+'%"></div>';
+  const pc = [confirmed/total*100, pending/total*100, objection/total*100, clean/total*100];
+  pb.innerHTML = '<div class="seg success" style="width:'+pc[0]+'%"></div><div class="seg warning" style="width:'+pc[1]+'%"></div><div class="seg danger" style="width:'+pc[2]+'%"></div><div class="seg clean" style="width:'+pc[3]+'%"></div>';
   document.getElementById('progressLabels').innerHTML =
     '<span>&#9989; 已确认 '+confirmed+' ('+Math.round(pc[0])+'%)</span>'+
     '<span>&#9203; 待确认 '+pending+' ('+Math.round(pc[1])+'%)</span>'+
-    '<span>&#9888;&#65039; 有异议 '+objection+' ('+Math.round(pc[2])+'%)</span>';
+    '<span>&#9888;&#65039; 有异议 '+objection+' ('+Math.round(pc[2])+'%)</span>'+
+    '<span>&#9989; 无异常 '+clean+' ('+Math.round(pc[3])+'%)</span>';
   document.getElementById('progressSection').style.display = 'block';
 
   // table rows
   const tbody = document.getElementById('confirmTbody');
   tbody.innerHTML = rows.map(r => {
     const dept = [r.dept3, r.dept4, r.dept5].filter(Boolean).join(' / ');
-    const statusBadge = r.status === '已确认' ? 'badge-success' : r.status === '有异议' ? 'badge-error' : 'badge-pending';
-    const statusLabel = r.status === '待确认' ? '⏳ 待确认' : r.status === '已确认' ? '✅ 已确认' : '⚠️ 有异议';
-    return '<tr>'+
-      '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-weight:600">'+esc(r.emp_id)+'</td>'+
+    const isClean = r.status === '无异常';
+    const statusBadge = r.status === '已确认' ? 'badge-success' : r.status === '有异议' ? 'badge-error' : r.status === '无异常' ? 'badge-success' : 'badge-pending';
+    const statusLabel = r.status === '待确认' ? '⏳ 待确认' : r.status === '已确认' ? '✅ 已确认' : r.status === '无异常' ? '✅ 无异常' : '⚠️ 有异议';
+    const countStyle = isClean ? 'color:#27AE60' : 'color:#D9001B;font-weight:600';
+    return '<tr>'+(isClean?' style="background:#f9fff9"':'')+
+      '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-weight:600'+(isClean?';color:#27AE60':'')+'">'+esc(r.emp_id)+'</td>'+
       '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0">'+esc(r.name)+'</td>'+
       '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-size:12px;color:#666">'+esc(dept)+'</td>'+
-      '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:center;font-weight:600;color:#D9001B">'+r.count+'</td>'+
+      '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:center;'+countStyle+'">'+(isClean?'—':r.count)+'</td>'+
       '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:center"><span class="badge '+statusBadge+'">'+statusLabel+'</span></td>'+
       '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:center">'+
-        '<button class="btn btn-sm" onclick="showEmpClock(\''+esc(r.emp_id)+'\')" style="margin-right:4px">⏰ 考勤记录</button>'+
-        '<button class="btn btn-sm" onclick="showEmpErrors(\''+esc(r.emp_id)+'\')" style="margin-right:4px">📋 异常明细</button>'+
-        (r.status === '待确认' ?
-          '<button class="btn btn-sm btn-success" onclick="markConfirmed(\''+esc(r.emp_id)+'\')">✅ 标记已确认</button>' :
-          '')+
+        (isClean ? '<span style="font-size:12px;color:#27AE60">✓ 无异常，无需操作</span>' :
+          '<button class="btn btn-sm" onclick="showEmpClock(\''+esc(r.emp_id)+'\')" style="margin-right:4px">⏰ 考勤记录</button>'+
+          '<button class="btn btn-sm" onclick="showEmpErrors(\''+esc(r.emp_id)+'\')" style="margin-right:4px">📋 异常明细</button>'+
+          (r.status === '待确认' ?
+            '<button class="btn btn-sm btn-success" onclick="markConfirmed(\''+esc(r.emp_id)+'\')">✅ 标记已确认</button>' : ''))+
       '</td></tr>';
   }).join('');
 
