@@ -383,10 +383,10 @@ function clearAllData(){
 
   document.getElementById('actionBarV').style.display = 'none';
   document.getElementById('actionBarC').style.display = 'none';
-  ['dropZoneV','dropZoneC'].forEach(id=>{
+  ['dropZoneV'].forEach(id=>{
     document.getElementById(id).classList.remove('has-data');
   });
-  ['fileStatusV','fileStatusC'].forEach(id=>{
+  ['fileStatusV'].forEach(id=>{
     document.getElementById(id).innerHTML = '';
   });
   document.getElementById('statsV').innerHTML = '';
