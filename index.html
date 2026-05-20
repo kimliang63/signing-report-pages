@@ -272,9 +272,52 @@ tr:hover td{background:#fafbfc}
 const state = {
   validation: { data: [], filtered: [], page: 1, pageSize: 20, validated: false },
   confirmation: { rows: [], loaded: false },
-  files: {}
+  files: {},
+  serverUrl: 'http://localhost:8899'
 };
 const COLORS = {'R1.1':'#0E66FB','R1.2':'#0E66FB','R3':'#FFAA0E','R4':'#9C27B0','R5':'#D9001B','R6':'#E67E22','R7':'#2ECC71'};
+
+// ========== PERSISTENCE (localStorage) ==========
+function saveState(){
+  try{
+    const cpy = {
+      validation: { data: state.validation.data, filtered: [], page: 1, pageSize: state.validation.pageSize, validated: state.validation.validated },
+      confirmation: { rows: state.confirmation.rows, loaded: state.confirmation.loaded },
+      files: state.files,
+      serverUrl: state.serverUrl
+    };
+    const json = JSON.stringify(cpy);
+    // localStorage max ~5MB; if too large, skip files data
+    if(json.length > 4_000_000){
+      cpy.files = {};
+      const json2 = JSON.stringify(cpy);
+      localStorage.setItem('signing_report_state', json2);
+      localStorage.setItem('signing_report_files_keys', JSON.stringify(Object.keys(state.files)));
+      console.warn('Files data too large for localStorage, saved keys only');
+    } else {
+      localStorage.setItem('signing_report_state', json);
+      const fkeys = Object.keys(state.files);
+      localStorage.setItem('signing_report_files_keys', JSON.stringify(fkeys));
+    }
+  } catch(e){ console.warn('saveState error:', e); }
+}
+function loadState(){
+  try {
+    const raw = localStorage.getItem('signing_report_state');
+    if(!raw) return false;
+    const saved = JSON.parse(raw);
+    state.validation = saved.validation || state.validation;
+    state.confirmation = saved.confirmation || state.confirmation;
+    state.serverUrl = saved.serverUrl || state.serverUrl;
+    // Files are too large for localStorage — just restore keys
+    state.files = {};
+    const fkeys = JSON.parse(localStorage.getItem('signing_report_files_keys') || '[]');
+    fkeys.forEach(k => { state.files[k] = []; }); // empty placeholders
+    console.log('State restored from localStorage (files omitted)');
+    return true;
+  } catch(e){ console.warn('loadState error:', e); return false; }
+}
+function getServerUrl(){ return state.serverUrl || 'http://localhost:8899'; }
 
 // ========== TAB SWITCH ==========
 document.querySelectorAll('.tab').forEach(t=>{
@@ -324,6 +367,7 @@ function loadFiles(files){
       document.getElementById('dataStatus').textContent='已上传';
       document.getElementById('dataStatus').className='badge badge-success';
       updateFileUI();
+      saveState();
     }
   }
 
@@ -512,6 +556,7 @@ function startValidation(){
       document.getElementById('overviewPanel').classList.add('open');
       document.getElementById('detailPanel').classList.add('open');
       applyFilters();
+      saveState();
       return;
     }
 
@@ -1222,6 +1267,7 @@ function renderConfirmation(){
   }).join('');
 
   document.getElementById('sendAllBtn').disabled = false;
+  saveState();
 }
 
 // Helper: toggle test mode switch
@@ -1627,7 +1673,6 @@ function sendAllFeishuCards(){
     '</div>';
   document.body.appendChild(overlay);
 }
-
 function doSendFeishuCards(){
   const overlay = document.getElementById('cardPreviewOverlay');
   if(overlay) overlay.remove();
@@ -1636,153 +1681,133 @@ function doSendFeishuCards(){
   const testMode = document.getElementById('testModeSwitch') ? document.getElementById('testModeSwitch').checked : false;
   const testEmpId = testMode ? (document.getElementById('testEmpIdInline') ? document.getElementById('testEmpIdInline').value.trim() : '') : '';
 
-  // Get selected rows — ALL selected
+  // Get selected rows
   const toSend = state.confirmation.rows.filter(r => r._selected);
+  if(!toSend.length){ alert('没有要发送的员工'); return; }
 
-  // Test mode does NOT filter data — only changes who receives
-  // Logic is handled in the Python script (test_emp_id -> find_user)
-
-  // Mark all as sending (show progress)
+  // Mark all as sending
   toSend.forEach(r => { r._sendStatus = 'sending'; });
   renderConfirmation();
 
-  // Build card data for ALL selected employees
+  // Show progress overlay
+  const progressOverlay = document.createElement('div');
+  progressOverlay.className = 'modal-overlay';
+  progressOverlay.id = 'sendProgressOverlay';
+  progressOverlay.onclick = function(e){if(e.target===progressOverlay && progressOverlay.dataset.done==='1') progressOverlay.remove()};
+  progressOverlay.innerHTML =
+    '<div class="modal-box" style="max-width:500px;text-align:center">'+
+    '<h2>🚀 正在发送飞书卡片</h2>'+
+    '<div style="margin:16px 0"><div class="progress-bar-bg"><div id="sendProgressFill" class="progress-bar-fill" style="width:0%"></div></div></div>'+
+    '<div id="sendProgressText" style="font-size:13px;color:#555;margin-bottom:8px">准备中...</div>'+
+    '<div id="sendProgressDetail" style="font-size:12px;color:#999;max-height:200px;overflow-y:auto;text-align:left;background:#f8f9fa;border-radius:6px;padding:8px;margin-top:8px"></div>'+
+    '<div style="margin-top:12px"><button class="btn" id="closeSendBtn" onclick="this.closest(\\'.modal-overlay\\').remove()" style="display:none">关闭</button></div>'+
+    '</div>';
+  document.body.appendChild(progressOverlay);
+
+  // Build card data
   const cardsData = toSend.map(emp => {
     const dept = [emp.dept3, emp.dept4, emp.dept5].filter(Boolean).join(' / ');
-    const errorsRows = emp.errors.map((e, i) => '规则 '+emp.rules[i]+': '+e).join('\\n');
+    const card = buildCardContent(emp);
+    // Ensure card is an object (not a string)
     return {
-      emp_id: emp.emp_id, name: emp.name, dept: dept,
-      count: emp.count, errorsHtml: errorsRows,
-      card: buildCardContent(emp)
+      emp_id: emp.emp_id,
+      name: emp.name,
+      dept: dept,
+      count: emp.count,
+      card: card
     };
   });
 
-  const scriptData = JSON.stringify({
-    app_id: FEISHU_CONFIG.APP_ID, app_secret: FEISHU_CONFIG.APP_SECRET,
-    test_mode: testMode, test_emp_id: testEmpId,
-  });
+  const url = getServerUrl() + '/api/send';
+  const detailEl = document.getElementById('sendProgressDetail');
+  const fillEl = document.getElementById('sendProgressFill');
+  const textEl = document.getElementById('sendProgressText');
+  const closeBtn = document.getElementById('closeSendBtn');
 
-  // Generate a download of the Python script
-  const pyScript = `#!/usr/bin/env python3
-"""自动发送飞书考勤确认卡片"""
-import requests, json, sys, time
-
-CONFIG = ${scriptData}
-API_TOKEN='https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal'
-API_SEND = 'https://open.feishu.cn/open-apis/im/v1/messages?receive_id_type=open_id'
-API_USER = 'https://open.feishu.cn/open-apis/contact/v3/users'
-
-LOG = []
-
-def log_result(emp_id, name, status, msg):
-    LOG.append({'emp_id': emp_id, 'name': name, 'status': status, 'msg': msg, 'time': time.strftime('%H:%M:%S')})
-
-def get_token():
-    r = requests.post(API_TOKEN, json={'app_id': CONFIG['app_id'], 'app_secret': CONFIG['app_secret']})
-    r.raise_for_status()
-    return r.json()['tenant_access_token']
-
-def find_user(token, emp_id):
-    params = {'employee_no': emp_id}
-    r = requests.get(API_USER, headers={'Authorization': 'Bearer '+token}, params=params)
-    if r.ok:
-        data = r.json()
-        if data.get('data',{}).get('user_list'):
-            return data['data']['user_list'][0]['open_id']
-    return None
-
-def send_card(token, open_id, card_json):
-    body = {'receive_id': open_id, 'msg_type': 'interactive', 'content': card_json}
-    r = requests.post(API_SEND, headers={'Authorization': 'Bearer '+token, 'Content-Type': 'application/json'}, json=body)
-    return r.ok and r.json().get('code') == 0
-
-def main():
-    token = get_token()
-    cards = CONFIG['cards']
-    total = len(cards)
-    log_result('-', '-', 'start', f'共 {total} 张卡片{", 测试模式: "+CONFIG["test_emp_id"] if CONFIG.get("test_mode") else ""}')
-    success, fail, not_found = 0, 0, 0
-    for i, c in enumerate(cards, 1):
-        print(f'[{i}/{total}] {c["name"]} ({c["emp_id"]})...', end=' ', flush=True)
-        # Test mode: send all cards to test_emp_id instead of each card's owner
-        target_emp = CONFIG.get("test_emp_id", c['emp_id']) if CONFIG.get("test_mode") else c['emp_id']
-        open_id = find_user(token, target_emp)
-        if not open_id:
-            print('✗ 未找到用户' + (f' (收件人: {target_emp})' if target_emp != c['emp_id'] else ''))
-            log_result(c['emp_id'], c['name'], 'fail', f'未找到飞书用户 ({target_emp})')
-            not_found += 1
-            continue
-        if send_card(token, open_id, json.dumps(c['card'], ensure_ascii=False)):
-            print('✓ 已发送')
-            log_result(c['emp_id'], c['name'], 'ok', '发送成功')
-            success += 1
-        else:
-            print('✗ 发送失败')
-            log_result(c['emp_id'], c['name'], 'fail', 'API返回失败')
-            fail += 1
-    summary = f'✅ 成功 {success} | ❌ 失败 {fail} | 👤 未找到 {not_found} | 合计 {total}'
-    print('\\n' + '='*40)
-    print(summary)
-    log_result('-', '-', 'done', summary)
-    # 输出JSON日志供页面读取
-    print('\\n---RESULT_JSON---')
-    print(json.dumps(LOG, ensure_ascii=False))
-
-if __name__ == '__main__':
-    main()
-`;
-
-  // Create download link
-  const blob = new Blob([pyScript], {type: 'text/plain;charset=utf-8'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'feishu_send_cards.py';
-  a.click();
-  URL.revokeObjectURL(url);
-
-  // Show instructions
-  const resultOverlay = document.createElement('div');
-  resultOverlay.className = 'modal-overlay';
-  resultOverlay.id = 'sendResultOverlay';
-  resultOverlay.onclick = function(e){if(e.target===resultOverlay) resultOverlay.remove()};
-  const testBadge = testMode && testEmpId ? '<span style="background:#ff9800;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;margin-left:8px">🧪 仅测试：'+testEmpId+'</span>' : '';
-  resultOverlay.innerHTML =
-    '<div class="modal-box" style="max-width:600px">'+
-    '<button class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</button>'+
-    '<h2>📨 飞书卡片已就绪</h2>'+
-    '<div style="background:#f0f7ff;border-radius:6px;padding:12px;margin-bottom:12px">'+
-    '<div style="font-size:14px;font-weight:600;margin-bottom:4px">✅ 脚本已下载：feishu_send_cards.py'+testBadge+'</div>'+
-    '<div style="font-size:13px;color:#555">即将向 <strong>'+toSend.length+'</strong> 位员工发送卡片</div>'+
-    '</div>'+
-    '<div style="background:#f8f9fa;border-radius:6px;padding:12px;margin-bottom:12px">'+
-    '<div style="font-size:13px;font-weight:600;margin-bottom:6px;color:#333">📋 执行方式</div>'+
-    '<div style="font-size:12px;color:#555;line-height:1.8">'+
-    '1. 将下载的 <code style="background:#eee;padding:1px 6px;border-radius:3px">feishu_send_cards.py</code> 放到有 Python 环境的电脑上<br>'+
-    '2. 安装依赖：<code style="background:#eee;padding:1px 6px;border-radius:3px">pip install requests</code><br>'+
-    '3. 执行：<code style="background:#eee;padding:1px 6px;border-radius:3px">python3 feishu_send_cards.py</code>'+
-    '</div></div>'+
-    '<div style="margin-top:12px;display:flex;gap:8px;justify-content:center">'+
-    '<button class="btn" onclick="this.closest(\'.modal-overlay\').remove()">关闭</button>'+
-    '<button class="btn btn-success" onclick="markAllSent()">✅ 标记已发送</button>'+
-    '</div>'+
-    '</div>';
-  document.body.appendChild(resultOverlay);
-}
-
-function markAllSent(){
-  // Mark all sending employees as sent
-  const now = new Date();
-  const ts = now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
-  state.confirmation.rows.forEach(r => {
-    if(r._sendStatus === 'sending'){
-      r._sendStatus = 'ok';
-      r._sendTime = ts;
+  // Use fetch with streaming progress
+  fetch(url, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      cards: cardsData,
+      test_mode: testMode,
+      test_emp_id: testEmpId,
+      app_id: FEISHU_CONFIG.APP_ID,
+      app_secret: FEISHU_CONFIG.APP_SECRET
+    })
+  }).then(async function(res){
+    if(!res.ok) throw new Error('服务器返回 '+res.status);
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buf = '';
+    let results = [];
+    // Read the streaming JSON response
+    while(true){
+      const {done, value} = await reader.read();
+      if(done) break;
+      buf += decoder.decode(value, {stream: true});
+      // Try to parse complete JSON chunks (newline-delimited)
+      const lines = buf.split('\\n');
+      buf = lines.pop(); // keep incomplete line
+      for(const line of lines){
+        if(!line.trim()) continue;
+        try {
+          const event = JSON.parse(line);
+          if(event.type === 'progress'){
+            const pct = Math.round(event.done / event.total * 100);
+            fillEl.style.width = pct + '%';
+            textEl.textContent = event.done + '/' + event.total + ' 已发送';
+            const log = event.done === 0 ? '开始发送...' : event.last_log || '';
+            if(log) detailEl.innerHTML += '<div>' + log + '</div>';
+            detailEl.scrollTop = detailEl.scrollHeight;
+          } else if(event.type === 'done'){
+            results = event.results || [];
+          }
+        } catch(e){ /* skip partial lines */ }
+      }
     }
+    // Process remaining buffer
+    if(buf.trim()){
+      try {
+        const event = JSON.parse(buf);
+        if(event.type === 'done') results = event.results || [];
+      } catch(e){}
+    }
+    return results;
+  }).then(function(results){
+    // Update send status
+    const now = new Date();
+    const ts = now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+    let ok=0, fail=0;
+    results.forEach(r => {
+      const row = state.confirmation.rows.find(x => x.emp_id === r.emp_id);
+      if(row){
+        if(r.status === 'ok'){
+          row._sendStatus = 'ok';
+          row._sendTime = ts;
+          ok++;
+        } else {
+          row._sendStatus = 'fail';
+          row._sendTime = ts;
+          fail++;
+        }
+      }
+    });
+    renderConfirmation();
+    saveState();
+    fillEl.style.width = '100%';
+    textEl.textContent = '✅ 完成！成功 ' + ok + '，失败 ' + fail;
+    detailEl.innerHTML += '<div style="font-weight:600;color:#333;margin-top:8px">✅ 成功 ' + ok + ' | ❌ 失败 ' + fail + '</div>';
+    closeBtn.style.display = 'inline-block';
+  }).catch(function(err){
+    textEl.textContent = '❌ 发送失败：' + err.message;
+    detailEl.innerHTML += '<div style="color:#D9001B">❌ ' + err.message + '</div>';
+    closeBtn.style.display = 'inline-block';
+    // Mark all as failed
+    toSend.forEach(r => { r._sendStatus = 'fail'; });
+    renderConfirmation();
+    saveState();
   });
-  renderConfirmation();
-  const overlay = document.getElementById('sendResultOverlay');
-  if(overlay) overlay.remove();
 }
 
 function showEmpClock(eid){
@@ -1909,6 +1934,9 @@ function showEmpErrors(eid){
 }
 
 function esc(s){if(!s) return ''; const d=document.createElement('div'); d.textContent=s; return d.innerHTML;}
+
+// Restore state from localStorage on page load
+loadState();
 </script>
 </body>
 </html>
