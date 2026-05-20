@@ -1133,8 +1133,206 @@ function markConfirmed(eid){
   renderConfirmation();
 }
 
+// ========== 飞书卡片预览与发送 ==========
+const FEISHU_CONFIG = {
+  APP_ID: 'cli_aa8057da9238dccd',
+  APP_SECRET: 'WGWr25p1KK0KXu7HYDRqLeQSVepx0JlX'
+};
+
+function buildCardContent(emp){
+  // 构建飞书消息卡片内容
+  const dept = [emp.dept3, emp.dept4, emp.dept5].filter(Boolean).join(' / ');
+  const errors = emp.errors || [];
+  const rules = emp.rules || [];
+  const errorHtml = errors.map((e, i) => '规则 '+rules[i]+': '+e).join('\n');
+  return {
+    config: { wide_screen_mode: true },
+    header: {
+      title: { tag: 'plain_text', content: '⚠️ 考勤异常确认通知' },
+      template: emp.count > 1 ? 'red' : 'yellow'
+    },
+    elements: [
+      { tag: 'div', text: { tag: 'lark_md', content: '**'+emp.name+'** ('+emp.emp_id+')' } },
+      { tag: 'div', text: { tag: 'lark_md', content: '部门：'+dept } },
+      { tag: 'div', text: { tag: 'lark_md', content: '异常条数：**'+emp.count+'** 条' } },
+      { tag: 'hr' },
+      { tag: 'div', text: { tag: 'lark_md', content: '**异常明细：**\n'+errorHtml } },
+      { tag: 'hr' },
+      { tag: 'div', text: { tag: 'lark_md', content: '请点击下方按钮确认或提出异议：' } },
+      {
+        tag: 'action',
+        actions: [
+          { tag: 'button', text: { tag: 'plain_text', content: '✅ 已确认' }, type: 'primary', value: { action: 'confirm', emp_id: emp.emp_id } },
+          { tag: 'button', text: { tag: 'plain_text', content: '⚠️ 有异议' }, type: 'danger', value: { action: 'object', emp_id: emp.emp_id } }
+        ]
+      }
+    ]
+  };
+}
+
+function renderCardPreview(emp, index){
+  const dept = [emp.dept3, emp.dept4, emp.dept5].filter(Boolean).join(' / ');
+  const errorsHtml = emp.errors.map((e, i) =>
+    '<div style="padding:3px 0;font-size:12px;color:#555">'+
+    '<span class="badge '+(emp.count>1?'badge-error':'badge-warning')+'" style="margin-right:4px">规则 '+emp.rules[i]+'</span>'+
+    esc(e)+'</div>'
+  ).join('');
+  return '<div class="card-preview-item">'+
+    '<div class="card-preview-header">'+
+      '<span class="badge badge-info" style="margin-right:8px">#'+(index+1)+'</span>'+
+      '<strong>'+esc(emp.name)+'</strong> ('+esc(emp.emp_id)+')'+
+      '<span style="margin-left:auto;font-size:12px;color:#888">'+esc(dept)+'</span>'+
+    '</div>'+
+    '<div class="card-preview-body">'+
+      '<div style="margin-bottom:4px">异常条数：<strong style="color:#D9001B">'+emp.count+'</strong> 条</div>'+
+      '<div style="border-top:1px solid #eee;padding-top:4px;margin-top:4px">'+
+        errorsHtml +
+      '</div>'+
+      '<div style="border-top:1px solid #eee;margin-top:6px;padding-top:6px;display:flex;gap:8px">'+
+        '<span class="badge badge-success">✅ 已确认</span>'+
+        '<span class="badge badge-error">⚠️ 有异议</span>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+}
+
 function sendAllFeishuCards(){
-  alert('飞书卡片推送功能需要在服务端运行。\n\n已为你生成推送脚本，请在终端执行：\n\npython3 /tmp/feishu_send_cards.py');
+  const rows = state.confirmation.rows;
+  if(!rows || !rows.length){
+    alert('请先生成确认名单');
+    return;
+  }
+
+  const pending = rows.filter(r => r.status === '待确认');
+  if(!pending.length){
+    alert('所有员工已确认，无需发送');
+    return;
+  }
+
+  // --- Step 1: Show card preview modal ---
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.id = 'cardPreviewOverlay';
+  overlay.onclick = function(e){if(e.target===overlay) overlay.remove()};
+
+  const previewCards = pending.map((emp, i) => renderCardPreview(emp, i)).join('');
+
+  overlay.innerHTML =
+    '<div class="modal-box" style="max-width:800px;max-height:90vh;overflow-y:auto">'+
+    '<button class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</button>'+
+    '<h2>📨 飞书卡片预览</h2>'+
+    '<p style="font-size:13px;color:#888;margin-bottom:12px">将向 <strong>'+pending.length+'</strong> 位员工发送考勤异常确认卡片</p>'+
+    '<div id="cardPreviewList">'+previewCards+'</div>'+
+    '<div style="margin-top:16px;display:flex;gap:8px;justify-content:center">'+
+    '<button class="btn" onclick="document.getElementById(\'cardPreviewOverlay\').remove()">取消</button>'+
+    '<button class="btn btn-success" onclick="doSendFeishuCards()">🚀 确认发送 '+pending.length+' 张卡片</button>'+
+    '</div>'+
+    '</div>';
+  document.body.appendChild(overlay);
+}
+
+function doSendFeishuCards(){
+  const overlay = document.getElementById('cardPreviewOverlay');
+  if(overlay) overlay.remove();
+
+  const pending = state.confirmation.rows.filter(r => r.status === '待确认');
+
+  // Build the data JSON for the Python script
+  const cardsData = pending.map(emp => {
+    const dept = [emp.dept3, emp.dept4, emp.dept5].filter(Boolean).join(' / ');
+    const errorsRows = emp.errors.map((e, i) => '规则 '+emp.rules[i]+': '+e).join('\\n');
+    return {
+      emp_id: emp.emp_id,
+      name: emp.name,
+      dept: dept,
+      count: emp.count,
+      errorsHtml: errorsRows,
+      card: buildCardContent(emp)
+    };
+  });
+
+  const scriptData = JSON.stringify({app_id: FEISHU_CONFIG.APP_ID, app_secret: FEISHU_CONFIG.APP_SECRET, cards: cardsData});
+
+  // Generate a download of the Python script
+  const pyScript = `#!/usr/bin/env python3
+"""自动发送飞书考勤确认卡片"""
+import requests, json, sys
+
+CONFIG = ${scriptData}
+API_TOKEN = 'https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal'
+API_SEND = 'https://open.feishu.cn/open-apis/im/v1/messages?receive_id_type=open_id'
+API_USER = 'https://open.feishu.cn/open-apis/contact/v3/users'
+
+def get_token():
+    r = requests.post(API_TOKEN, json={'app_id': CONFIG['app_id'], 'app_secret': CONFIG['app_secret']})
+    r.raise_for_status()
+    return r.json()['tenant_access_token']
+
+def find_user(token, emp_id):
+    params = {'employee_no': emp_id}
+    r = requests.get(API_USER, headers={'Authorization': 'Bearer '+token}, params=params)
+    if r.ok:
+        data = r.json()
+        if data.get('data',{}).get('user_list'):
+            return data['data']['user_list'][0]['open_id']
+    return None
+
+def send_card(token, open_id, card_json):
+    body = {'receive_id': open_id, 'msg_type': 'interactive', 'content': card_json}
+    r = requests.post(API_SEND, headers={'Authorization': 'Bearer '+token, 'Content-Type': 'application/json'}, json=body)
+    return r.ok and r.json().get('code') == 0
+
+def main():
+    token = get_token()
+    cards = CONFIG['cards']
+    total = len(cards)
+    for i, c in enumerate(cards, 1):
+        print(f'[{i}/{total}] {c[\"name\"]} ({c[\"emp_id\"]})...', end=' ', flush=True)
+        open_id = find_user(token, c['emp_id'])
+        if not open_id:
+            print('✗ 未找到用户')
+            continue
+        if send_card(token, open_id, json.dumps(c['card'], ensure_ascii=False)):
+            print('✓ 已发送')
+        else:
+            print('✗ 发送失败')
+
+if __name__ == '__main__':
+    main()
+`;
+
+  // Create download link
+  const blob = new Blob([pyScript], {type: 'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'feishu_send_cards.py';
+  a.click();
+  URL.revokeObjectURL(url);
+
+  // Show instructions
+  const resultOverlay = document.createElement('div');
+  resultOverlay.className = 'modal-overlay';
+  resultOverlay.id = 'sendResultOverlay';
+  resultOverlay.onclick = function(e){if(e.target===resultOverlay) resultOverlay.remove()};
+  resultOverlay.innerHTML =
+    '<div class="modal-box" style="max-width:600px">'+
+    '<button class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</button>'+
+    '<h2>📨 飞书卡片已就绪</h2>'+
+    '<div style="background:#f0f7ff;border-radius:6px;padding:12px;margin-bottom:12px">'+
+    '<div style="font-size:14px;font-weight:600;margin-bottom:4px">✅ 脚本已下载：feishu_send_cards.py</div>'+
+    '<div style="font-size:13px;color:#555">即将向 <strong>'+pending.length+'</strong> 位员工发送卡片</div>'+
+    '</div>'+
+    '<div style="background:#f8f9fa;border-radius:6px;padding:12px;margin-bottom:12px">'+
+    '<div style="font-size:13px;font-weight:600;margin-bottom:6px;color:#333">📋 执行方式</div>'+
+    '<div style="font-size:12px;color:#555;line-height:1.8">'+
+    '1. 将下载的 <code style="background:#eee;padding:1px 6px;border-radius:3px">feishu_send_cards.py</code> 放到有 Python 环境的电脑上<br>'+
+    '2. 安装依赖：<code style="background:#eee;padding:1px 6px;border-radius:3px">pip install requests</code><br>'+
+    '3. 执行：<code style="background:#eee;padding:1px 6px;border-radius:3px">python3 feishu_send_cards.py</code>'+
+    '</div></div>'+
+    '<div style="font-size:12px;color:#888">发送后回到此页面手动标记已确认的员工状态</div>'+
+    '</div>';
+  document.body.appendChild(resultOverlay);
 }
 
 function showEmpClock(eid){
