@@ -778,10 +778,14 @@ function startValidation(){
             r.dept4 = emp.dept4;
             r.dept5 = emp.dept5;
           }
-          // Try to extract date from detail/message
+          // Try to extract date from detail/message (support both 2026-05-14 and 2026/05/14)
           if(!r.date){
-            const m = (r.detail||r.message||'').match(/\d{4}-\d{2}-\d{2}/);
-            if(m) r.date = m[0];
+            const m = (r.detail||r.message||'').match(/\d{4}[-\/]\d{2}[-\/]\d{2}/);
+            if(m) r.date = m[0].replace(/\//g,'-');
+          }
+          // Fallback: use first date from signEmp's days
+          if(!r.date && emp && emp.days && emp.days.length){
+            r.date = emp.days[0];
           }
         });
 
