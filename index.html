@@ -1152,13 +1152,13 @@ function renderConfirmation(){
       '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:center;'+countStyle+'">'+(isClean?'—':r.count)+'</td>'+
       '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:center"><span class="badge '+statusBadge+'">'+statusLabel+'</span></td>'+
       '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:center">'+
-        (isClean ? '<span style="font-size:12px;color:#27AE60">✓ 无异常，无需操作</span>' :
-          '<button class="btn btn-sm" onclick="showEmpClock(\''+esc(r.emp_id)+'\')" style="margin-right:4px">⏰ 考勤记录</button>'+
-          '<button class="btn btn-sm" onclick="showEmpErrors(\''+esc(r.emp_id)+'\')" style="margin-right:4px">📋 异常明细</button>'+
-          (r.status === '待确认' ?
-            '<button class="btn btn-sm btn-success" onclick="markConfirmed(\''+esc(r.emp_id)+'\')">✅ 标记已确认</button>' : '')+
-          (r.status === '有异议' ?
-            '<button class="btn btn-sm btn-warning" onclick="showObjectionDetail(\''+esc(r.emp_id)+'\')" style="margin-left:4px">📋 查看异议</button>' : ''))+
+        '<button class="btn btn-sm" onclick="showEmpClock(\''+esc(r.emp_id)+'\')" style="margin-right:4px">⏰ 考勤记录</button>'+
+        (isClean ? '' :
+          '<button class="btn btn-sm" onclick="showEmpErrors(\''+esc(r.emp_id)+'\')" style="margin-right:4px">📋 异常明细</button>')+
+        (r.status === '待确认' || r.status === '无异常' ?
+          '<button class="btn btn-sm btn-success" onclick="markConfirmed(\''+esc(r.emp_id)+'\')">✅ 标记已确认</button>' : '')+
+        (r.status === '有异议' ?
+          '<button class="btn btn-sm btn-warning" onclick="showObjectionDetail(\''+esc(r.emp_id)+'\')" style="margin-left:4px">📋 查看异议</button>' : '')+
       '</td></tr>';
   }).join('');
 
