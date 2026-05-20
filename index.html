@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>签字报表确认系统 - 综合看板</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;background:#f0f2f5;color:#333;min-height:100vh;padding:20px}
@@ -18,8 +19,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 .tab{padding:8px 20px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:500;color:#555;border:none;background:transparent;transition:.15s}
 .tab.active{background:#fff;color:#1a1a2e;box-shadow:0 1px 4px rgba(0,0,0,.08)}
 .tab:hover:not(.active){color:#333}
-/* upload zone */
+/* upload zone - BIG clickable card */
 .upload-zone{border:2px dashed #ccc;border-radius:10px;padding:24px;text-align:center;background:#fff;margin-bottom:16px;transition:.2s;cursor:pointer}
+.upload-zone:hover{border-color:#0E66FB;background:#f5f8ff}
 .upload-zone.dragover{border-color:#0E66FB;background:#f0f6ff}
 .upload-zone.has-data{border-color:#12CC7E;background:#f6fff9}
 .upload-zone .hint{color:#999;font-size:13px;margin-top:4px}
@@ -75,9 +77,6 @@ tr:hover td{background:#fafbfc}
 .bar-row{display:flex;align-items:center;gap:6px;margin:3px 0;font-size:12px}
 .bar-row .bar-label{width:100px;text-align:right;color:#666;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bar-row .bar-fill{height:16px;border-radius:3px;min-width:4px;transition:.3s;background:#0E66FB}
-.bar-row .bar-fill.warning{background:#FFAA0E}
-.bar-row .bar-fill.error{background:#D9001B}
-.bar-row .bar-fill.success{background:#12CC7E}
 .bar-row .bar-num{font-size:11px;color:#888;white-space:nowrap}
 /* objection */
 .obj-list{display:grid;gap:8px}
@@ -91,7 +90,7 @@ tr:hover td{background:#fafbfc}
 .progress-bar .seg.warning{background:#FFAA0E}
 .progress-bar .seg.danger{background:#D9001B}
 .progress-labels{display:flex;justify-content:space-between;font-size:11px;color:#888;margin-top:4px}
-/* hidden sections */
+/* panels */
 .panel{display:none}
 .panel.active{display:block}
 /* btn */
@@ -112,12 +111,11 @@ tr:hover td{background:#fafbfc}
   <div class="header">
     <div>
       <h1>签字报表确认系统</h1>
-      <div class="sub">综合看板 · 数据校验 + 员工确认</div>
+      <div class="sub">综合看板 &middot; 数据校验 + 员工确认</div>
     </div>
     <div style="display:flex;gap:8px;align-items:center">
       <span id="dataStatus" class="badge badge-pending">未加载数据</span>
-      <button class="btn btn-primary" onclick="document.getElementById('csvInput').click()">加载CSV数据</button>
-      <input type="file" id="csvInput" accept=".csv" multiple style="display:none" onchange="loadCSVFiles(this.files)">
+      <span id="dataCount" style="font-size:12px;color:#888"></span>
     </div>
   </div>
 
@@ -126,12 +124,15 @@ tr:hover td{background:#fafbfc}
     <button class="tab" data-panel="confirmation">员工确认</button>
   </div>
 
-  <!-- ========== PANEL 1: 数据校验 ========== -->
+  <!-- HIDDEN FILE INPUT (accepts csv/xls/xlsx) -->
+  <input type="file" id="fileInput" accept=".csv,.xls,.xlsx" multiple style="display:none">
+
+  <!-- ========== PANEL 1 ========== -->
   <div id="panel-validation" class="panel active">
-    <div class="upload-zone" id="dropZoneV">
-      <div style="font-size:24px;margin-bottom:4px">📂</div>
-      <div><strong>上传CSV数据文件</strong></div>
-      <div class="hint">点击上方"加载CSV数据"，或拖放文件到页面中</div>
+    <div class="upload-zone" id="dropZoneV" onclick="openFilePicker()">
+      <div style="font-size:32px;margin-bottom:6px">&#128451;</div>
+      <div><strong>点击此处上传数据文件</strong></div>
+      <div class="hint">支持 .csv / .xls / .xlsx，可多选 &middot; 也可拖放文件到此处</div>
     </div>
     <div class="file-status" id="fileStatusV"></div>
 
@@ -149,7 +150,7 @@ tr:hover td{background:#fafbfc}
 
     <div class="filter-bar" id="filterBarV" style="display:none">
       <select id="ruleFilter"><option value="">所有规则</option><option value="R1.2">R1.2 重复打卡</option><option value="R3">R3 加班工时偏差</option><option value="R4">R4 补签审批中</option><option value="R5">R5 REG=0有打卡</option></select>
-      <input type="text" id="searchInput" placeholder="搜索员工工号/姓名/明细...">
+      <input type="text" id="searchInput" placeholder="搜索工号/姓名/明细...">
       <span class="info" id="tableInfo">共 0 条</span>
     </div>
 
@@ -170,10 +171,10 @@ tr:hover td{background:#fafbfc}
 
   <!-- ========== PANEL 2: 员工确认 ========== -->
   <div id="panel-confirmation" class="panel">
-    <div class="upload-zone" id="dropZoneC">
-      <div style="font-size:24px;margin-bottom:4px">📂</div>
-      <div><strong>上传CSV数据文件</strong></div>
-      <div class="hint">需要"确认状态.csv"显示确认进度</div>
+    <div class="upload-zone" id="dropZoneC" onclick="openFilePicker()">
+      <div style="font-size:32px;margin-bottom:6px">&#128203;</div>
+      <div><strong>点击此处上传确认数据</strong></div>
+      <div class="hint">需要 "校验报告.csv/.xlsx" 和 "确认状态.csv/.xlsx" &middot; 可拖放</div>
     </div>
     <div class="file-status" id="fileStatusC"></div>
 
@@ -184,7 +185,7 @@ tr:hover td{background:#fafbfc}
       <div class="stat-card red"><div class="num" id="objectionCount">0</div><div class="label">有异议</div></div>
     </div>
 
-    <div style="margin-bottom:16px;display:none" id="progressSection">
+    <div id="progressSection" style="display:none;margin-bottom:16px">
       <h3 style="font-size:14px;margin-bottom:8px;color:#333">整体确认进度</h3>
       <div class="progress-bar" id="progressBar"></div>
       <div class="progress-labels" id="progressLabels"></div>
@@ -202,12 +203,10 @@ tr:hover td{background:#fafbfc}
 // ========== STATE ==========
 const state = {
   validation: { data: [], filtered: [], page: 1, pageSize: 20 },
-  confirmation: { rows: [], departments: {}, loaded: false },
+  confirmation: { rows: [], loaded: false },
   files: {}
 };
-
-const LABELS = { R1.2:'R1.2 重复打卡',R3:'R3 加班工时偏差',R4:'R4 补签审批中',R5:'R5 REG=0有打卡' };
-const COLORS = {R1.2:'#0E66FB',R3:'#FFAA0E',R4:'#9C27B0',R5:'#D9001B'};
+const COLORS = {'R1.2':'#0E66FB','R3':'#FFAA0E','R4':'#9C27B0','R5':'#D9001B'};
 
 // ========== TAB SWITCH ==========
 document.querySelectorAll('.tab').forEach(t=>{
@@ -215,9 +214,24 @@ document.querySelectorAll('.tab').forEach(t=>{
     document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
     t.classList.add('active');
     document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-    document.getElementById('panel-'+t.dataset.panel).classList.add('active');
+    const panel = document.getElementById('panel-'+t.dataset.panel);
+    if(panel) panel.classList.add('active');
   });
 });
+
+// ========== FILE INPUT ==========
+const fileInput = document.getElementById('fileInput');
+fileInput.addEventListener('change', function(e){
+  if(this.files.length) loadFiles(this.files);
+  this.value = ''; // allow re-select same file
+});
+
+function openFilePicker(){
+  fileInput.click();
+}
+// Bind click to upload zones (after potential inline-onclick failures on file://)
+document.getElementById('dropZoneV').addEventListener('click', openFilePicker);
+document.getElementById('dropZoneC').addEventListener('click', openFilePicker);
 
 // ========== DROP ZONE ==========
 ['dropZoneV','dropZoneC'].forEach(id=>{
@@ -226,43 +240,92 @@ document.querySelectorAll('.tab').forEach(t=>{
   el.addEventListener('dragleave',()=>el.classList.remove('dragover'));
   el.addEventListener('drop',e=>{
     e.preventDefault();el.classList.remove('dragover');
-    if(e.dataTransfer.files.length)loadCSVFiles(e.dataTransfer.files);
+    if(e.dataTransfer.files.length) loadFiles(e.dataTransfer.files);
   });
 });
 
-// ========== CSV LOADING ==========
-function loadCSVFiles(files){
+// ========== FILE LOADING (CSV + XLS/XLSX) ==========
+function loadFiles(files){
+  console.log('loadFiles called with', files.length, 'file(s)');
   document.getElementById('dataStatus').textContent='加载中...';
   document.getElementById('dataStatus').className='badge badge-info';
-  let pending=files.length;
-  Array.from(files).forEach(f=>{
-    const reader=new FileReader();
-    reader.onload=e=>{
-      Papa.parse(e.target.result,{header:true,complete:r=>{
-        state.files[f.name]=r.data.filter(d=>d.emp_id||Object.values(d).some(v=>v));
-        pending--;
-        if(pending===0)processLoadedData();
-      }});
-    };
-    reader.readAsText(f);
+  let pending = files.length;
+
+  function done(){
+    pending--;
+    if(pending === 0) processLoadedData();
+  }
+
+  Array.from(files).forEach(f => {
+    console.log('Processing:', f.name, f.size, 'bytes');
+    const name = f.name.toLowerCase();
+    if(name.endsWith('.csv')){
+      const reader = new FileReader();
+      reader.onload = e => {
+        Papa.parse(e.target.result, {header:true, complete: r => {
+          state.files[f.name] = r.data.filter(d => Object.values(d).some(v=>v && v.trim()));
+          done();
+        }});
+      };
+      reader.readAsText(f);
+    } else if(name.endsWith('.xls') || name.endsWith('.xlsx')){
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const wb = XLSX.read(e.target.result, {type:'array'});
+          const rows = [];
+          // Try each sheet, pick the one with most rows
+          let best = [], bestLen = 0;
+          wb.SheetNames.forEach(sn => {
+            const data = XLSX.utils.sheet_to_json(wb.Sheets[sn], {header:1, defval:''});
+            if(data.length > bestLen){
+              best = data;
+              bestLen = data.length;
+            }
+          });
+          if(best.length > 1){
+            const headers = best[0].map(h => String(h).trim());
+            for(let i=1; i<best.length; i++){
+              const row = {};
+              headers.forEach((h, idx) => { row[h] = best[i][idx] !== undefined ? String(best[i][idx]).trim() : ''; });
+              if(Object.values(row).some(v=>v)) rows.push(row);
+            }
+          }
+          state.files[f.name] = rows;
+        } catch(err) {
+          console.error('XLSX parse error:', err);
+          state.files[f.name] = [];
+        }
+        done();
+      };
+      reader.readAsArrayBuffer(f);
+    } else {
+      state.files[f.name] = [];
+      done();
+    }
   });
 }
 
 function processLoadedData(){
-  // Validation data from 校验报告.csv
-  const vf=Object.keys(state.files).find(k=>k.includes('校验报告')||k.includes('validate'));
+  console.log('processLoadedData, files:', Object.keys(state.files));
+  const vf = Object.keys(state.files).find(k => k.includes('校验报告')||k.includes('validate')||k.includes('report'));
   if(vf){
-    state.validation.data=state.files[vf].filter(r=>r.rule&&r.emp_id);
+    console.log('Found validation file:', vf);
+    state.validation.data = state.files[vf].filter(r=>r.rule&&r.emp_id);
+    console.log('Validation data rows:', state.validation.data.length);
     applyFilters();
+  } else {
+    console.log('No validation file matched');
   }
-
-  // Confirmation data from 确认状态.csv
-  const cf=Object.keys(state.files).find(k=>k.includes('确认状态')||k.includes('status'));
+  const cf = Object.keys(state.files).find(k => k.includes('确认状态')||k.includes('status')||k.includes('confirm'));
   if(cf){
-    state.confirmation.rows=state.files[cf].filter(r=>r.emp_id);
+    console.log('Found confirmation file:', cf);
+    state.confirmation.rows = state.files[cf].filter(r=>r.emp_id);
+    console.log('Confirmation rows:', state.confirmation.rows.length);
     buildConfirmation();
+  } else {
+    console.log('No confirmation file matched');
   }
-
   updateFileStatus();
   document.getElementById('dataStatus').textContent='已加载';
   document.getElementById('dataStatus').className='badge badge-success';
@@ -273,25 +336,27 @@ function updateFileStatus(){
     const el=document.getElementById(id);
     el.classList.add('has-data');
   });
-  ['fileStatusV','fileStatusC'].forEach((id,i)=>{
+  const fCount = Object.keys(state.files).length;
+  document.getElementById('dataCount').textContent = fCount + ' 个文件';
+  ['fileStatusV','fileStatusC'].forEach(id=>{
     const el=document.getElementById(id);
     el.innerHTML='';
     Object.keys(state.files).forEach(name=>{
       const div=document.createElement('div');
       div.className='file-item loaded';
-      div.innerHTML='<span class="dot"></span>'+name+' <span style="color:#888;font-size:11px">('+state.files[name].length+'行)</span>';
+      div.innerHTML='<span class="dot"></span>'+esc(name)+' <span style="color:#888;font-size:11px">('+state.files[name].length+'行)</span>';
       el.appendChild(div);
     });
   });
 }
 
-// ========== VALIDATION: FILTER + RENDER ==========
+// ========== VALIDATION ==========
 function applyFilters(){
   const rule=document.getElementById('ruleFilter').value;
   const search=document.getElementById('searchInput').value.toLowerCase();
   let data=state.validation.data;
-  if(rule)data=data.filter(r=>r.rule===rule);
-  if(search)data=data.filter(r=>(r.emp_id||'').toLowerCase().includes(search)||(r.message||'').toLowerCase().includes(search)||(r.detail||'').toLowerCase().includes(search));
+  if(rule) data=data.filter(r=>r.rule===rule);
+  if(search) data=data.filter(r=>(r.emp_id||'').toLowerCase().includes(search)||(r.message||'').toLowerCase().includes(search)||(r.detail||'').toLowerCase().includes(search));
   state.validation.filtered=data;
   state.validation.page=1;
   renderStats();
@@ -305,10 +370,10 @@ function applyFilters(){
 
 function renderStats(){
   const d=state.validation.filtered;
-  const unique=new Set(d.map(r=>r.emp_id));
+  const uniq=new Set(d.map(r=>r.emp_id));
   document.getElementById('totalWarnings').textContent=d.filter(r=>r.level==='warning').length;
   document.getElementById('totalErrors').textContent=d.filter(r=>r.level==='error').length;
-  document.getElementById('totalEmployees').textContent=unique.size;
+  document.getElementById('totalEmployees').textContent=uniq.size;
   document.getElementById('totalRecords').textContent=d.length;
   document.getElementById('statsV').style.display='grid';
 }
@@ -322,8 +387,8 @@ function renderRuleBars(){
   const max=Math.max(...Object.values(grp),1);
   Object.entries(grp).sort((a,b)=>b[1]-a[1]).forEach(([rule,cnt])=>{
     const row=document.createElement('div');row.className='bar-row';
-    const pct=(cnt/max*100);
-    row.innerHTML='<span class="bar-label">'+rule+'</span><div style="flex:1;background:#f0f0f0;border-radius:3px"><div class="bar-fill" style="width:'+pct+'%;background:'+(COLORS[rule]||'#0E66FB')+'"></div></div><span class="bar-num">'+cnt+'条</span>';
+    const pct=cnt/max*100;
+    row.innerHTML='<span class="bar-label">'+esc(rule)+'</span><div style="flex:1;background:#f0f0f0;border-radius:3px"><div class="bar-fill" style="width:'+pct+'%;background:'+(COLORS[rule]||'#0E66FB')+'"></div></div><span class="bar-num">'+cnt+'条</span>';
     el.appendChild(row);
   });
 }
@@ -340,17 +405,16 @@ function renderTable(){
   tbody.innerHTML='';
   page.forEach(r=>{
     const tr=document.createElement('tr');
-    const lvl=r.level==='error'?'badge badge-error':r.level==='warning'?'badge badge-warning':'badge badge-info';
-    tr.innerHTML='<td>'+r.rule+'</td><td>'+r.emp_id+'</td><td><span class="'+lvl+'">'+r.level+'</span></td><td>'+esc(r.message)+'</td><td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(r.detail||'')+'">'+esc((r.detail||'').substring(0,60))+'</td>';
+    const lvl=r.level==='error'?'badge badge-error':'badge badge-warning';
+    tr.innerHTML='<td>'+esc(r.rule)+'</td><td>'+esc(r.emp_id)+'</td><td><span class="'+lvl+'">'+esc(r.level)+'</span></td><td>'+esc(r.message)+'</td><td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(r.detail||'')+'">'+esc((r.detail||'').substring(0,60))+'</td>';
     tbody.appendChild(tr);
   });
-  if(!page.length)tbody.innerHTML='<tr><td colspan="5" class="empty">无匹配数据</td></tr>';
+  if(!page.length) tbody.innerHTML='<tr><td colspan="5" class="empty">无匹配数据</td></tr>';
   document.getElementById('tableInfo').textContent='共 '+d.length+' 条，显示 '+(start+1)+'-'+Math.min(start+ps,d.length);
   document.getElementById('pageInfo').textContent=p+'/'+total;
   document.getElementById('prevBtn').disabled=p<=1;
   document.getElementById('nextBtn').disabled=p>=total;
 }
-
 function prevPage(){if(state.validation.page>1){state.validation.page--;renderTable()}}
 function nextPage(){const t=Math.ceil(state.validation.filtered.length/state.validation.pageSize)||1;if(state.validation.page<t){state.validation.page++;renderTable()}}
 
@@ -361,36 +425,35 @@ document.getElementById('pageSize').addEventListener('change',renderTable);
 // ========== CONFIRMATION ==========
 function buildConfirmation(){
   const rows=state.confirmation.rows;
-  if(!rows.length)return;
+  if(!rows.length) return;
   state.confirmation.loaded=true;
 
   const total=rows.length;
   const confirmed=rows.filter(r=>r.confirm_status==='已确认'||r.confirm_status==='confirmed').length;
-  const pending=rows.filter(r=>!r.confirm_status||r.confirm_status==='待确认'||r.confirm_status==='').length;
   const objection=rows.filter(r=>r.objection_reason&&r.objection_reason.trim()).length;
-  const sent=rows.filter(r=>r.send_status==='已发送'||r.send_status==='sent').length;
+  const pending=total-confirmed-objection;
 
   document.getElementById('totalEmp').textContent=total;
   document.getElementById('confirmedCount').textContent=confirmed;
-  document.getElementById('pendingCount').textContent=total-confirmed-objection;
+  document.getElementById('pendingCount').textContent=pending;
   document.getElementById('objectionCount').textContent=objection;
   document.getElementById('statsC').style.display='grid';
 
   // Progress bar
   const pb=document.getElementById('progressBar');
-  const pcts=[confirmed/total*100,(total-confirmed-objection)/total*100,objection/total*100];
-  pb.innerHTML='<div class="seg success" style="width:'+pcts[0]+'%"></div><div class="seg warning" style="width:'+pcts[1]+'%"></div><div class="seg danger" style="width:'+pcts[2]+'%"></div>';
-  document.getElementById('progressLabels').innerHTML='<span>✅ 已确认 '+confirmed+' ('+Math.round(pcts[0])+'%)</span><span>⏳ 待确认 '+Math.round(total-confirmed-objection)+' ('+Math.round(pcts[1])+'%)</span><span>⚠️ 有异议 '+objection+' ('+Math.round(pcts[2])+'%)</span>';
+  const pc=[confirmed/total*100, pending/total*100, objection/total*100];
+  pb.innerHTML='<div class="seg success" style="width:'+pc[0]+'%"></div><div class="seg warning" style="width:'+pc[1]+'%"></div><div class="seg danger" style="width:'+pc[2]+'%"></div>';
+  document.getElementById('progressLabels').innerHTML='<span>&#9989; 已确认 '+confirmed+' ('+Math.round(pc[0])+'%)</span><span>&#9203; 待确认 '+pending+' ('+Math.round(pc[1])+'%)</span><span>&#9888;&#65039; 有异议 '+objection+' ('+Math.round(pc[2])+'%)</span>';
   document.getElementById('progressSection').style.display='block';
 
   // Department tree
   const depts={};
   rows.forEach(r=>{
     const d=r.department||'未知';
-    if(!depts[d])depts[d]={total:0,confirmed:0,pending:0,objection:0};
+    if(!depts[d]) depts[d]={total:0,confirmed:0,pending:0,objection:0};
     depts[d].total++;
-    if(r.confirm_status==='已确认')depts[d].confirmed++;
-    else if(r.objection_reason&&r.objection_reason.trim())depts[d].objection++;
+    if(r.confirm_status==='已确认') depts[d].confirmed++;
+    else if(r.objection_reason&&r.objection_reason.trim()) depts[d].objection++;
     else depts[d].pending++;
   });
   const dt=document.getElementById('deptTree');
@@ -414,11 +477,9 @@ function buildConfirmation(){
       ol.appendChild(item);
     });
   }
-
-  document.getElementById('progressSection').style.display='block';
 }
 
-function esc(s){if(!s)return '';const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+function esc(s){if(!s) return ''; const d=document.createElement('div'); d.textContent=s; return d.innerHTML;}
 </script>
 </body>
 </html>
