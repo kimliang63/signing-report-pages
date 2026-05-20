@@ -129,10 +129,11 @@ tr:hover td{background:#fafbfc}
 
   <!-- ========== PANEL 1 ========== -->
   <div id="panel-validation" class="panel active">
-    <div class="upload-zone" id="dropZoneV" onclick="openFilePicker()">
+    <div class="upload-zone" id="dropZoneV">
       <div style="font-size:32px;margin-bottom:6px">&#128451;</div>
       <div><strong>点击此处上传数据文件</strong></div>
       <div class="hint">支持 .csv / .xls / .xlsx，可多选 &middot; 也可拖放文件到此处</div>
+      <div id="loadingV" style="display:none;color:#0E66FB;margin-top:8px">&#8987; 处理中...</div>
     </div>
     <div class="file-status" id="fileStatusV"></div>
 
@@ -171,10 +172,11 @@ tr:hover td{background:#fafbfc}
 
   <!-- ========== PANEL 2: 员工确认 ========== -->
   <div id="panel-confirmation" class="panel">
-    <div class="upload-zone" id="dropZoneC" onclick="openFilePicker()">
+    <div class="upload-zone" id="dropZoneC">
       <div style="font-size:32px;margin-bottom:6px">&#128203;</div>
       <div><strong>点击此处上传确认数据</strong></div>
       <div class="hint">需要 "校验报告.csv/.xlsx" 和 "确认状态.csv/.xlsx" &middot; 可拖放</div>
+      <div id="loadingC" style="display:none;color:#0E66FB;margin-top:8px">&#8987; 处理中...</div>
     </div>
     <div class="file-status" id="fileStatusC"></div>
 
@@ -249,6 +251,9 @@ function loadFiles(files){
   console.log('loadFiles called with', files.length, 'file(s)');
   document.getElementById('dataStatus').textContent='加载中...';
   document.getElementById('dataStatus').className='badge badge-info';
+  // Show loading indicators
+  document.getElementById('loadingV').style.display='block';
+  document.getElementById('loadingC').style.display='block';
   let pending = files.length;
 
   function done(){
@@ -308,16 +313,16 @@ function loadFiles(files){
 
 function processLoadedData(){
   console.log('processLoadedData, files:', Object.keys(state.files));
-  const vf = Object.keys(state.files).find(k => k.includes('校验报告')||k.includes('validate')||k.includes('report'));
+  const vf = Object.keys(state.files).find(k => k.includes('校验')||k.includes('validate')||k.includes('check')||k.includes('report')||k.includes('检查'));
   if(vf){
     console.log('Found validation file:', vf);
-    state.validation.data = state.files[vf].filter(r=>r.rule&&r.emp_id);
+    state.validation.data = state.files[vf].filter(r=>(r.rule||r.rule_code||r['校验规则'])&&(r.emp_id||r.emp||r['员工编号']));
     console.log('Validation data rows:', state.validation.data.length);
     applyFilters();
   } else {
-    console.log('No validation file matched');
+    console.log('No validation file matched. Files:', Object.keys(state.files));
   }
-  const cf = Object.keys(state.files).find(k => k.includes('确认状态')||k.includes('status')||k.includes('confirm'));
+  const cf = Object.keys(state.files).find(k => k.includes('确认')||k.includes('状态')||k.includes('status')||k.includes('confirm'));
   if(cf){
     console.log('Found confirmation file:', cf);
     state.confirmation.rows = state.files[cf].filter(r=>r.emp_id);
@@ -329,6 +334,10 @@ function processLoadedData(){
   updateFileStatus();
   document.getElementById('dataStatus').textContent='已加载';
   document.getElementById('dataStatus').className='badge badge-success';
+  document.getElementById('loadingV').style.display='none';
+  document.getElementById('loadingC').style.display='none';
+  // Scroll to see results
+  document.querySelector('.stats')?.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 function updateFileStatus(){
