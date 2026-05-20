@@ -246,7 +246,7 @@ const state = {
   confirmation: { rows: [], loaded: false },
   files: {}
 };
-const COLORS = {'R1.1':'#0E66FB','接近卡未舍去':'#0E66FB','R3':'#FFAA0E','R4':'#9C27B0','R5':'#D9001B','R6':'#E67E22','R7':'#2ECC71'};
+const COLORS = {'R1.1':'#0E66FB','R1.2':'#0E66FB','R3':'#FFAA0E','R4':'#9C27B0','R5':'#D9001B','R6':'#E67E22','R7':'#2ECC71'};
 
 // ========== TAB SWITCH ==========
 document.querySelectorAll('.tab').forEach(t=>{
@@ -689,7 +689,7 @@ function startValidation(){
           });
           if(dupDates.length){
             const name=signEmp[eid]?signEmp[eid].name:'';
-            results.push({rule:'接近卡未舍去', emp_id:eid, level:'warning',
+            results.push({rule:'R1.2', emp_id:eid, level:'warning',
               message:'打卡重卡',
               detail:'考勤日期: ['+[...new Set(dupDates)].sort().slice(0,8).join(', ')+']（同一日打卡间隔<10分钟，共'+dupDates.length+'天）'});
           }
@@ -868,7 +868,7 @@ function renderStats(){
   // Render rule reference table
   const RULE_DEFS = [
     {rule:'R1.1', risk:'warning', desc:'周末考勤 — 周末有打卡但休假/年假未涵盖'},
-    {rule:'接近卡未舍去', risk:'warning', desc:'打卡重卡 — 同一人同一日打卡间隔<10分钟'},
+    {rule:'R1.2', risk:'warning', desc:'打卡重卡 — 同一人同一日打卡间隔<10分钟'},
     {rule:'R3', risk:'warning', desc:'加班偏差 — 签字报表OT与系统估算偏差超过5%'},
     {rule:'R4', risk:'warning', desc:'补签审批 — 补签申请尚未审批完成'},
     {rule:'R5', risk:'error', desc:'REG归零 — 计薪出勤=0但存在打卡记录'},
@@ -996,7 +996,7 @@ function showAllRules(){
   const levelMap = {};
   const descMap = {
     'R1.1':'周末考勤 — 周末有打卡但休假/年假未涵盖',
-    '接近卡未舍去':'打卡重卡 — 同一人同一日打卡间隔<10分钟',
+    'R1.2':'打卡重卡 — 同一人同一日打卡间隔<10分钟',
     'R3':'加班偏差 — 签字报表OT与系统估算偏差超过5%',
     'R4':'补签审批 — 补签申请尚未审批完成',
     'R5':'REG归零 — 计薪出勤=0但存在打卡记录',
@@ -1004,7 +1004,7 @@ function showAllRules(){
     'R7':'居家办公审批 — 居家办公审批中但签字报表未体现'
   };
   const riskMap = {
-    'R1.1':'warning','接近卡未舍去':'warning',
+    'R1.1':'warning','R1.2':'warning',
     'R3':'warning','R4':'warning','R5':'error','R6':'warning','R7':'warning'
   };
   d.forEach(r => {
@@ -1012,7 +1012,7 @@ function showAllRules(){
     hitCount[key] = (hitCount[key]||0) + 1;
     levelMap[key] = r.level;
   });
-  const allRules = ['R1.1','接近卡未舍去','R3','R4','R5','R6','R7'];
+  const allRules = ['R1.1','R1.2','R3','R4','R5','R6','R7'];
   const overlay = document.createElement('div');
   overlay.className = 'modal-overlay';
   overlay.onclick = function(e){if(e.target===overlay) overlay.remove()};
