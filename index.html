@@ -580,7 +580,7 @@ function startValidation(){
             if(dt){
               emp.days.push(dt);
               if(!signRows[eid]) signRows[eid]=[];
-              signRows[eid].push({dept3:d3||emp.dept3, dept4:d4||emp.dept4, dept5:d5||emp.dept5, date:dt});
+              signRows[eid].push({dept3:d3||emp.dept3, dept4:d4||emp.dept4, dept5:d5||emp.dept5, date:dt, _rawRow:r});
             }
           });
         }
@@ -775,7 +775,11 @@ function startValidation(){
 
         state.validation.data = results;
 
-        // Enrich results with employee info from signing report
+        // Enrich results with employee info + signing report raw data
+        const signReportFields = ['考勤日期','姓名','工号','三级部门','四级部门','五级部门',
+          '计薪出勤时长合计（REG)','REG','计薪出勤','OT1.5合计','OT1.5','OT2.0合计','OT2.0',
+          '每日总工时','每日工时','工作日出勤合计','OT0.5合计','OT0.5','居家办公合计','居家',
+          '公出合计','出差合计','休息日出勤合计','法定假出勤合计','年假合计','调休假合计','病假合计','事假合计'];
         state.validation.data.forEach(r=>{
           const emp = signEmp[r.emp_id];
           if(emp){
@@ -783,6 +787,33 @@ function startValidation(){
             r.dept3 = emp.dept3;
             r.dept4 = emp.dept4;
             r.dept5 = emp.dept5;
+            // Attach raw signing report row that matches this anomaly
+            if(r.rawData === undefined && s){
+              // Try to match by rule date or fallback to first row
+              const targetDate = r.date || '';
+              let match = null;
+              // Match by emp_id + date from signRows
+              if(signRows[r.emp_id] && signRows[r.emp_id].length){
+                // Find the row matching the target date
+                const matchedRow = signRows[r.emp_id].find(sr => targetDate && sr.date === targetDate);
+                if(matchedRow) match = matchedRow._rawRow;
+              }
+              if(!match){
+                // Fallback: find any row in s.rows for this emp
+                for(const row of s.rows){
+                  const reid = cv(row,['工号','emp_id','员工编号']).trim();
+                  if(reid === r.emp_id){ match = row; break; }
+                }
+              }
+              if(match){
+                // Build clean rawData object with key sign-report fields
+                const rd = {};
+                signReportFields.forEach(f => { if(match[f] !== undefined) rd[f] = match[f]; });
+                // Also add any other fields that exist
+                Object.keys(match).forEach(k => { if(rd[k] === undefined) rd[k] = match[k]; });
+                r.rawData = rd;
+              }
+            }
           }
           // Try to extract date from detail/message (support both 2026-05-14 and 2026/05/14)
           if(!r.date){
@@ -894,12 +925,26 @@ function renderTable(){
     const badgeClass = r.level==='error'?'badge badge-error':'badge badge-warning';
     const dept = [r.dept3||'',r.dept4||'',r.dept5||''].filter(Boolean).join(' / ');
     const detail = (r.detail||r.message||'');
+    // Build raw data snippet from signing report
+    let rawHtml = '';
+    if(r.rawData){
+      const rd = r.rawData;
+      const parts = [];
+      const keyOrder = ['考勤日期','姓名','工号','三级部门','四级部门','五级部门',
+        '计薪出勤时长合计（REG)','REG','OT1.5合计','OT1.5','OT2.0合计','OT2.0',
+        '每日总工时','居家办公合计','公出合计','出差合计','年假合计','病假合计','事假合计'];
+      keyOrder.forEach(k => {
+        if(rd[k] !== undefined && rd[k] !== '') parts.push(k+': '+rd[k]);
+      });
+      if(parts.length) rawHtml = '<div style="font-size:11px;background:#f8f9fa;padding:5px 8px;border-radius:3px;margin-bottom:3px;color:#555;line-height:1.6">📄 签字报表：<br>'+parts.join(' | ')+'</div>';
+    }
     tr.innerHTML='<td>'+esc(r.emp_id)+'</td>'+
       '<td>'+esc(r.name||'')+'</td>'+
       '<td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(dept)+'">'+esc(dept)+'</td>'+
       '<td>'+esc(r.date||'')+'</td>'+
       '<td><span class="'+badgeClass+'">'+esc(r.level)+'</span></td>'+
-      '<td style="max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(detail)+'">'+esc(detail.substring(0,80))+'</td>';
+      '<td style="max-width:300px;overflow:hidden" title="'+esc(detail)+'">'+
+        rawHtml+'<span style="font-size:12px;color:#D9001B">⚠ '+esc(detail.substring(0,120))+'</span></td>';
     tbody.appendChild(tr);
   });
   if(!page.length) tbody.innerHTML='<tr><td colspan="6" class="empty">无匹配数据</td></tr>';
@@ -1164,20 +1209,52 @@ function showEmpErrors(eid){
   const errs = all.filter(r => r.emp_id === eid);
   if(!errs.length) return alert('无异常记录');
 
+  // Collect unique rawData from all errors for this employee
+  const rawDatas = [];
+  const seen = new Set();
+  errs.forEach(r => {
+    if(r.rawData){
+      const key = JSON.stringify(r.rawData);
+      if(!seen.has(key)){ rawDatas.push(r.rawData); seen.add(key); }
+    }
+  });
+
   const overlay = document.createElement('div');
   overlay.className = 'modal-overlay';
   overlay.onclick = function(e){if(e.target===overlay) overlay.remove()};
+
+  let rawHtml = '';
+  if(rawDatas.length){
+    rawHtml = '<div style="background:#f8f9fa;padding:12px;border-radius:6px;margin-bottom:12px">'+
+      '<div style="font-weight:600;margin-bottom:8px;color:#333">📄 签字报表源数据</div>';
+    rawDatas.forEach((rd, ri) => {
+      const parts = [];
+      ['考勤日期','姓名','工号','三级部门','四级部门','五级部门',
+        '计薪出勤时长合计（REG)','REG','OT1.5合计','OT1.5','OT2.0合计','OT2.0',
+        '每日总工时','居家办公合计','公出合计','出差合计','年假合计','病假合计','事假合计'
+      ].forEach(k => {
+        if(rd[k] !== undefined && rd[k] !== '') parts.push(k+': '+rd[k]);
+      });
+      if(parts.length){
+        rawHtml += '<div style="font-size:12px;color:#555;line-height:1.6;'+(rawDatas.length>1?'margin-bottom:6px;':'')+'">'+
+          parts.join(' | ')+'</div>';
+      }
+    });
+    rawHtml += '</div>';
+  }
+
   overlay.innerHTML =
-    '<div class="modal-box">'+
+    '<div class="modal-box" style="max-width:700px">'+
     '<button class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</button>'+
     '<h2>📋 异常明细 — '+esc(eid)+'</h2>'+
+    rawHtml+
     '<table class="modal-table"><thead><tr>'+
     '<th>规则</th><th>风险</th><th>错误详情</th></tr></thead><tbody>'+
     errs.map(r =>
       '<tr>'+
       '<td style="font-weight:600">'+esc(r.rule)+'</td>'+
       '<td><span class="badge '+(r.level==='error'?'badge-error':'badge-warning')+'">'+esc(r.level)+'</span></td>'+
-      '<td style="color:#666;font-size:12px">'+esc(r.detail||r.message||'')+'</td></tr>'
+      '<td style="color:#D9001B;font-size:12px">⚠ '+esc(r.detail||r.message||'')+'</td></tr>'
     ).join('')+
     '</tbody></table></div>';
   document.body.appendChild(overlay);
