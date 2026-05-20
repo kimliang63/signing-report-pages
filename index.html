@@ -463,8 +463,8 @@ function startValidation(){
           }
           const sample = rows[0];
           const keys = Object.keys(sample);
-          const hasRule = sample.rule || sample.rule_code || sample['校验规则'];
-          const hasEmp = sample.emp_id || sample.emp || sample['员工编号'] || sample.empId;
+          const hasRule = sample.rule || sample.rule_code || sample['校验规则'] || sample['Rule'] || sample['规则'];
+          const hasEmp = sample.emp_id || sample.emp || sample['员工编号'] || sample.empId || sample['工号'] || sample['员工ID'];
           diag += '📄 [' + esc(name) + '] ' + rows.length + '行 列=[' + esc(keys.join(',')) + '] rule=' + !!hasRule + ' emp=' + !!hasEmp + '; ';
           if(hasRule && hasEmp && rows.length > maxRows){
             found = {name, rows};
@@ -474,7 +474,7 @@ function startValidation(){
         if(found){
           diag += '✅ 选 ' + esc(found.name) + '(' + found.rows.length + '行)';
           state.validation.data = found.rows.filter(r=>
-            (r.rule||r.rule_code||r['校验规则'])&&(r.emp_id||r.emp||r['员工编号']||r.empId)
+            (r.rule||r.rule_code||r['校验规则']||r['Rule']||r['规则'])&&(r.emp_id||r.emp||r['员工编号']||r.empId||r['工号']||r['员工ID'])
           );
           diag += ' → 过滤后 ' + state.validation.data.length + ' 行有效记录';
         } else {
@@ -597,7 +597,7 @@ function loadConfirmation(){
   Object.entries(state.files).forEach(([name, rows]) => {
     if(!rows || !rows.length) return;
     const sample = rows[0];
-    const hasEmp = sample.emp_id || sample.emp || sample['员工编号'];
+    const hasEmp = sample.emp_id || sample.emp || sample['员工编号'] || sample.empId || sample['工号'] || sample['员工ID'];
     const hasConfirm = sample.confirm_status || sample.send_status || sample['确认状态'];
     if(hasEmp && hasConfirm && rows.length > maxRows){
       found = {name, rows};
@@ -605,7 +605,7 @@ function loadConfirmation(){
     }
   });
   if(found){
-    state.confirmation.rows = found.rows.filter(r=>r.emp_id||r.emp||r['员工编号']);
+    state.confirmation.rows = found.rows.filter(r=>r.emp_id||r.emp||r['员工编号']||r.empId||r['工号']||r['员工ID']);
     state.confirmation.loaded = true;
     buildConfirmation();
   } else {
