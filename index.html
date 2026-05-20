@@ -1595,12 +1595,20 @@ function sendAllFeishuCards(){
     return;
   }
 
-  // Check test mode — note: preview still shows ALL selected employees
-  // Test mode only affects which employee actually receives the cards
+  // Test mode: preview only shows the test employee's card
   const testMode = document.getElementById('testModeSwitch') ? document.getElementById('testModeSwitch').checked : false;
   const testEmpId = testMode ? (document.getElementById('testEmpIdInline') ? document.getElementById('testEmpIdInline').value.trim() : '') : '';
 
-  const finalToSend = toSend;
+  let finalToSend = toSend;
+  if(testMode && testEmpId){
+    const match = toSend.filter(r => r.emp_id === testEmpId);
+    if(match.length > 0){
+      finalToSend = match;
+    } else {
+      alert('测试模式：勾选的员工中未找到工号为「'+testEmpId+'」的员工');
+      return;
+    }
+  }
   const testModeLabel = testMode && testEmpId ? ' 🧪 测试模式：仅发送给 <strong>'+testEmpId+'</strong>' : '';
 
   // --- Step 1: Show card preview modal ---
@@ -1635,12 +1643,12 @@ function doSendFeishuCards(){
   const testEmpId = testMode ? (document.getElementById('testEmpIdInline') ? document.getElementById('testEmpIdInline').value.trim() : '') : '';
 
   // Get selected rows — ALL selected, test mode doesn't filter data
-  const toSend = state.confirmation.rows.filter(r => r._selected);
+  let toSend = state.confirmation.rows.filter(r => r._selected);
 
+  // Test mode: filter toSend to only the test employee
   if(testMode && testEmpId){
-    // Check that the test emp is in the selection
-    const hasTestEmp = toSend.some(r => r.emp_id === testEmpId);
-    if(!hasTestEmp){
+    toSend = toSend.filter(r => r.emp_id === testEmpId);
+    if(toSend.length === 0){
       alert('测试模式：勾选的员工中未找到工号为「'+testEmpId+'」的员工');
       return;
     }
