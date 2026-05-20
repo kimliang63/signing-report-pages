@@ -1372,19 +1372,12 @@ function buildCardContent(emp){
       const r = dr._rawRow || {};
       const date = dr.date || '';
       const clocks = punchByDate[date] || [];
-      const clockStr = clocks.length ? clocks.map(c=>c.slice(11,16)).join(', ') : '—';
-      const reg = r['计薪出勤时长合计(REG)'] || r['REG'] || r['计薪出勤'] || '-';
-      const ot15 = r['OT1.5合计'] || r['OT1.5'] || '-';
-      const ot20 = r['OT2.0合计'] || r['OT2.0'] || '-';
-      return date+'  '+clockStr+'  REG:'+reg+'  1.5x:'+ot15+'  2.0x:'+ot20;
+      // Full datetime format: 2026/05/11 13:01:06, 2026/05/11 08:30:02
+      const clockStr = clocks.length ? clocks.map(c=>c.replace(/-/g,'/')).join(', ') : '—';
+      return date+'    '+clockStr;
     }).join('\\n');
     if(emp.dailyRows.length > 15) dailyRowsText += '\\n...等'+emp.dailyRows.length+'条记录';
   }
-
-  const totalReg = typeof emp.reg === 'number' ? emp.reg.toFixed(1)+'h' : (emp.reg || '-');
-  const totalOt15 = typeof emp.ot15 === 'number' ? emp.ot15.toFixed(1)+'h' : (emp.ot15 || '-');
-  const totalOt20 = typeof emp.ot20 === 'number' ? emp.ot20.toFixed(1)+'h' : (emp.ot20 || '-');
-  const totalHome = typeof emp.home_off === 'number' ? emp.home_off.toFixed(1)+'h' : (emp.home_off || '-');
 
   // Build attendance process modules
   let moduleText = '';
@@ -1420,29 +1413,15 @@ function buildCardContent(emp){
 
   // Build body elements
   const elements = [
-    { tag: 'div', text: { tag: 'lark_md', content: '**'+esc(emp.name)+'** ('+emp.emp_id+')\\n部门：'+dept } },
+    { tag: 'div', text: { tag: 'lark_md', content: '**'+esc(emp.name)+'** ('+emp.emp_id+')\n部门：'+dept } },
     { tag: 'hr' },
     { tag: 'div', text: { tag: 'lark_md', content: '📋 **考勤确认通知**' } }
   ];
 
-  // Anomaly section if any
-  if(emp.count > 0){
-    elements.push({ tag: 'div', text: { tag: 'lark_md', content: '⚠️ 异常 **'+emp.count+'** 条\\n'+emp.errors.map((e,i)=>'['+emp.rules[i]+'] '+e).join('\\n') } });
-    elements.push({ tag: 'hr' });
-  } else {
-    elements.push({ tag: 'div', text: { tag: 'lark_md', content: '本周期考勤无异常 ✅' } });
-    elements.push({ tag: 'hr' });
-  }
-
-  // Monthly summary
-  elements.push({ tag: 'div', text: { tag: 'lark_md',
-    content: '**— 月度合计 —**\\nREG: '+totalReg+' | OT1.5: '+totalOt15+' | OT2.0: '+totalOt20+' | 居家: '+totalHome
-  }});
-
-  // Daily details with clock times
+  // Daily details with clock times — only date + full clock times (no REG/OT)
   if(dailyRowsText){
     elements.push({ tag: 'div', text: { tag: 'lark_md',
-      content: '**— 每日明细（最近15天） —**\\n'+dailyRowsText
+      content: dailyRowsText
     }});
   } else {
     elements.push({ tag: 'div', text: { tag: 'lark_md', content: '每日明细：无签字报表明细数据' } });
@@ -1509,38 +1488,24 @@ function renderCardContent(emp){
     });
   }
 
-  // Build daily attendance rows with clock times
+  // Build daily attendance rows with clock times — only date + full clock times
   let dailyHtml = '';
   if(emp.dailyRows && emp.dailyRows.length){
     emp.dailyRows.forEach(dr => {
       const r = dr._rawRow || {};
       const date = dr.date || '';
-      // Get clock times for this date
+      // Get clock times for this date — full datetime format
       const clocks = punchByDate[date] || [];
-      const clockStr = clocks.length ? clocks.join(', ') : '—';
-      const reg = r['计薪出勤时长合计(REG)'] || r['REG'] || r['计薪出勤'] || '-';
-      const ot15 = r['OT1.5合计'] || r['OT1.5'] || '-';
-      const ot20 = r['OT2.0合计'] || r['OT2.0'] || '-';
-      const home_off = r['居家办公合计'] || r['居家'] || '-';
+      const clockStr = clocks.length ? clocks.map(c=>c.replace(/-/g,'/')).join(', ') : '—';
       dailyHtml +=
         '<tr>'+
         '<td style="padding:2px 4px;white-space:nowrap;color:#555">'+esc(date)+'</td>'+
-        '<td style="padding:2px 4px;white-space:nowrap;color:#333;font-family:monospace;font-size:10px">'+esc(clockStr)+'</td>'+
-        '<td style="padding:2px 4px;text-align:right">'+esc(reg)+'</td>'+
-        '<td style="padding:2px 4px;text-align:right">'+esc(ot15)+'</td>'+
-        '<td style="padding:2px 4px;text-align:right">'+esc(ot20)+'</td>'+
-        '<td style="padding:2px 4px;text-align:right">'+esc(home_off)+'</td>'+
+        '<td style="padding:2px 4px;white-space:nowrap;color:#333;font-family:monospace;font-size:11px">'+esc(clockStr)+'</td>'+
         '</tr>';
     });
   } else {
-    dailyHtml = '<tr><td colspan="6" style="padding:6px;color:#999;text-align:center">无签字报表明细数据</td></tr>';
+    dailyHtml = '<tr><td colspan="2" style="padding:6px;color:#999;text-align:center">无签字报表明细数据</td></tr>';
   }
-
-  // Monthly totals
-  const totalReg = typeof emp.reg === 'number' ? emp.reg.toFixed(1) : (emp.reg || '-');
-  const totalOt15 = typeof emp.ot15 === 'number' ? emp.ot15.toFixed(1) : (emp.ot15 || '-');
-  const totalOt20 = typeof emp.ot20 === 'number' ? emp.ot20.toFixed(1) : (emp.ot20 || '-');
-  const totalHome = typeof emp.home_off === 'number' ? emp.home_off.toFixed(1) : (emp.home_off || '-');
 
   // Build leave module
   let leaveHtml = '';
@@ -1584,16 +1549,6 @@ function renderCardContent(emp){
       '<span style="margin-left:auto;font-size:12px;color:#888">'+esc(dept)+'</span>'+
     '</div>'+
     '<div class="card-preview-body">'+
-      // Anomaly section
-      (isClean
-        ? '<div style="margin-bottom:8px;color:#27AE60;font-size:12px">✅ 本周期考勤无异常</div>'
-        : '<div style="margin-bottom:6px;font-size:12px;color:#D9001B">⚠️ 异常条数：<strong>'+emp.count+'</strong> 条</div>'+
-          '<div style="font-size:11px;margin-bottom:8px">'+
-            emp.errors.map((e, i) =>
-              '<div style="padding:2px 0"><span class="badge '+(emp.count>1?'badge-error':'badge-warning')+'" style="margin-right:4px">规则 '+emp.rules[i]+'</span>'+esc(e)+'</div>'
-            ).join('')+
-          '</div>'
-      )+
       // Section: 签字报表明细（含打卡时间）
       '<div class="card-section-title">📋 签字报表明细</div>'+
       '<div style="font-size:11px;color:#888;margin-bottom:4px">考勤日期范围: ' +
@@ -1603,20 +1558,9 @@ function renderCardContent(emp){
       '<thead><tr>'+
       '<th style="text-align:left;padding:3px 4px;border-bottom:1px solid #ddd">考勤日期</th>'+
       '<th style="text-align:left;padding:3px 4px;border-bottom:1px solid #ddd">打卡时间</th>'+
-      '<th style="text-align:right;padding:3px 4px;border-bottom:1px solid #ddd">REG</th>'+
-      '<th style="text-align:right;padding:3px 4px;border-bottom:1px solid #ddd">OT1.5</th>'+
-      '<th style="text-align:right;padding:3px 4px;border-bottom:1px solid #ddd">OT2.0</th>'+
-      '<th style="text-align:right;padding:3px 4px;border-bottom:1px solid #ddd">居家</th>'+
       '</tr></thead><tbody>'+
       dailyHtml+
-      '</tbody>'+
-      '<tfoot><tr style="font-weight:600;border-top:2px solid #ddd">'+
-      '<td style="padding:4px">📊 合计</td><td></td>'+
-      '<td style="text-align:right">'+esc(totalReg)+'</td>'+
-      '<td style="text-align:right">'+esc(totalOt15)+'</td>'+
-      '<td style="text-align:right">'+esc(totalOt20)+'</td>'+
-      '<td style="text-align:right">'+esc(totalHome)+'</td>'+
-      '</tr></tfoot></table>'+
+      '</tbody></table>'+
 
       // Other attendance modules
       (leaveHtml ? '<div style="border-top:1px solid #eee;margin:10px 0"></div>'+leaveHtml : '')+
