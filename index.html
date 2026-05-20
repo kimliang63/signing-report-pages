@@ -1595,21 +1595,15 @@ function sendAllFeishuCards(){
     return;
   }
 
-  // Test mode: preview only shows the test employee's card
+  // Test mode: show all selected cards, preview normally
+  // Test mode ONLY changes who receives — not what data is shown
   const testMode = document.getElementById('testModeSwitch') ? document.getElementById('testModeSwitch').checked : false;
   const testEmpId = testMode ? (document.getElementById('testEmpIdInline') ? document.getElementById('testEmpIdInline').value.trim() : '') : '';
 
-  let finalToSend = toSend;
-  if(testMode && testEmpId){
-    const match = toSend.filter(r => r.emp_id === testEmpId);
-    if(match.length > 0){
-      finalToSend = match;
-    } else {
-      alert('测试模式：勾选的员工中未找到工号为「'+testEmpId+'」的员工');
-      return;
-    }
-  }
-  const testModeLabel = testMode && testEmpId ? ' 🧪 测试模式：仅发送给 <strong>'+testEmpId+'</strong>' : '';
+  const finalToSend = toSend;
+  const testModeLabel = testMode && testEmpId
+    ? ' 🧪 测试模式：所有卡片全部发送给 <strong>'+testEmpId+'</strong>'
+    : '';
 
   // --- Step 1: Show card preview modal ---
   const overlay = document.createElement('div');
@@ -1642,17 +1636,11 @@ function doSendFeishuCards(){
   const testMode = document.getElementById('testModeSwitch') ? document.getElementById('testModeSwitch').checked : false;
   const testEmpId = testMode ? (document.getElementById('testEmpIdInline') ? document.getElementById('testEmpIdInline').value.trim() : '') : '';
 
-  // Get selected rows — ALL selected, test mode doesn't filter data
-  let toSend = state.confirmation.rows.filter(r => r._selected);
+  // Get selected rows — ALL selected
+  const toSend = state.confirmation.rows.filter(r => r._selected);
 
-  // Test mode: filter toSend to only the test employee
-  if(testMode && testEmpId){
-    toSend = toSend.filter(r => r.emp_id === testEmpId);
-    if(toSend.length === 0){
-      alert('测试模式：勾选的员工中未找到工号为「'+testEmpId+'」的员工');
-      return;
-    }
-  }
+  // Test mode does NOT filter data — only changes who receives
+  // Logic is handled in the Python script (test_emp_id -> find_user)
 
   // Mark all as sending (show progress)
   toSend.forEach(r => { r._sendStatus = 'sending'; });
@@ -1671,6 +1659,7 @@ function doSendFeishuCards(){
 
   const scriptData = JSON.stringify({
     app_id: FEISHU_CONFIG.APP_ID, app_secret: FEISHU_CONFIG.APP_SECRET,
+    test_mode: testMode, test_emp_id: testEmpId,
   });
 
   // Generate a download of the Python script
@@ -1715,10 +1704,12 @@ def main():
     success, fail, not_found = 0, 0, 0
     for i, c in enumerate(cards, 1):
         print(f'[{i}/{total}] {c["name"]} ({c["emp_id"]})...', end=' ', flush=True)
-        open_id = find_user(token, c['emp_id'])
+        # Test mode: send all cards to test_emp_id instead of each card's owner
+        target_emp = CONFIG.get("test_emp_id", c['emp_id']) if CONFIG.get("test_mode") else c['emp_id']
+        open_id = find_user(token, target_emp)
         if not open_id:
-            print('✗ 未找到用户')
-            log_result(c['emp_id'], c['name'], 'fail', '未找到飞书用户')
+            print('✗ 未找到用户' + (f' (收件人: {target_emp})' if target_emp != c['emp_id'] else ''))
+            log_result(c['emp_id'], c['name'], 'fail', f'未找到飞书用户 ({target_emp})')
             not_found += 1
             continue
         if send_card(token, open_id, json.dumps(c['card'], ensure_ascii=False)):
