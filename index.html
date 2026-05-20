@@ -107,6 +107,7 @@ tr:hover td{background:#fafbfc}
 .panel.active{display:block}
 .v-divider{width:1px;height:20px;background:#ddd;margin:0 4px}
 .btn-sm{padding:5px 12px;font-size:12px}
+.row-clean{background:#f9fff9}
 .btn-warning{background:#E67E22;color:#fff;border-color:#E67E22}
 .btn-warning:hover{background:#D35400}
 /* modal */
@@ -1124,7 +1125,7 @@ function renderConfirmation(){
   document.getElementById('cleanCount').textContent = clean;
   document.getElementById('statsC').style.display = 'grid';
 
-  document.getElementById('confirmBadge').innerHTML = '👥 共 <strong>'+total+'</strong> 人 · 待确认 <strong>'+pending+'</strong> 人 · 已确认 <strong>'+confirmed+'</strong> 人 · 有异议 <strong>'+objection+'</strong> 人 · 无异常 <strong>'+clean+'</strong> 人';
+  document.getElementById('confirmBadge').innerHTML = '👥 共 <strong>'+total+'</strong> 人（签字报表总人数） · 待确认 <strong>'+pending+'</strong> 人 · 已确认 <strong>'+confirmed+'</strong> 人 · 有异议 <strong>'+objection+'</strong> 人 · 无异常 <strong>'+clean+'</strong> 人';
 
   // progress bar
   const pb = document.getElementById('progressBar');
@@ -1145,7 +1146,8 @@ function renderConfirmation(){
     const statusBadge = r.status === '已确认' ? 'badge-success' : r.status === '有异议' ? 'badge-error' : r.status === '无异常' ? 'badge-success' : 'badge-pending';
     const statusLabel = r.status === '待确认' ? '⏳ 待确认' : r.status === '已确认' ? '✅ 已确认' : r.status === '无异常' ? '✅ 无异常' : '⚠️ 有异议';
     const countStyle = isClean ? 'color:#27AE60' : 'color:#D9001B;font-weight:600';
-    return '<tr>'+(isClean?' style="background:#f9fff9"':'')+
+    const cleanClass = isClean ? 'row-clean' : '';
+    return '<tr class="'+cleanClass+'">'+
       '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-weight:600'+(isClean?';color:#27AE60':'')+'">'+esc(r.emp_id)+'</td>'+
       '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0">'+esc(r.name)+'</td>'+
       '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-size:12px;color:#666">'+esc(dept)+'</td>'+
@@ -1159,6 +1161,7 @@ function renderConfirmation(){
           '<button class="btn btn-sm btn-success" onclick="markConfirmed(\''+esc(r.emp_id)+'\')">✅ 标记已确认</button>' : '')+
         (r.status === '有异议' ?
           '<button class="btn btn-sm btn-warning" onclick="showObjectionDetail(\''+esc(r.emp_id)+'\')" style="margin-left:4px">📋 查看异议</button>' : '')+
+        '<button class="btn btn-sm" onclick="showCardPreview(\''+esc(r.emp_id)+'\')" style="margin-left:4px">📨 卡片预览</button>'+
       '</td></tr>';
   }).join('');
 
@@ -1214,7 +1217,7 @@ const FEISHU_CONFIG = {
 };
 
 function buildCardContent(emp){
-  // 构建飞书消息卡片内容
+  const totalPeople = state.confirmation?.rows?.length || 0;
   const dept = [emp.dept3, emp.dept4, emp.dept5].filter(Boolean).join(' / ');
   const isClean = emp.status === '无异常';
   const errors = emp.errors || [];
@@ -1233,7 +1236,8 @@ function buildCardContent(emp){
       { tag: 'hr' },
       { tag: 'div', text: { tag: 'lark_md', content: '**'+(isClean?'确认状态：':'异常明细：')+'**\\n'+errorHtml } },
       { tag: 'hr' },
-      { tag: 'div', text: { tag: 'lark_md', content: '请点击下方按钮确认或提出异议：' } },
+      { tag: 'div', text: { tag: 'lark_md', content: '👥 本考勤周期共 **'+totalPeople+'** 人参与确认' } },
+      { tag: 'hr' },
       {
         tag: 'action',
         actions: [
@@ -1243,6 +1247,44 @@ function buildCardContent(emp){
       }
     ]
   };
+}
+
+function showCardPreview(eid){
+  const rows = state.confirmation?.rows || [];
+  const emp = rows.find(r => r.emp_id === eid);
+  if(!emp) return;
+  const idx = rows.indexOf(emp);
+  const totalPeople = rows.length;
+  // Count stats
+  const clean = rows.filter(r => r.status === '无异常').length;
+  const confirmed = rows.filter(r => r.status === '已确认').length;
+  const pending = rows.filter(r => r.status === '待确认').length;
+  const objection = rows.filter(r => r.status === '有异议').length;
+  // Build card preview
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.onclick = function(e){if(e.target===overlay) overlay.remove()};
+  // Stats card at the top
+  const statsRow =
+    '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:14px;padding:10px 14px;background:#f8f9fa;border-radius:8px;font-size:12px">'+
+    '<span style="font-weight:600;color:#333;font-size:13px">👥 '+totalPeople+'</span>'+
+    '<span class="v-divider"></span>'+
+    '<span style="color:#D9001B">⏳ 待确认 '+pending+'</span>'+
+    '<span class="v-divider"></span>'+
+    '<span style="color:#27AE60">✅ 已确认 '+confirmed+'</span>'+
+    '<span class="v-divider"></span>'+
+    '<span style="color:#E67E22">⚠️ 有异议 '+objection+'</span>'+
+    '<span class="v-divider"></span>'+
+    '<span style="color:#2ECC71">✅ 无异常 '+clean+'</span>'+
+    '</div>';
+  overlay.innerHTML =
+    '<div class="modal-box" style="max-width:520px">'+
+    '<button class="modal-close" onclick="this.closest(\\'.modal-overlay\\').remove()">&times;</button>'+
+    statsRow+
+    '<div style="font-size:14px;font-weight:600;margin-bottom:12px;color:#333">'+esc(emp.name)+' 的飞书卡片预览</div>'+
+    renderCardPreview(emp, idx)+
+    '</div>';
+  document.body.appendChild(overlay);
 }
 
 function renderCardPreview(emp, index){
