@@ -403,9 +403,41 @@ function toggleCollapse(id){
   el.classList.toggle('open');
 }
 
-// ========== START VALIDATION (manual trigger) ==========
+// ========== START VALIDATION (built-in rule engine) ==========
+const WEEKEND_DATES = {};
+(function(){const d=new Date(2026,4,1);const e=new Date(2026,4,31);while(d<=e){if(d.getDay()===0||d.getDay()===6)WEEKEND_DATES[d.toISOString().slice(0,10)]=1;d.setDate(d.getDate()+1)}})();
+
+function gn(v){const n=parseFloat(v);return isNaN(n)?0:n}
+
+function findFile(patterns){
+  // Find a file whose first row contains ALL specified column patterns
+  const names=Object.keys(state.files);
+  for(const pats of patterns){
+    for(const name of names){
+      const rows=state.files[name];
+      if(!rows||!rows.length) continue;
+      const sample=rows[0];
+      let match=true;
+      for(const p of pats){
+        const found=Object.keys(sample).some(k=>k.includes(p));
+        if(!found){match=false;break}
+      }
+      if(match) return {name,rows};
+    }
+  }
+  // Fallback: try to match by filename keywords
+  for(const pats of patterns){
+    for(const name of names){
+      for(const p of pats){
+        if(name.toLowerCase().includes(p.toLowerCase())) return {name,rows:state.files[name]};
+      }
+    }
+  }
+  return null;
+}
+
 function startValidation(){
-  // Reset previous results
+  // Reset
   state.validation.data = [];
   state.validation.filtered = [];
   state.validation.validated = false;
@@ -417,10 +449,13 @@ function startValidation(){
 
   const steps = [
     {label:'检测文件...', pct:5},
-    {label:'解析校验报表...', pct:20},
-    {label:'按规则分类...', pct:40},
-    {label:'统计汇总...', pct:60},
-    {label:'生成明细数据...', pct:80},
+    {label:'识别数据类型...', pct:15},
+    {label:'执行校验规则...', pct:40},
+    {label:'R1.1 周末出勤...', pct:50},
+    {label:'R1.2 打卡去重...', pct:60},
+    {label:'R3 OT偏差...', pct:68},
+    {label:'R4-R7 补签/REG/公出/居家...', pct:85},
+    {label:'汇总统计...', pct:95},
     {label:'校验完成', pct:100}
   ];
 
@@ -430,15 +465,16 @@ function startValidation(){
 
   function runStep(idx){
     if(idx >= steps.length){
-      // Done - render results
       progressFill.style.width = '100%';
-      const diag = state._diag || '';
-      progressText.innerHTML = '&#10003; 校验完成！共 <strong>' + state.validation.data.length + '</strong> 条记录<br><span style="font-size:11px;color:#666">' + esc(diag) + '</span>';
+      const n = state.validation.data.length;
+      const w = state.validation.data.filter(r=>r.level==='warning').length;
+      const e = state.validation.data.filter(r=>r.level==='error').length;
+      progressText.innerHTML = '&#10003; 校验完成！共 <strong>' + n + '</strong> 条异常 (Warning: ' + w + ' / Error: ' + e + ')' +
+        '<br><span style="font-size:11px;color:#666">基于7条内置校验规则（R1.1~R7）自动分析</span>';
       btn.disabled = false;
       btn.innerHTML = '&#9654; 重新校验';
       state.validation.validated = true;
       document.getElementById('btnExportCSV').disabled = false;
-      // Auto-open overview
       document.getElementById('overviewPanel').classList.add('open');
       document.getElementById('detailPanel').classList.add('open');
       applyFilters();
@@ -451,41 +487,280 @@ function startValidation(){
       progressText.textContent = step.label + ' (' + step.pct + '%)';
 
       if(idx === 1){
-        // Auto-detect: scan all files for columns matching rule + emp_id
-        let found = null, maxRows = 0;
-        const fileNames = Object.keys(state.files);
-        let diag = '📁 ' + fileNames.length + ' 个文件: ';
-        fileNames.forEach(name => {
-          const rows = state.files[name];
-          if(!rows || !rows.length){
-            diag += '⚠️ [' + esc(name) + '] 空数据; ';
-            return;
+        // Identify files by their column structure
+        const signFile = findFile([
+          ['计薪出勤', 'REG', '工号'],
+          ['签字', '考勤日期']
+        ]);
+        const punchFile = findFile([
+          ['打卡时间', '工号', '考勤机'],
+          ['打卡记录']
+        ]);
+        const suppFile = findFile([
+          ['补签日期', '补签事由'],
+          ['补签管理']
+        ]);
+        const leaveFile = findFile([
+          ['休假类型', '销假'],
+          ['休假流程']
+        ]);
+        const busFile = findFile([
+          ['公出时长', '公出事由'],
+          ['公出管理']
+        ]);
+        const tripFile = findFile([
+          ['出差时长', '出差事由'],
+          ['出差管理']
+        ]);
+        const homeFile = findFile([
+          ['居家办公'],
+          ['导出居家办公']
+        ]);
+
+        state._engineFiles = {
+          signing: signFile, punch: punchFile, supp: suppFile,
+          leave: leaveFile, bus: busFile, trip: tripFile, home: homeFile
+        };
+
+        // Show diagnostic of file matching
+        const labels = { signing:'签字报表', punch:'打卡记录', supp:'补签管理', leave:'休假流程', bus:'公出管理', trip:'出差管理', home:'居家办公' };
+        let diag = '📁 文件识别情况: ';
+        for(const [key, label] of Object.entries(labels)){
+          const f = state._engineFiles[key];
+          diag += (f ? '✅' : '❌') + label + ' ';
+        }
+        progressText.innerHTML = step.label + ' (' + step.pct + '%)<br><span style="font-size:11px;color:#888">' + diag + '</span>';
+      }
+
+      if(idx === 2){
+        // Run all rules
+        const results = [];
+        const ef = state._engineFiles;
+        const s = ef.signing, p = ef.punch, sp = ef.supp, lv = ef.leave, b = ef.bus, t = ef.trip, h = ef.home;
+
+        // Helper: get column value by alias
+        function cv(row, aliases){
+          for(const a of aliases){
+            if(row[a]!==undefined) return row[a];
+            for(const k of Object.keys(row)){
+              if(k.includes(a)) return row[k];
+            }
           }
-          const sample = rows[0];
-          const keys = Object.keys(sample);
-          const hasRule = sample.rule || sample.rule_code || sample['校验规则'] || sample['Rule'] || sample['规则'];
-          const hasEmp = sample.emp_id || sample.emp || sample['员工编号'] || sample.empId || sample['工号'] || sample['员工ID'];
-          diag += '📄 [' + esc(name) + '] ' + rows.length + '行 列=[' + esc(keys.join(',')) + '] rule=' + !!hasRule + ' emp=' + !!hasEmp + '; ';
-          if(hasRule && hasEmp && rows.length > maxRows){
-            found = {name, rows};
-            maxRows = rows.length;
+          return '';
+        }
+
+        // Build employee map from signing report
+        const signEmp = {};
+        if(s){
+          s.rows.forEach(r=>{
+            const eid = cv(r,['工号','emp_id','员工编号']).trim();
+            if(!eid || !eid.startsWith('GL')) return;
+            const n = cv(r,['姓名','name']);
+            if(!signEmp[eid]) signEmp[eid]={name:n, dept4:'', reg:0, ot15:0, ot20:0, home_off:0, days:[]};
+            const emp = signEmp[eid];
+            emp.reg += gn(cv(r,['计薪出勤时长合计（REG)','REG','计薪出勤']));
+            emp.ot15 += gn(cv(r,['OT1.5合计','OT1.5']));
+            emp.ot20 += gn(cv(r,['OT2.0合计','OT2.0']));
+            emp.home_off += gn(cv(r,['居家办公合计','居家']));
+            const dt = cv(r,['考勤日期','date','日期']).slice(0,10);
+            if(dt) emp.days.push(dt);
+          });
+        }
+
+        // Build punch clock data
+        const punchByEmp = {};
+        if(p){
+          p.rows.forEach(r=>{
+            const eid = cv(r,['工号','emp_id','员工编号']).trim();
+            const ct = cv(r,['打卡时间','punch_time','time']).trim();
+            if(!eid||!ct) return;
+            if(!punchByEmp[eid]) punchByEmp[eid]=[];
+            punchByEmp[eid].push({datetime:ct, date:ct.slice(0,10)});
+          });
+        }
+
+        // Build supplementary sign data
+        const suppByEmp = {};
+        if(sp){
+          sp.rows.forEach(r=>{
+            const eid = cv(r,['工号','emp_id']).trim();
+            const ds = (cv(r,['补签日期','补签时间','date'])||'').slice(0,10);
+            const st = cv(r,['审批状态','status']);
+            const rs = cv(r,['补签事由','reason','备注']);
+            if(eid&&ds){
+              if(!suppByEmp[eid]) suppByEmp[eid]=[];
+              suppByEmp[eid].push({date:ds, status:st, reason:rs});
+            }
+          });
+        }
+
+        // Build leave data
+        const leaveByEmp = {};
+        if(lv){
+          lv.rows.forEach(r=>{
+            const eid = cv(r,['工号','emp_id']).trim();
+            if(!eid) return;
+            leaveByEmp[eid]={
+              type: cv(r,['休假类型','leave_type','type']),
+              start: (cv(r,['开始时间','start_time','start'])+'').slice(0,10),
+              end: (cv(r,['结束时间','end_time','end'])+'').slice(0,10)
+            };
+          });
+        }
+
+        // Build business trip
+        const busByEmp = {};
+        if(b){
+          b.rows.forEach(r=>{
+            const eid = cv(r,['工号','emp_id']).trim();
+            if(!eid) return;
+            if(!busByEmp[eid]) busByEmp[eid]=[];
+            busByEmp[eid].push({start: cv(r,['开始时间','start']), status: cv(r,['审批状态','status'])});
+          });
+        }
+
+        // Build trip
+        const tripByEmp = {};
+        if(t){
+          t.rows.forEach(r=>{
+            const eid = cv(r,['工号','emp_id']).trim();
+            if(!eid) return;
+            if(!tripByEmp[eid]) tripByEmp[eid]=[];
+            tripByEmp[eid].push({start: cv(r,['开始时间','start']), status: cv(r,['审批状态','status'])});
+          });
+        }
+
+        // Build home office
+        const homeByEmp = {};
+        if(h){
+          h.rows.forEach(r=>{
+            const eid = cv(r,['工号','emp_id']).trim();
+            if(!eid) return;
+            if(!homeByEmp[eid]) homeByEmp[eid]=[];
+            homeByEmp[eid].push({start: cv(r,['开始时间','start']), status: cv(r,['审批状态','status'])});
+          });
+        }
+
+        // ---- R1.1 周末打卡但休假未涵盖 ----
+        Object.entries(signEmp).forEach(([eid, s])=>{
+          const clocks = punchByEmp[eid]||[];
+          const wkndClocks = clocks.filter(c=>WEEKEND_DATES[c.date]);
+          if(!wkndClocks.length) return;
+          const lvInfo = leaveByEmp[eid];
+          const noLeave = wkndClocks.filter(c=>!(lvInfo&&c.date>=lvInfo.start&&c.date<=lvInfo.end));
+          if(!noLeave.length) return;
+          const dates = [...new Set(noLeave.map(c=>c.date))].sort();
+          if(s.reg>0){
+            results.push({rule:'R1.1', emp_id:eid, level:'warning',
+              message:'周末有打卡但休假未涵盖（'+dates.length+'天）',
+              detail:'日期: '+dates.join(', ')+' | REG='+s.reg.toFixed(1)+'h'});
           }
         });
-        if(found){
-          diag += '✅ 选 ' + esc(found.name) + '(' + found.rows.length + '行)';
-          state.validation.data = found.rows.filter(r=>
-            (r.rule||r.rule_code||r['校验规则']||r['Rule']||r['规则'])&&(r.emp_id||r.emp||r['员工编号']||r.empId||r['工号']||r['员工ID'])
-          );
-          diag += ' → 过滤后 ' + state.validation.data.length + ' 行有效记录';
-        } else {
-          diag += '❌ 未找到含 rule+emp_id 列的文件';
-        }
-        // Store diagnostics for display at completion
-        state._diag = diag;
+
+        // ---- R1.2 打卡去重 ----
+        Object.entries(punchByEmp).forEach(([eid, clocks])=>{
+          const byDate={};
+          clocks.forEach(c=>{if(!byDate[c.date]) byDate[c.date]=[]; byDate[c.date].push(c)});
+          const dupDates=[];
+          Object.entries(byDate).forEach(([ds,dcs])=>{
+            if(dcs.length<2) return;
+            const times=dcs.map(d=>new Date(d.datetime)).sort((a,b)=>a-b);
+            for(let i=1;i<times.length;i++){
+              if((times[i]-times[i-1])/60000<10){dupDates.push(ds);break}
+            }
+          });
+          if(dupDates.length){
+            const name=signEmp[eid]?signEmp[eid].name:'';
+            results.push({rule:'R1.2', emp_id:eid, level:'warning',
+              message:'存在重复打卡（间隔<10分钟）共'+dupDates.length+'天',
+              detail:'重复日期: ['+[...new Set(dupDates)].sort().slice(0,8).join(', ')+']'});
+          }
+        });
+
+        // ---- R3 OT偏差>5% ----
+        Object.entries(signEmp).forEach(([eid, s])=>{
+          const clocks = punchByEmp[eid]||[];
+          if(!clocks.length) return;
+          const byDate={};
+          clocks.forEach(c=>{if(!byDate[c.date]) byDate[c.date]=[]; byDate[c.date].push(c)});
+          let eo15=0, eo20=0;
+          Object.entries(byDate).forEach(([ds,dcs])=>{
+            const times=dcs.map(d=>new Date(d.datetime)).sort((a,b)=>a-b);
+            if(times.length<2) return;
+            const th=(times[times.length-1]-times[0])/3600000;
+            if(WEEKEND_DATES[ds]) eo20+=th;
+            else if(th>8) eo15+=th-8;
+          });
+          [[s.ot15, eo15, 'OT1.5'],[s.ot20, eo20, 'OT2.0']].forEach(([sv,ev,label])=>{
+            if(sv>0&&ev>0){
+              const diff=Math.abs(sv-ev)/Math.max(sv,ev);
+              if(diff>0.05){
+                results.push({rule:'R3', emp_id:eid, level:'warning',
+                  message:label+'偏差'+(diff*100).toFixed(0)+'%',
+                  detail:'签字报表='+sv.toFixed(1)+'h vs 系统估算='+ev.toFixed(1)+'h'});
+              }
+            }
+          });
+        });
+
+        // ---- R4 补签审批中 ----
+        Object.entries(signEmp).forEach(([eid, s])=>{
+          (suppByEmp[eid]||[]).forEach(p=>{
+            if(p.status.includes('审批中')||p.status.includes('pending')||p.status.includes('approv')){
+              results.push({rule:'R4', emp_id:eid, level:'warning',
+                message:'补签审批中（'+p.date+'）',
+                detail:'事由: '+(p.reason||'无').slice(0,30)+' | REG='+s.reg.toFixed(1)+'h'});
+            }
+          });
+        });
+
+        // ---- R5 REG=0但有打卡 ----
+        Object.entries(signEmp).forEach(([eid, s])=>{
+          const clocks = punchByEmp[eid]||[];
+          if(s.reg===0 && clocks.length>0){
+            const dates=[...new Set(clocks.map(c=>c.date))].sort();
+            results.push({rule:'R5', emp_id:eid, level:'error',
+              message:'REG=0但存在'+clocks.length+'条打卡记录',
+              detail:'打卡日期范围: '+dates[0]+' ~ '+dates[dates.length-1]});
+          }
+        });
+
+        // ---- R6 公出/出差审批中 ----
+        Object.entries(signEmp).forEach(([eid, s])=>{
+          (busByEmp[eid]||[]).forEach(b=>{
+            const st=b.status.toLowerCase();
+            if((st.includes('approv')||st.includes('审批')||st.includes('complete'))&&s.reg===0){
+              results.push({rule:'R6', emp_id:eid, level:'warning',
+                message:'公出'+b.start.slice(0,10)+' | REG=0',
+                detail:'公出审批中但REG=0h'});
+            }
+          });
+          (tripByEmp[eid]||[]).forEach(tr=>{
+            if(tr.status.includes('审批中')&&s.reg===0){
+              results.push({rule:'R6', emp_id:eid, level:'warning',
+                message:'出差'+tr.start.slice(0,10)+'审批中 | REG=0',
+                detail:'出差审批中但REG=0h'});
+            }
+          });
+        });
+
+        // ---- R7 居家办公审批中 ----
+        Object.entries(signEmp).forEach(([eid, s])=>{
+          (homeByEmp[eid]||[]).forEach(h=>{
+            if(h.status.includes('审批中')&&s.home_off===0){
+              results.push({rule:'R7', emp_id:eid, level:'warning',
+                message:'居家'+h.start.slice(0,10)+'审批中 | 报表居家=0',
+                detail:'居家办公审批中但签字报表居家时长=0h'});
+            }
+          });
+        });
+
+        state.validation.data = results;
+        progressText.textContent = '执行校验规则... 共 ' + results.length + ' 条异常';
       }
 
       runStep(idx + 1);
-    }, 200);
+    }, 150);
   }
 
   runStep(0);
