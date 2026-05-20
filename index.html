@@ -1530,12 +1530,23 @@ function sendAllFeishuCards(){
     '<div class="modal-box" style="max-width:800px;max-height:90vh;overflow-y:auto">'+
     '<button class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</button>'+
     '<h2>📨 飞书卡片预览</h2>'+
+    '<div style="margin-bottom:12px;padding:10px 12px;background:#F5F6FA;border-radius:6px;font-size:13px">'+
+      '<label style="display:flex;align-items:center;gap:6px;margin-bottom:8px;cursor:pointer">'+
+        '<input type="checkbox" id="testModeCheck" onchange="document.getElementById(&#39;testEmpId&#39;).style.display=this.checked?&#39;inline-block&#39;:&#39;none&#39;"> '+
+        '<strong>🧪 测试模式</strong> — 仅发送给指定工号，不发送给全员'+
+      '</label>'+
+      '<div style="display:flex;align-items:center;gap:8px">'+
+        '<span style="color:#888">测试工号：</span>'+
+        '<input type="text" id="testEmpId" placeholder="输入工号" style="display:none;padding:4px 8px;border:1px solid #ccc;border-radius:4px;width:150px">'+
+      '</div>'+
+    '</div>'+
     '<p style="font-size:13px;color:#888;margin-bottom:12px">将向 <strong>'+toSend.length+'</strong> 位员工发送考勤确认卡片（含无异常人员）</p>'+
     '<div id="cardPreviewList">'+previewCards+'</div>'+
     '<div style="margin-top:16px;display:flex;gap:8px;justify-content:center">'+
     '<button class="btn" onclick="document.getElementById(\'cardPreviewOverlay\').remove()">取消</button>'+
     '<button class="btn btn-success" onclick="doSendFeishuCards()">🚀 确认发送 '+toSend.length+' 张卡片</button>'+
     '</div>'+
+    '<div id="sendResultContainer" style="margin-top:12px;display:none"></div>'+
     '</div>';
   document.body.appendChild(overlay);
 }
@@ -1544,33 +1555,48 @@ function doSendFeishuCards(){
   const overlay = document.getElementById('cardPreviewOverlay');
   if(overlay) overlay.remove();
 
-  const toSend = state.confirmation.rows.filter(r => r.status === '待确认' || r.status === '无异常');
+  const testMode = document.getElementById('testModeCheck') ? document.getElementById('testModeCheck').checked : false;
+  const testEmpId = testMode ? (document.getElementById('testEmpId') ? document.getElementById('testEmpId').value.trim() : '') : '';
 
-  // Build the data JSON for the Python script
+  let toSend = state.confirmation.rows.filter(r => r.status === '待确认' || r.status === '无异常');
+
+  if(testMode && testEmpId){
+    toSend = toSend.filter(r => r.emp_id === testEmpId);
+    if(!toSend.length){
+      alert('测试模式：未找到工号为「'+testEmpId+'」的员工在待发送列表中');
+      return;
+    }
+  }
+
+  // Build card data
   const cardsData = toSend.map(emp => {
     const dept = [emp.dept3, emp.dept4, emp.dept5].filter(Boolean).join(' / ');
     const errorsRows = emp.errors.map((e, i) => '规则 '+emp.rules[i]+': '+e).join('\\n');
     return {
-      emp_id: emp.emp_id,
-      name: emp.name,
-      dept: dept,
-      count: emp.count,
-      errorsHtml: errorsRows,
+      emp_id: emp.emp_id, name: emp.name, dept: dept,
+      count: emp.count, errorsHtml: errorsRows,
       card: buildCardContent(emp)
     };
   });
 
-  const scriptData = JSON.stringify({app_id: FEISHU_CONFIG.APP_ID, app_secret: FEISHU_CONFIG.APP_SECRET, cards: cardsData});
+  const scriptData = JSON.stringify({
+    app_id: FEISHU_CONFIG.APP_ID, app_secret: FEISHU_CONFIG.APP_SECRET,
+  });
 
   // Generate a download of the Python script
   const pyScript = `#!/usr/bin/env python3
 """自动发送飞书考勤确认卡片"""
-import requests, json, sys
+import requests, json, sys, time
 
 CONFIG = ${scriptData}
-API_TOKEN = 'https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal'
+API_TOKEN='https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal'
 API_SEND = 'https://open.feishu.cn/open-apis/im/v1/messages?receive_id_type=open_id'
 API_USER = 'https://open.feishu.cn/open-apis/contact/v3/users'
+
+LOG = []
+
+def log_result(emp_id, name, status, msg):
+    LOG.append({'emp_id': emp_id, 'name': name, 'status': status, 'msg': msg, 'time': time.strftime('%H:%M:%S')})
 
 def get_token():
     r = requests.post(API_TOKEN, json={'app_id': CONFIG['app_id'], 'app_secret': CONFIG['app_secret']})
@@ -1595,16 +1621,31 @@ def main():
     token = get_token()
     cards = CONFIG['cards']
     total = len(cards)
+    log_result('-', '-', 'start', f'共 {total} 张卡片{", 测试模式: "+CONFIG["test_emp_id"] if CONFIG.get("test_mode") else ""}')
+    success, fail, not_found = 0, 0, 0
     for i, c in enumerate(cards, 1):
-        print(f'[{i}/{total}] {c[\"name\"]} ({c[\"emp_id\"]})...', end=' ', flush=True)
+        print(f'[{i}/{total}] {c["name"]} ({c["emp_id"]})...', end=' ', flush=True)
         open_id = find_user(token, c['emp_id'])
         if not open_id:
             print('✗ 未找到用户')
+            log_result(c['emp_id'], c['name'], 'fail', '未找到飞书用户')
+            not_found += 1
             continue
         if send_card(token, open_id, json.dumps(c['card'], ensure_ascii=False)):
             print('✓ 已发送')
+            log_result(c['emp_id'], c['name'], 'ok', '发送成功')
+            success += 1
         else:
             print('✗ 发送失败')
+            log_result(c['emp_id'], c['name'], 'fail', 'API返回失败')
+            fail += 1
+    summary = f'✅ 成功 {success} | ❌ 失败 {fail} | 👤 未找到 {not_found} | 合计 {total}'
+    print('\\n' + '='*40)
+    print(summary)
+    log_result('-', '-', 'done', summary)
+    # 输出JSON日志供页面读取
+    print('\\n---RESULT_JSON---')
+    print(json.dumps(LOG, ensure_ascii=False))
 
 if __name__ == '__main__':
     main()
@@ -1624,13 +1665,14 @@ if __name__ == '__main__':
   resultOverlay.className = 'modal-overlay';
   resultOverlay.id = 'sendResultOverlay';
   resultOverlay.onclick = function(e){if(e.target===resultOverlay) resultOverlay.remove()};
+  const testBadge = testMode && testEmpId ? '<span style="background:#ff9800;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;margin-left:8px">🧪 仅测试：'+testEmpId+'</span>' : '';
   resultOverlay.innerHTML =
     '<div class="modal-box" style="max-width:600px">'+
     '<button class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</button>'+
     '<h2>📨 飞书卡片已就绪</h2>'+
     '<div style="background:#f0f7ff;border-radius:6px;padding:12px;margin-bottom:12px">'+
-    '<div style="font-size:14px;font-weight:600;margin-bottom:4px">✅ 脚本已下载：feishu_send_cards.py</div>'+
-    '<div style="font-size:13px;color:#555">即将向 <strong>'+pending.length+'</strong> 位员工发送卡片</div>'+
+    '<div style="font-size:14px;font-weight:600;margin-bottom:4px">✅ 脚本已下载：feishu_send_cards.py'+testBadge+'</div>'+
+    '<div style="font-size:13px;color:#555">即将向 <strong>'+toSend.length+'</strong> 位员工发送卡片</div>'+
     '</div>'+
     '<div style="background:#f8f9fa;border-radius:6px;padding:12px;margin-bottom:12px">'+
     '<div style="font-size:13px;font-weight:600;margin-bottom:6px;color:#333">📋 执行方式</div>'+
