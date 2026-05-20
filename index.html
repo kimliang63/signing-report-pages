@@ -1611,8 +1611,6 @@ function sendAllFeishuCards(){
 
   const previewCards = finalToSend.map((emp, i) => renderCardContent(emp)).join('');
 
-  const testModeLabel = testMode && testEmpId ? ' 🧪 测试模式：'+testEmpId : '';
-
   overlay.innerHTML =
     '<div class="modal-box" style="max-width:800px;max-height:90vh;overflow-y:auto">'+
     '<button class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</button>'+
