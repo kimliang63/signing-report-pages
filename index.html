@@ -350,7 +350,6 @@ function updateFileUI(){
   const fCount = Object.keys(state.files).length;
   const hasFile = fCount > 0;
   document.getElementById('fileCountBadge').textContent = fCount + ' 个文件';
-  document.getElementById('fileCountBadgeC').textContent = fCount + ' 个文件';
   document.getElementById('actionBarV').style.display = hasFile ? 'flex' : 'none';
   document.getElementById('actionBarC').style.display = hasFile ? 'flex' : 'none';
 
@@ -398,13 +397,10 @@ function clearAllData(){
   document.getElementById('progressWrap').style.display = 'none';
   document.getElementById('statsC').style.display = 'none';
   document.getElementById('progressSection').style.display = 'none';
-  document.getElementById('deptTree').innerHTML = '';
-  document.getElementById('objectionList').innerHTML = '';
   document.getElementById('btnExportCSV').disabled = true;
   document.getElementById('dataStatus').textContent = '未上传文件';
   document.getElementById('dataStatus').className = 'badge badge-pending';
   document.getElementById('fileCountBadge').textContent = '0 个文件';
-  document.getElementById('fileCountBadgeC').textContent = '0 个文件';
 }
 
 // ========== TOGGLE COLLAPSE ==========
