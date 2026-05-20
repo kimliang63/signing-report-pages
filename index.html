@@ -172,12 +172,12 @@ tr:hover td{background:#fafbfc}
       </div>
       <div class="collapsible-body">
         <div class="filter-bar" id="filterBarV">
-          <select id="ruleFilter"><option value="">所有规则</option><option value="R1.2">R1.2 重复打卡</option><option value="R3">R3 加班工时偏差</option><option value="R4">R4 补签审批中</option><option value="R5">R5 REG=0有打卡</option></select>
-          <input type="text" id="searchInput" placeholder="搜索工号/姓名/明细...">
+          <input type="text" id="searchInput" placeholder="搜索工号或姓名...">
+          <select id="ruleFilter"><option value="">所有错误类型</option><option value="warning">Warning</option><option value="error">Error</option></select>
           <span class="info" id="tableInfo">共 0 条</span>
         </div>
         <div class="table-wrap" id="tableWrapV">
-          <table><thead><tr><th>规则</th><th>工号</th><th>级别</th><th>消息</th><th>明细</th></tr></thead><tbody id="tbodyV"></tbody></table>
+          <table><thead><tr><th>工号</th><th>员工</th><th>部门</th><th>考勤日期</th><th>错误类型</th><th>错误详情</th></tr></thead><tbody id="tbodyV"></tbody></table>
           <div class="pagination" id="paginationV">
             <button onclick="prevPage()" id="prevBtn">上一页</button>
             <span class="page-info" id="pageInfo">1/1</span>
@@ -234,7 +234,7 @@ const state = {
   confirmation: { rows: [], loaded: false },
   files: {}
 };
-const COLORS = {'R1.2':'#0E66FB','R3':'#FFAA0E','R4':'#9C27B0','R5':'#D9001B'};
+const COLORS = {'R1.1':'#0E66FB','R1.2':'#0E66FB','R3':'#FFAA0E','R4':'#9C27B0','R5':'#D9001B','R6':'#E67E22','R7':'#2ECC71'};
 
 // ========== TAB SWITCH ==========
 document.querySelectorAll('.tab').forEach(t=>{
@@ -549,21 +549,33 @@ function startValidation(){
           return '';
         }
 
-        // Build employee map from signing report
+        // Build employee map from signing report (attendance-date granularity)
         const signEmp = {};
+        const signRows = {}; // {eid: [{dept3, dept4, dept5, date}, ...]}
         if(s){
           s.rows.forEach(r=>{
             const eid = cv(r,['工号','emp_id','员工编号']).trim();
             if(!eid || !eid.startsWith('GL')) return;
             const n = cv(r,['姓名','name']);
-            if(!signEmp[eid]) signEmp[eid]={name:n, dept4:'', reg:0, ot15:0, ot20:0, home_off:0, days:[]};
+            const d3 = cv(r,['三级部门','dept3','department3']);
+            const d4 = cv(r,['四级部门','dept4','department4']);
+            const d5 = cv(r,['五级部门','dept5','department5']);
+            if(!signEmp[eid]) signEmp[eid]={name:n, dept3:d3, dept4:d4, dept5:d5, reg:0, ot15:0, ot20:0, home_off:0, days:[]};
             const emp = signEmp[eid];
+            if(!emp.dept3&&d3) emp.dept3=d3;
+            if(!emp.dept4&&d4) emp.dept4=d4;
+            if(!emp.dept5&&d5) emp.dept5=d5;
+            if(!emp.name&&n) emp.name=n;
             emp.reg += gn(cv(r,['计薪出勤时长合计（REG)','REG','计薪出勤']));
             emp.ot15 += gn(cv(r,['OT1.5合计','OT1.5']));
             emp.ot20 += gn(cv(r,['OT2.0合计','OT2.0']));
             emp.home_off += gn(cv(r,['居家办公合计','居家']));
             const dt = cv(r,['考勤日期','date','日期']).slice(0,10);
-            if(dt) emp.days.push(dt);
+            if(dt){
+              emp.days.push(dt);
+              if(!signRows[eid]) signRows[eid]=[];
+              signRows[eid].push({dept3:d3||emp.dept3, dept4:d4||emp.dept4, dept5:d5||emp.dept5, date:dt});
+            }
           });
         }
 
@@ -756,6 +768,23 @@ function startValidation(){
         });
 
         state.validation.data = results;
+
+        // Enrich results with employee info from signing report
+        state.validation.data.forEach(r=>{
+          const emp = signEmp[r.emp_id];
+          if(emp){
+            r.name = emp.name;
+            r.dept3 = emp.dept3;
+            r.dept4 = emp.dept4;
+            r.dept5 = emp.dept5;
+          }
+          // Try to extract date from detail/message
+          if(!r.date){
+            const m = (r.detail||r.message||'').match(/\d{4}-\d{2}-\d{2}/);
+            if(m) r.date = m[0];
+          }
+        });
+
         progressText.textContent = '执行校验规则... 共 ' + results.length + ' 条异常';
       }
 
@@ -771,11 +800,10 @@ function applyFilters(){
   const rule=document.getElementById('ruleFilter').value;
   const search=document.getElementById('searchInput').value.toLowerCase();
   let data=state.validation.data;
-  if(rule) data=data.filter(r=>r.rule===rule);
+  if(rule) data=data.filter(r=>r.level===rule);
   if(search) data=data.filter(r=>
     (r.emp_id||'').toLowerCase().includes(search)||
-    (r.message||'').toLowerCase().includes(search)||
-    (r.detail||'').toLowerCase().includes(search)
+    (r.name||'').toLowerCase().includes(search)
   );
   state.validation.filtered=data;
   state.validation.page=1;
@@ -800,7 +828,10 @@ function renderStats(){
 function renderRuleBars(){
   const d=state.validation.filtered;
   const grp={};
-  d.forEach(r=>{grp[r.rule]=(grp[r.rule]||0)+1});
+  d.forEach(r=>{
+    const key = r.rule || (r.detail||r.message||'').match(/^(R\d+\.?\d*)/)?.[1] || '其他';
+    grp[key]=(grp[key]||0)+1;
+  });
   const el=document.getElementById('ruleBarsV');
   el.innerHTML='<h3 style="font-size:14px;margin:0 0 8px;color:#333">按规则分布</h3>'+
     '<div id="ruleBars"></div>';
@@ -826,11 +857,18 @@ function renderTable(){
   tbody.innerHTML='';
   page.forEach(r=>{
     const tr=document.createElement('tr');
-    const lvl=r.level==='error'?'badge badge-error':'badge badge-warning';
-    tr.innerHTML='<td>'+esc(r.rule)+'</td><td>'+esc(r.emp_id)+'</td><td><span class="'+lvl+'">'+esc(r.level)+'</span></td><td>'+esc(r.message)+'</td><td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(r.detail||'')+'">'+esc((r.detail||'').substring(0,60))+'</td>';
+    const badgeClass = r.level==='error'?'badge badge-error':'badge badge-warning';
+    const dept = [r.dept3||'',r.dept4||'',r.dept5||''].filter(Boolean).join(' / ');
+    const detail = (r.detail||r.message||'');
+    tr.innerHTML='<td>'+esc(r.emp_id)+'</td>'+
+      '<td>'+esc(r.name||'')+'</td>'+
+      '<td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(dept)+'">'+esc(dept)+'</td>'+
+      '<td>'+esc(r.date||'')+'</td>'+
+      '<td><span class="'+badgeClass+'">'+esc(r.level)+'</span></td>'+
+      '<td style="max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(detail)+'">'+esc(detail.substring(0,80))+'</td>';
     tbody.appendChild(tr);
   });
-  if(!page.length) tbody.innerHTML='<tr><td colspan="5" class="empty">无匹配数据</td></tr>';
+  if(!page.length) tbody.innerHTML='<tr><td colspan="6" class="empty">无匹配数据</td></tr>';
   const end = Math.min(start+ps, d.length);
   document.getElementById('tableInfo').textContent='共 '+d.length+' 条，显示 '+(d.length?(start+1):0)+'-'+end;
   document.getElementById('pageInfo').textContent=p+'/'+total;
@@ -848,13 +886,19 @@ document.getElementById('pageSize').addEventListener('change',renderTable);
 function exportCSV(){
   if(!state.validation.validated || !state.validation.data.length) return;
   const d = state.validation.filtered.length ? state.validation.filtered : state.validation.data;
-  const headers = ['rule','emp_id','level','message','detail'];
+  const headers = ['工号','员工','三级部门','四级部门','五级部门','考勤日期','错误类型','错误详情'];
   const rows = [headers.join(',')];
   d.forEach(r => {
-    const vals = headers.map(h => {
-      const v = (r[h]||'').replace(/"/g,'""');
-      return '"'+v+'"';
-    });
+    const vals = [
+      r.emp_id||'',
+      r.name||'',
+      r.dept3||'',
+      r.dept4||'',
+      r.dept5||'',
+      r.date||'',
+      r.level||'',
+      (r.detail||r.message||'')
+    ].map(v => '"'+(v||'').replace(/"/g,'""')+'"');
     rows.push(vals.join(','));
   });
   const blob = new Blob([rows.join('\n')], {type:'text/csv;charset=utf-8;'});
