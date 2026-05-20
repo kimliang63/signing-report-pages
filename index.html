@@ -1741,36 +1741,36 @@ function doSendFeishuCards(){
     const decoder = new TextDecoder();
     let buf = '';
     let results = [];
-    // Read the streaming JSON response
+    // Read the streaming NDJSON response
     while(true){
       const {done, value} = await reader.read();
       if(done) break;
       buf += decoder.decode(value, {stream: true});
-      // Try to parse complete JSON chunks (newline-delimited)
-      const lines = buf.split('\\n');
+      // Parse NDJSON — split by newline
+      const lines = buf.split('\n');
       buf = lines.pop(); // keep incomplete line
       for(const line of lines){
         if(!line.trim()) continue;
         try {
-          const event = JSON.parse(line);
-          if(event.type === 'progress'){
-            const pct = Math.round(event.done / event.total * 100);
+          const evt = JSON.parse(line.trim());
+          if(evt.type === 'progress'){
+            const pct = Math.round(evt.done / evt.total * 100);
             fillEl.style.width = pct + '%';
-            textEl.textContent = event.done + '/' + event.total + ' 已发送';
-            const log = event.done === 0 ? '开始发送...' : event.last_log || '';
+            textEl.textContent = evt.done + '/' + evt.total + ' 已发送';
+            const log = evt.done === 0 ? '开始发送...' : evt.last_log || '';
             if(log) detailEl.innerHTML += '<div>' + log + '</div>';
             detailEl.scrollTop = detailEl.scrollHeight;
-          } else if(event.type === 'done'){
-            results = event.results || [];
+          } else if(evt.type === 'done'){
+            results = evt.results || [];
           }
-        } catch(e){ /* skip partial lines */ }
+        } catch(e){ /* skip parse errors */ }
       }
     }
     // Process remaining buffer
     if(buf.trim()){
       try {
-        const event = JSON.parse(buf);
-        if(event.type === 'done') results = event.results || [];
+        const evt = JSON.parse(buf.trim());
+        if(evt.type === 'done') results = evt.results || [];
       } catch(e){}
     }
     return results;
