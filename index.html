@@ -683,8 +683,8 @@ function startValidation(){
           });
           if(dupDates.length){
             const name=signEmp[eid]?signEmp[eid].name:'';
-            results.push({rule:'R1.2', emp_id:eid, level:'warning',
-              message:'存在重复打卡（间隔<10分钟）共'+dupDates.length+'天',
+            results.push({rule:'接近卡未舍去', emp_id:eid, level:'warning',
+              message:'接近卡未舍去（间隔<10分钟）共'+dupDates.length+'天',
               detail:'重复日期: ['+[...new Set(dupDates)].sort().slice(0,8).join(', ')+']'});
           }
         });
