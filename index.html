@@ -246,7 +246,7 @@ const state = {
   confirmation: { rows: [], loaded: false },
   files: {}
 };
-const COLORS = {'R1.1':'#0E66FB','R1.2':'#0E66FB','R3':'#FFAA0E','R4':'#9C27B0','R5':'#D9001B','R6':'#E67E22','R7':'#2ECC71'};
+const COLORS = {'R1.1':'#0E66FB','接近卡未舍去':'#0E66FB','R3':'#FFAA0E','R4':'#9C27B0','R5':'#D9001B','R6':'#E67E22','R7':'#2ECC71'};
 
 // ========== TAB SWITCH ==========
 document.querySelectorAll('.tab').forEach(t=>{
@@ -670,8 +670,8 @@ function startValidation(){
           const dates = [...new Set(noLeave.map(c=>c.date))].sort();
           if(s.reg>0){
             results.push({rule:'R1.1', emp_id:eid, level:'warning',
-              message:'周末有打卡但休假未涵盖（'+dates.length+'天）',
-              detail:'日期: '+dates.join(', ')+' | REG='+s.reg.toFixed(1)+'h'});
+              message:'周末考勤',
+              detail:'考勤日期: '+dates.join(', ')+'（周末有打卡但休假/年假未涵盖，REG='+s.reg.toFixed(1)+'h）'});
           }
         });
 
@@ -690,8 +690,8 @@ function startValidation(){
           if(dupDates.length){
             const name=signEmp[eid]?signEmp[eid].name:'';
             results.push({rule:'接近卡未舍去', emp_id:eid, level:'warning',
-              message:'接近卡未舍去（间隔<10分钟）共'+dupDates.length+'天',
-              detail:'重复日期: ['+[...new Set(dupDates)].sort().slice(0,8).join(', ')+']'});
+              message:'打卡重卡',
+              detail:'考勤日期: ['+[...new Set(dupDates)].sort().slice(0,8).join(', ')+']（同一日打卡间隔<10分钟，共'+dupDates.length+'天）'});
           }
         });
 
@@ -714,8 +714,8 @@ function startValidation(){
               const diff=Math.abs(sv-ev)/Math.max(sv,ev);
               if(diff>0.05){
                 results.push({rule:'R3', emp_id:eid, level:'warning',
-                  message:label+'偏差'+(diff*100).toFixed(0)+'%',
-                  detail:'签字报表='+sv.toFixed(1)+'h vs 系统估算='+ev.toFixed(1)+'h'});
+                  message:'加班偏差',
+                  detail:'考勤日期: 当月 | '+label+' 签字报表='+sv.toFixed(1)+'h vs 系统估算='+ev.toFixed(1)+'h（偏差'+(diff*100).toFixed(0)+'%）'});
               }
             }
           });
@@ -726,8 +726,8 @@ function startValidation(){
           (suppByEmp[eid]||[]).forEach(p=>{
             if(p.status.includes('审批中')||p.status.includes('pending')||p.status.includes('approv')){
               results.push({rule:'R4', emp_id:eid, level:'warning',
-                message:'补签审批中（'+p.date+'）',
-                detail:'事由: '+(p.reason||'无').slice(0,30)+' | REG='+s.reg.toFixed(1)+'h'});
+                message:'补签审批',
+                detail:'考勤日期: '+p.date+'（补签申请未完成审批，事由: '+(p.reason||'无').slice(0,30)+'，REG='+s.reg.toFixed(1)+'h）'});
             }
           });
         });
@@ -738,8 +738,8 @@ function startValidation(){
           if(s.reg===0 && clocks.length>0){
             const dates=[...new Set(clocks.map(c=>c.date))].sort();
             results.push({rule:'R5', emp_id:eid, level:'error',
-              message:'REG=0但存在'+clocks.length+'条打卡记录',
-              detail:'打卡日期范围: '+dates[0]+' ~ '+dates[dates.length-1]});
+              message:'REG归零',
+              detail:'考勤日期范围: '+dates[0]+' ~ '+dates[dates.length-1]+'（计薪出勤=0但存在'+clocks.length+'条打卡记录）'});
           }
         });
 
@@ -749,15 +749,15 @@ function startValidation(){
             const st=b.status.toLowerCase();
             if((st.includes('approv')||st.includes('审批')||st.includes('complete'))&&s.reg===0){
               results.push({rule:'R6', emp_id:eid, level:'warning',
-                message:'公出'+b.start.slice(0,10)+' | REG=0',
-                detail:'公出审批中但REG=0h'});
+                message:'公出/出差审批',
+                detail:'考勤日期: '+b.start.slice(0,10)+'（公出审批中但REG=0，计薪出勤='+s.reg.toFixed(1)+'h）'});
             }
           });
           (tripByEmp[eid]||[]).forEach(tr=>{
             if(tr.status.includes('审批中')&&s.reg===0){
               results.push({rule:'R6', emp_id:eid, level:'warning',
-                message:'出差'+tr.start.slice(0,10)+'审批中 | REG=0',
-                detail:'出差审批中但REG=0h'});
+                message:'公出/出差审批',
+                detail:'考勤日期: '+tr.start.slice(0,10)+'（出差审批中但REG=0，计薪出勤='+s.reg.toFixed(1)+'h）'});
             }
           });
         });
@@ -767,8 +767,8 @@ function startValidation(){
           (homeByEmp[eid]||[]).forEach(h=>{
             if(h.status.includes('审批中')&&s.home_off===0){
               results.push({rule:'R7', emp_id:eid, level:'warning',
-                message:'居家'+h.start.slice(0,10)+'审批中 | 报表居家=0',
-                detail:'居家办公审批中但签字报表居家时长=0h'});
+                message:'居家办公审批',
+                detail:'考勤日期: '+h.start.slice(0,10)+'（居家办公审批中但签字报表居家时长=0h，REG='+s.reg.toFixed(1)+'h）'});
             }
           });
         });
@@ -867,13 +867,13 @@ function renderStats(){
 
   // Render rule reference table
   const RULE_DEFS = [
-    {rule:'R1.1', risk:'warning', desc:'周末有打卡但休假未涵盖 — 周末打卡了但未覆盖休假记录'},
-    {rule:'接近卡未舍去', risk:'warning', desc:'接近卡未舍去 — 同一人同一日打卡间隔 < 10分钟'},
-    {rule:'R3', risk:'warning', desc:'加班工时偏差 > 5% — 签字报表OT vs 系统估算偏差超过5%'},
-    {rule:'R4', risk:'warning', desc:'补签审批中 — 补签申请尚未审批完成'},
-    {rule:'R5', risk:'error', desc:'REG=0但有打卡记录 — 计薪出勤时长为0却存在打卡记录'},
-    {rule:'R6', risk:'warning', desc:'公出/出差审批中但REG=0 — 出差/公出审批中但计薪出勤为0'},
-    {rule:'R7', risk:'warning', desc:'居家办公审批中但报表居家时长=0 — 居家办公审批中但签字报表未体现'},
+    {rule:'R1.1', risk:'warning', desc:'周末考勤 — 周末有打卡但休假/年假未涵盖'},
+    {rule:'接近卡未舍去', risk:'warning', desc:'打卡重卡 — 同一人同一日打卡间隔<10分钟'},
+    {rule:'R3', risk:'warning', desc:'加班偏差 — 签字报表OT与系统估算偏差超过5%'},
+    {rule:'R4', risk:'warning', desc:'补签审批 — 补签申请尚未审批完成'},
+    {rule:'R5', risk:'error', desc:'REG归零 — 计薪出勤=0但存在打卡记录'},
+    {rule:'R6', risk:'warning', desc:'公出/出差审批 — 公出/出差审批中但REG=0'},
+    {rule:'R7', risk:'warning', desc:'居家办公审批 — 居家办公审批中但签字报表未体现'},
   ];
   const rdiv = document.getElementById('ruleDetailV');
   rdiv.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'+
@@ -942,7 +942,7 @@ function renderTable(){
       '<td>'+esc(r.name||'')+'</td>'+
       '<td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(dept)+'">'+esc(dept)+'</td>'+
       '<td>'+esc(r.date||'')+'</td>'+
-      '<td><span class="'+badgeClass+'">'+esc(r.level)+'</span></td>'+
+      '<td><span class="'+badgeClass+'" style="margin-right:4px">'+esc(r.rule||'')+'</span><span style="font-size:11px;color:'+(r.level==='error'?'#D9001B':'#E67E00')+'">'+esc(r.message||'')+'</span></td>'+
       '<td style="max-width:300px;overflow:hidden" title="'+esc(detail)+'">'+
         rawHtml+'<span style="font-size:12px;color:#D9001B">⚠ '+esc(detail.substring(0,120))+'</span></td>';
     tbody.appendChild(tr);
@@ -975,7 +975,7 @@ function exportCSV(){
       r.dept4||'',
       r.dept5||'',
       r.date||'',
-      r.level||'',
+      (r.rule||'')+' '+(r.message||r.level||''),
       (r.detail||r.message||'')
     ].map(v => '"'+(v||'').replace(/"/g,'""')+'"');
     rows.push(vals.join(','));
@@ -995,13 +995,13 @@ function showAllRules(){
   const hitCount = {};
   const levelMap = {};
   const descMap = {
-    'R1.1':'周末有打卡但休假未涵盖',
-    '接近卡未舍去':'同一人同一日打卡间隔<10分钟',
-    'R3':'加班工时偏差超过5%',
-    'R4':'补签申请审批中',
-    'R5':'REG=0但有打卡记录',
-    'R6':'公出/出差审批中但REG=0',
-    'R7':'居家办公审批中但报表居家=0'
+    'R1.1':'周末考勤 — 周末有打卡但休假/年假未涵盖',
+    '接近卡未舍去':'打卡重卡 — 同一人同一日打卡间隔<10分钟',
+    'R3':'加班偏差 — 签字报表OT与系统估算偏差超过5%',
+    'R4':'补签审批 — 补签申请尚未审批完成',
+    'R5':'REG归零 — 计薪出勤=0但存在打卡记录',
+    'R6':'公出/出差审批 — 公出/出差审批中但REG=0',
+    'R7':'居家办公审批 — 居家办公审批中但签字报表未体现'
   };
   const riskMap = {
     'R1.1':'warning','接近卡未舍去':'warning',
