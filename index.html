@@ -10,100 +10,101 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;background:#f0f2f5;color:#333;min-height:100vh;padding:20px}
 .container{max-width:1400px;margin:0 auto}
-/* header */
 .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px}
 .header h1{font-size:22px;color:#1a1a2e}
 .header .sub{color:#888;font-size:13px}
-/* tabs */
 .tabs{display:flex;gap:4px;margin-bottom:16px;background:#e8eaf0;border-radius:10px;padding:4px;width:fit-content}
 .tab{padding:8px 20px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:500;color:#555;border:none;background:transparent;transition:.15s}
 .tab.active{background:#fff;color:#1a1a2e;box-shadow:0 1px 4px rgba(0,0,0,.08)}
 .tab:hover:not(.active){color:#333}
-/* upload zone - BIG clickable card */
 .upload-zone{border:2px dashed #ccc;border-radius:10px;padding:24px;text-align:center;background:#fff;margin-bottom:16px;transition:.2s;cursor:pointer}
 .upload-zone:hover{border-color:#0E66FB;background:#f5f8ff}
 .upload-zone.dragover{border-color:#0E66FB;background:#f0f6ff}
 .upload-zone.has-data{border-color:#12CC7E;background:#f6fff9}
 .upload-zone .hint{color:#999;font-size:13px;margin-top:4px}
-/* file status */
 .file-status{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
 .file-item{background:#fff;border-radius:6px;padding:6px 12px;font-size:12px;border:1px solid #e5e5e5;display:flex;align-items:center;gap:6px}
 .file-item.loaded{border-color:#12CC7E;background:#f6fff9}
 .file-item .dot{width:8px;height:8px;border-radius:50%;background:#ddd}
 .file-item.loaded .dot{background:#12CC7E}
+/* action bar */
+.action-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+.action-bar .file-badge{font-size:12px;color:#888;background:#fff;padding:4px 10px;border-radius:12px;border:1px solid #e5e5e5}
+.btn{padding:8px 18px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;font-size:13px;font-weight:500;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:#f0f0f0}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-primary{background:#0E66FB;color:#fff;border-color:#0E66FB}
+.btn-primary:hover{background:#0a52d4}
+.btn-success{background:#12CC7E;color:#fff;border-color:#12CC7E}
+.btn-success:hover{background:#0fb56e}
+.btn-danger{background:#D9001B;color:#fff;border-color:#D9001B}
+.btn-danger:hover{background:#b80016}
+/* progress bar */
+.progress-wrap{background:#fff;border-radius:8px;padding:16px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.progress-bar-bg{height:6px;border-radius:3px;background:#e5e5e5;overflow:hidden;margin-bottom:8px;position:relative}
+.progress-bar-fill{height:100%;border-radius:3px;background:#0E66FB;width:0%;transition:width .3s ease}
+.progress-text{font-size:12px;color:#888;text-align:center}
+/* collapsible panel */
+.collapsible{margin-bottom:10px;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.collapsible-header{background:#fff;padding:12px 16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:600;color:#333;user-select:none;transition:.15s}
+.collapsible-header:hover{background:#f8f9fb}
+.collapsible-header .arrow{transition:transform .2s;font-size:12px;color:#999}
+.collapsible.open .collapsible-header .arrow{transform:rotate(90deg)}
+.collapsible-body{background:#fff;padding:0 16px 16px;display:none}
+.collapsible.open .collapsible-body{display:block}
 /* stat cards */
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:20px}
-.stat-card{background:#fff;border-radius:8px;padding:16px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-.stat-card .num{font-size:30px;font-weight:700;line-height:1.2}
-.stat-card .label{font-size:12px;color:#888;margin-top:4px}
-.stat-card .sub{font-size:11px;color:#bbb;margin-top:2px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:16px}
+.stat-card{background:#f8f9fb;border-radius:6px;padding:14px;text-align:center}
+.stat-card .num{font-size:28px;font-weight:700;line-height:1.2}
+.stat-card .label{font-size:12px;color:#888;margin-top:2px}
 .stat-card.blue .num{color:#0E66FB}
 .stat-card.green .num{color:#12CC7E}
 .stat-card.orange .num{color:#FFAA0E}
 .stat-card.red .num{color:#D9001B}
 /* filter bar */
-.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
 .filter-bar select,.filter-bar input{padding:6px 10px;border:1px solid #ddd;border-radius:6px;font-size:13px;background:#fff}
 .filter-bar input{flex:1;min-width:160px}
 .filter-bar .info{font-size:12px;color:#888;margin-left:auto}
 /* table */
-.table-wrap{overflow-x:auto;background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.table-wrap{overflow-x:auto;border-radius:6px;border:1px solid #eee}
 table{width:100%;border-collapse:collapse;font-size:13px}
-th{background:#f4f7fe;padding:10px 12px;text-align:left;font-weight:600;color:#555;border-bottom:1px solid #e5e5e5;white-space:nowrap}
-td{padding:9px 12px;border-bottom:1px solid #f0f0f0;color:#444}
+th{background:#f4f7fe;padding:9px 12px;text-align:left;font-weight:600;color:#555;border-bottom:1px solid #e5e5e5;white-space:nowrap}
+td{padding:8px 12px;border-bottom:1px solid #f0f0f0;color:#444}
 tr:hover td{background:#fafbfc}
-/* pagination */
-.pagination{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;font-size:13px}
-.pagination button{padding:4px 12px;border:1px solid #ddd;border-radius:4px;background:#fff;cursor:pointer;font-size:13px}
+.pagination{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;font-size:13px}
+.pagination button{padding:3px 10px;border:1px solid #ddd;border-radius:4px;background:#fff;cursor:pointer;font-size:12px}
 .pagination button:hover{background:#f0f0f0}
 .pagination button:disabled{opacity:.4;cursor:default}
-.pagination .page-info{color:#888}
-/* badge */
 .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:500}
 .badge-warning{background:#fff3e0;color:#e65100}
 .badge-error{background:#fce4ec;color:#c62828}
 .badge-success{background:#e8f5e9;color:#2e7d32}
 .badge-info{background:#e3f2fd;color:#1565c0}
 .badge-pending{background:#fff8e1;color:#f57f17}
-/* dept tree */
-.dept-tree{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-bottom:16px}
-.dept-card{background:#fff;border-radius:8px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-.dept-card .dept-name{font-size:13px;font-weight:600;margin-bottom:6px;color:#333}
-.dept-card .dept-stat{display:flex;gap:10px;font-size:12px;color:#666}
-.dept-card .dept-stat span{display:flex;align-items:center;gap:3px}
-/* empty */
-.empty{text-align:center;padding:40px;color:#999;font-size:14px}
-/* charts - simple bars */
-.bar-row{display:flex;align-items:center;gap:6px;margin:3px 0;font-size:12px}
+.bar-row{display:flex;align-items:center;gap:6px;margin:2px 0;font-size:12px}
 .bar-row .bar-label{width:100px;text-align:right;color:#666;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bar-row .bar-fill{height:16px;border-radius:3px;min-width:4px;transition:.3s;background:#0E66FB}
+.bar-row .bar-fill{height:14px;border-radius:3px;min-width:4px;transition:.3s}
 .bar-row .bar-num{font-size:11px;color:#888;white-space:nowrap}
-/* objection */
-.obj-list{display:grid;gap:8px}
-.obj-item{background:#fff;border-radius:6px;padding:10px 14px;border-left:3px solid #FFAA0E;font-size:13px}
+/* confirmation */
+.dept-tree{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-bottom:12px}
+.dept-card{background:#fff;border-radius:8px;padding:12px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.dept-card .dept-name{font-size:13px;font-weight:600;margin-bottom:4px;color:#333}
+.dept-card .dept-stat{display:flex;gap:10px;font-size:12px;color:#666}
+.obj-list{display:grid;gap:6px}
+.obj-item{background:#fff;border-radius:6px;padding:8px 12px;border-left:3px solid #FFAA0E;font-size:13px}
 .obj-item .obj-emp{font-weight:600;color:#333}
 .obj-item .obj-reason{color:#888;font-size:12px;margin-top:2px}
-/* progress bar */
-.progress-bar{height:8px;border-radius:4px;background:#e5e5e5;overflow:hidden;display:flex}
+.progress-bar{height:8px;border-radius:4px;background:#e5e5e5;overflow:hidden;display:flex;margin-bottom:4px}
 .progress-bar .seg{height:100%;transition:.3s}
 .progress-bar .seg.success{background:#12CC7E}
 .progress-bar .seg.warning{background:#FFAA0E}
 .progress-bar .seg.danger{background:#D9001B}
-.progress-labels{display:flex;justify-content:space-between;font-size:11px;color:#888;margin-top:4px}
-/* panels */
+.progress-labels{display:flex;justify-content:space-between;font-size:11px;color:#888;margin-top:2px}
+.empty{text-align:center;padding:30px;color:#999;font-size:13px}
 .panel{display:none}
 .panel.active{display:block}
-/* btn */
-.btn{padding:6px 14px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;font-size:13px}
-.btn:hover{background:#f0f0f0}
-.btn-primary{background:#0E66FB;color:#fff;border-color:#0E66FB}
-.btn-primary:hover{background:#0a52d4}
-/* responsive */
-@media(max-width:768px){
-  .stats{grid-template-columns:repeat(2,1fr)}
-  .dept-tree{grid-template-columns:1fr}
-  .header{flex-direction:column;align-items:flex-start}
-}
+.v-divider{width:1px;height:20px;background:#ddd;margin:0 4px}
 </style>
 </head>
 <body>
@@ -111,11 +112,10 @@ tr:hover td{background:#fafbfc}
   <div class="header">
     <div>
       <h1>签字报表确认系统</h1>
-      <div class="sub">综合看板 &middot; 数据校验 + 员工确认</div>
+      <div class="sub">综合看板 &middot; 手动校验模式</div>
     </div>
     <div style="display:flex;gap:8px;align-items:center">
-      <span id="dataStatus" class="badge badge-pending">未加载数据</span>
-      <span id="dataCount" style="font-size:12px;color:#888"></span>
+      <span id="dataStatus" class="badge badge-pending">未上传文件</span>
     </div>
   </div>
 
@@ -124,61 +124,88 @@ tr:hover td{background:#fafbfc}
     <button class="tab" data-panel="confirmation">员工确认</button>
   </div>
 
-  <!-- HIDDEN FILE INPUT (accepts csv/xls/xlsx) -->
   <input type="file" id="fileInput" accept=".csv,.xls,.xlsx" multiple style="display:none">
 
-  <!-- ========== PANEL 1 ========== -->
+  <!-- =================== PANEL: 数据校验 =================== -->
   <div id="panel-validation" class="panel active">
+    <!-- Upload zone -->
     <div class="upload-zone" id="dropZoneV">
-      <div style="font-size:32px;margin-bottom:6px">&#128451;</div>
-      <div><strong>点击此处上传数据文件</strong></div>
+      <div style="font-size:28px;margin-bottom:4px">&#128451;</div>
+      <div><strong>上传数据文件</strong></div>
       <div class="hint">支持 .csv / .xls / .xlsx，可多选 &middot; 也可拖放文件到此处</div>
-      <div id="loadingV" style="display:none;color:#0E66FB;margin-top:8px">&#8987; 处理中...</div>
+      <div id="uploadLoadingV" style="display:none;color:#0E66FB;margin-top:6px;font-size:13px">&#8987; 处理中...</div>
     </div>
     <div class="file-status" id="fileStatusV"></div>
 
-    <div class="stats" id="statsV" style="display:none">
-      <div class="stat-card orange"><div class="num" id="totalWarnings">0</div><div class="label">Warning</div><div class="sub">需关注</div></div>
-      <div class="stat-card red"><div class="num" id="totalErrors">0</div><div class="label">Error</div><div class="sub">需处理</div></div>
-      <div class="stat-card blue"><div class="num" id="totalEmployees">0</div><div class="label">异常员工数</div><div class="sub">去重</div></div>
-      <div class="stat-card"><div class="num" id="totalRecords">0</div><div class="label">明细记录数</div><div class="sub">总行数</div></div>
+    <!-- Action bar: 开始校验 + 导出 -->
+    <div class="action-bar" id="actionBarV" style="display:none">
+      <span class="file-badge" id="fileCountBadge">0 个文件</span>
+      <button class="btn btn-primary" id="btnStartValidation" onclick="startValidation()">&#9654; 开始校验</button>
+      <span class="v-divider"></span>
+      <button class="btn" id="btnExportCSV" onclick="exportCSV()" disabled>&#11015; 导出 CSV</button>
+      <button class="btn" onclick="clearAllData()">&#128465; 清空重选</button>
     </div>
 
-    <div id="ruleBarsV" style="display:none;margin-bottom:16px">
-      <h3 style="font-size:14px;margin-bottom:8px;color:#333">按规则分布</h3>
-      <div id="ruleBars"></div>
+    <!-- Progress indicator (hidden until validation starts) -->
+    <div class="progress-wrap" id="progressWrap" style="display:none">
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
+      <div class="progress-text" id="progressText">准备中...</div>
     </div>
 
-    <div class="filter-bar" id="filterBarV" style="display:none">
-      <select id="ruleFilter"><option value="">所有规则</option><option value="R1.2">R1.2 重复打卡</option><option value="R3">R3 加班工时偏差</option><option value="R4">R4 补签审批中</option><option value="R5">R5 REG=0有打卡</option></select>
-      <input type="text" id="searchInput" placeholder="搜索工号/姓名/明细...">
-      <span class="info" id="tableInfo">共 0 条</span>
+    <!-- Collapsible: 总览统计 -->
+    <div class="collapsible" id="overviewPanel">
+      <div class="collapsible-header" onclick="toggleCollapse('overviewPanel')">
+        <span>&#128202; 校验总览</span>
+        <span class="arrow">&#9654;</span>
+      </div>
+      <div class="collapsible-body">
+        <div class="stats" id="statsV"></div>
+        <div id="ruleBarsV"></div>
+      </div>
     </div>
 
-    <div class="table-wrap" id="tableWrapV" style="display:none">
-      <table><thead><tr>
-        <th>规则</th><th>工号</th><th>级别</th><th>消息</th><th>明细</th>
-      </tr></thead><tbody id="tbodyV"></tbody></table>
-      <div class="pagination" id="paginationV">
-        <button onclick="prevPage()" id="prevBtn">上一页</button>
-        <span class="page-info" id="pageInfo">1/1</span>
-        <button onclick="nextPage()" id="nextBtn">下一页</button>
-        <select id="pageSize" onchange="renderTable()" style="margin-left:8px;padding:4px 6px;border:1px solid #ddd;border-radius:4px;font-size:12px">
-          <option value="20">20条/页</option><option value="50">50条/页</option><option value="100">100条/页</option>
-        </select>
+    <!-- Collapsible: 明细数据 -->
+    <div class="collapsible" id="detailPanel">
+      <div class="collapsible-header" onclick="toggleCollapse('detailPanel')">
+        <span>&#128203; 明细数据</span>
+        <span class="arrow">&#9654;</span>
+      </div>
+      <div class="collapsible-body">
+        <div class="filter-bar" id="filterBarV">
+          <select id="ruleFilter"><option value="">所有规则</option><option value="R1.2">R1.2 重复打卡</option><option value="R3">R3 加班工时偏差</option><option value="R4">R4 补签审批中</option><option value="R5">R5 REG=0有打卡</option></select>
+          <input type="text" id="searchInput" placeholder="搜索工号/姓名/明细...">
+          <span class="info" id="tableInfo">共 0 条</span>
+        </div>
+        <div class="table-wrap" id="tableWrapV">
+          <table><thead><tr><th>规则</th><th>工号</th><th>级别</th><th>消息</th><th>明细</th></tr></thead><tbody id="tbodyV"></tbody></table>
+          <div class="pagination" id="paginationV">
+            <button onclick="prevPage()" id="prevBtn">上一页</button>
+            <span class="page-info" id="pageInfo">1/1</span>
+            <button onclick="nextPage()" id="nextBtn">下一页</button>
+            <select id="pageSize" onchange="renderTable()" style="margin-left:6px;padding:3px 6px;border:1px solid #ddd;border-radius:4px;font-size:12px">
+              <option value="20">20条/页</option><option value="50">50条/页</option><option value="100">100条/页</option>
+            </select>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- ========== PANEL 2: 员工确认 ========== -->
+  <!-- =================== PANEL: 员工确认 =================== -->
   <div id="panel-confirmation" class="panel">
     <div class="upload-zone" id="dropZoneC">
-      <div style="font-size:32px;margin-bottom:6px">&#128203;</div>
-      <div><strong>点击此处上传确认数据</strong></div>
-      <div class="hint">需要 "校验报告.csv/.xlsx" 和 "确认状态.csv/.xlsx" &middot; 可拖放</div>
-      <div id="loadingC" style="display:none;color:#0E66FB;margin-top:8px">&#8987; 处理中...</div>
+      <div style="font-size:28px;margin-bottom:4px">&#128203;</div>
+      <div><strong>上传确认数据</strong></div>
+      <div class="hint">需要 "校验报告" 和 "确认状态" 文件 &middot; 可拖放</div>
+      <div id="uploadLoadingC" style="display:none;color:#0E66FB;margin-top:6px;font-size:13px">&#8987; 处理中...</div>
     </div>
     <div class="file-status" id="fileStatusC"></div>
+
+    <div class="action-bar" id="actionBarC" style="display:none">
+      <span class="file-badge" id="fileCountBadgeC">0 个文件</span>
+      <button class="btn btn-primary" onclick="loadConfirmation()">&#9654; 加载确认数据</button>
+      <button class="btn" onclick="clearAllData()">&#128465; 清空重选</button>
+    </div>
 
     <div class="stats" id="statsC" style="display:none">
       <div class="stat-card blue"><div class="num" id="totalEmp">0</div><div class="label">总员工</div></div>
@@ -187,24 +214,23 @@ tr:hover td{background:#fafbfc}
       <div class="stat-card red"><div class="num" id="objectionCount">0</div><div class="label">有异议</div></div>
     </div>
 
-    <div id="progressSection" style="display:none;margin-bottom:16px">
-      <h3 style="font-size:14px;margin-bottom:8px;color:#333">整体确认进度</h3>
+    <div id="progressSection" style="display:none;margin-bottom:12px">
+      <h3 style="font-size:14px;margin-bottom:6px;color:#333">整体确认进度</h3>
       <div class="progress-bar" id="progressBar"></div>
       <div class="progress-labels" id="progressLabels"></div>
     </div>
 
-    <h3 style="font-size:14px;margin-bottom:8px;color:#333">按部门统计</h3>
+    <h3 style="font-size:14px;margin-bottom:6px;color:#333">按部门统计</h3>
     <div class="dept-tree" id="deptTree"></div>
 
-    <h3 style="font-size:14px;margin:16px 0 8px;color:#333">异议原因明细</h3>
+    <h3 style="font-size:14px;margin:12px 0 6px;color:#333">异议原因明细</h3>
     <div id="objectionList" class="obj-list"></div>
   </div>
 </div>
-
 <script>
 // ========== STATE ==========
 const state = {
-  validation: { data: [], filtered: [], page: 1, pageSize: 20 },
+  validation: { data: [], filtered: [], page: 1, pageSize: 20, validated: false },
   confirmation: { rows: [], loaded: false },
   files: {}
 };
@@ -225,17 +251,15 @@ document.querySelectorAll('.tab').forEach(t=>{
 const fileInput = document.getElementById('fileInput');
 fileInput.addEventListener('change', function(e){
   if(this.files.length) loadFiles(this.files);
-  this.value = ''; // allow re-select same file
+  this.value = '';
 });
 
 function openFilePicker(){
   fileInput.click();
 }
-// Bind click to upload zones (after potential inline-onclick failures on file://)
 document.getElementById('dropZoneV').addEventListener('click', openFilePicker);
 document.getElementById('dropZoneC').addEventListener('click', openFilePicker);
 
-// ========== DROP ZONE ==========
 ['dropZoneV','dropZoneC'].forEach(id=>{
   const el=document.getElementById(id);
   el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('dragover')});
@@ -246,23 +270,26 @@ document.getElementById('dropZoneC').addEventListener('click', openFilePicker);
   });
 });
 
-// ========== FILE LOADING (CSV + XLS/XLSX) ==========
+// ========== FILE LOADING ==========
 function loadFiles(files){
-  console.log('loadFiles called with', files.length, 'file(s)');
   document.getElementById('dataStatus').textContent='加载中...';
   document.getElementById('dataStatus').className='badge badge-info';
-  // Show loading indicators
-  document.getElementById('loadingV').style.display='block';
-  document.getElementById('loadingC').style.display='block';
+  document.getElementById('uploadLoadingV').style.display='block';
+  document.getElementById('uploadLoadingC').style.display='block';
   let pending = files.length;
 
   function done(){
     pending--;
-    if(pending === 0) processLoadedData();
+    if(pending === 0){
+      document.getElementById('uploadLoadingV').style.display='none';
+      document.getElementById('uploadLoadingC').style.display='none';
+      document.getElementById('dataStatus').textContent='已上传';
+      document.getElementById('dataStatus').className='badge badge-success';
+      updateFileUI();
+    }
   }
 
   Array.from(files).forEach(f => {
-    console.log('Processing:', f.name, f.size, 'bytes');
     const name = f.name.toLowerCase();
     if(name.endsWith('.csv')){
       const reader = new FileReader();
@@ -278,25 +305,23 @@ function loadFiles(files){
       reader.onload = e => {
         try {
           const wb = XLSX.read(e.target.result, {type:'array'});
-          const rows = [];
-          // Try each sheet, pick the one with most rows
           let best = [], bestLen = 0;
           wb.SheetNames.forEach(sn => {
             const data = XLSX.utils.sheet_to_json(wb.Sheets[sn], {header:1, defval:''});
-            if(data.length > bestLen){
-              best = data;
-              bestLen = data.length;
-            }
+            if(data.length > bestLen){ best = data; bestLen = data.length; }
           });
           if(best.length > 1){
             const headers = best[0].map(h => String(h).trim());
+            const rows = [];
             for(let i=1; i<best.length; i++){
               const row = {};
               headers.forEach((h, idx) => { row[h] = best[i][idx] !== undefined ? String(best[i][idx]).trim() : ''; });
               if(Object.values(row).some(v=>v)) rows.push(row);
             }
+            state.files[f.name] = rows;
+          } else {
+            state.files[f.name] = [];
           }
-          state.files[f.name] = rows;
         } catch(err) {
           console.error('XLSX parse error:', err);
           state.files[f.name] = [];
@@ -311,42 +336,19 @@ function loadFiles(files){
   });
 }
 
-function processLoadedData(){
-  console.log('processLoadedData, files:', Object.keys(state.files));
-  const vf = Object.keys(state.files).find(k => k.includes('校验')||k.includes('validate')||k.includes('check')||k.includes('report')||k.includes('检查'));
-  if(vf){
-    console.log('Found validation file:', vf);
-    state.validation.data = state.files[vf].filter(r=>(r.rule||r.rule_code||r['校验规则'])&&(r.emp_id||r.emp||r['员工编号']));
-    console.log('Validation data rows:', state.validation.data.length);
-    applyFilters();
-  } else {
-    console.log('No validation file matched. Files:', Object.keys(state.files));
-  }
-  const cf = Object.keys(state.files).find(k => k.includes('确认')||k.includes('状态')||k.includes('status')||k.includes('confirm'));
-  if(cf){
-    console.log('Found confirmation file:', cf);
-    state.confirmation.rows = state.files[cf].filter(r=>r.emp_id);
-    console.log('Confirmation rows:', state.confirmation.rows.length);
-    buildConfirmation();
-  } else {
-    console.log('No confirmation file matched');
-  }
-  updateFileStatus();
-  document.getElementById('dataStatus').textContent='已加载';
-  document.getElementById('dataStatus').className='badge badge-success';
-  document.getElementById('loadingV').style.display='none';
-  document.getElementById('loadingC').style.display='none';
-  // Scroll to see results
-  document.querySelector('.stats')?.scrollIntoView({behavior:'smooth',block:'start'});
-}
+function updateFileUI(){
+  const fCount = Object.keys(state.files).length;
+  const hasFile = fCount > 0;
+  document.getElementById('fileCountBadge').textContent = fCount + ' 个文件';
+  document.getElementById('fileCountBadgeC').textContent = fCount + ' 个文件';
+  document.getElementById('actionBarV').style.display = hasFile ? 'flex' : 'none';
+  document.getElementById('actionBarC').style.display = hasFile ? 'flex' : 'none';
 
-function updateFileStatus(){
   ['dropZoneV','dropZoneC'].forEach(id=>{
     const el=document.getElementById(id);
-    el.classList.add('has-data');
+    if(hasFile) el.classList.add('has-data'); else el.classList.remove('has-data');
   });
-  const fCount = Object.keys(state.files).length;
-  document.getElementById('dataCount').textContent = fCount + ' 个文件';
+
   ['fileStatusV','fileStatusC'].forEach(id=>{
     const el=document.getElementById(id);
     el.innerHTML='';
@@ -359,13 +361,147 @@ function updateFileStatus(){
   });
 }
 
-// ========== VALIDATION ==========
+// ========== CLEAR ALL ==========
+function clearAllData(){
+  state.files = {};
+  state.validation.data = [];
+  state.validation.filtered = [];
+  state.validation.validated = false;
+  state.validation.page = 1;
+  state.confirmation.rows = [];
+  state.confirmation.loaded = false;
+
+  document.getElementById('actionBarV').style.display = 'none';
+  document.getElementById('actionBarC').style.display = 'none';
+  ['dropZoneV','dropZoneC'].forEach(id=>{
+    document.getElementById(id).classList.remove('has-data');
+  });
+  ['fileStatusV','fileStatusC'].forEach(id=>{
+    document.getElementById(id).innerHTML = '';
+  });
+  document.getElementById('statsV').innerHTML = '';
+  document.getElementById('statsV').style.display = 'none';
+  document.getElementById('ruleBarsV').innerHTML = '';
+  document.getElementById('tbodyV').innerHTML = '';
+  document.getElementById('tableWrapV').style.display = 'none';
+  document.getElementById('filterBarV').style.display = 'none';
+  document.getElementById('progressWrap').style.display = 'none';
+  document.getElementById('statsC').style.display = 'none';
+  document.getElementById('progressSection').style.display = 'none';
+  document.getElementById('deptTree').innerHTML = '';
+  document.getElementById('objectionList').innerHTML = '';
+  document.getElementById('btnExportCSV').disabled = true;
+  document.getElementById('dataStatus').textContent = '未上传文件';
+  document.getElementById('dataStatus').className = 'badge badge-pending';
+  document.getElementById('fileCountBadge').textContent = '0 个文件';
+  document.getElementById('fileCountBadgeC').textContent = '0 个文件';
+}
+
+// ========== TOGGLE COLLAPSE ==========
+function toggleCollapse(id){
+  const el = document.getElementById(id);
+  el.classList.toggle('open');
+}
+
+// ========== START VALIDATION (manual trigger) ==========
+function startValidation(){
+  // Reset previous results
+  state.validation.data = [];
+  state.validation.filtered = [];
+  state.validation.validated = false;
+
+  const progressWrap = document.getElementById('progressWrap');
+  const progressFill = document.getElementById('progressFill');
+  const progressText = document.getElementById('progressText');
+  progressWrap.style.display = 'block';
+
+  const steps = [
+    {label:'检测文件...', pct:5},
+    {label:'解析校验报表...', pct:20},
+    {label:'按规则分类...', pct:40},
+    {label:'统计汇总...', pct:60},
+    {label:'生成明细数据...', pct:80},
+    {label:'校验完成', pct:100}
+  ];
+
+  const btn = document.getElementById('btnStartValidation');
+  btn.disabled = true;
+  btn.innerHTML = '&#8987; 校验中...';
+
+  function runStep(idx){
+    if(idx >= steps.length){
+      // Done - render results
+      progressFill.style.width = '100%';
+      const diag = state._diag || '';
+      progressText.innerHTML = '&#10003; 校验完成！共 <strong>' + state.validation.data.length + '</strong> 条记录<br><span style="font-size:11px;color:#666">' + esc(diag) + '</span>';
+      btn.disabled = false;
+      btn.innerHTML = '&#9654; 重新校验';
+      state.validation.validated = true;
+      document.getElementById('btnExportCSV').disabled = false;
+      // Auto-open overview
+      document.getElementById('overviewPanel').classList.add('open');
+      document.getElementById('detailPanel').classList.add('open');
+      applyFilters();
+      return;
+    }
+
+    const step = steps[idx];
+    setTimeout(() => {
+      progressFill.style.width = step.pct + '%';
+      progressText.textContent = step.label + ' (' + step.pct + '%)';
+
+      if(idx === 1){
+        // Auto-detect: scan all files for columns matching rule + emp_id
+        let found = null, maxRows = 0;
+        const fileNames = Object.keys(state.files);
+        let diag = '📁 ' + fileNames.length + ' 个文件: ';
+        fileNames.forEach(name => {
+          const rows = state.files[name];
+          if(!rows || !rows.length){
+            diag += '⚠️ [' + esc(name) + '] 空数据; ';
+            return;
+          }
+          const sample = rows[0];
+          const keys = Object.keys(sample);
+          const hasRule = sample.rule || sample.rule_code || sample['校验规则'];
+          const hasEmp = sample.emp_id || sample.emp || sample['员工编号'] || sample.empId;
+          diag += '📄 [' + esc(name) + '] ' + rows.length + '行 列=[' + esc(keys.join(',')) + '] rule=' + !!hasRule + ' emp=' + !!hasEmp + '; ';
+          if(hasRule && hasEmp && rows.length > maxRows){
+            found = {name, rows};
+            maxRows = rows.length;
+          }
+        });
+        if(found){
+          diag += '✅ 选 ' + esc(found.name) + '(' + found.rows.length + '行)';
+          state.validation.data = found.rows.filter(r=>
+            (r.rule||r.rule_code||r['校验规则'])&&(r.emp_id||r.emp||r['员工编号']||r.empId)
+          );
+          diag += ' → 过滤后 ' + state.validation.data.length + ' 行有效记录';
+        } else {
+          diag += '❌ 未找到含 rule+emp_id 列的文件';
+        }
+        // Store diagnostics for display at completion
+        state._diag = diag;
+      }
+
+      runStep(idx + 1);
+    }, 200);
+  }
+
+  runStep(0);
+}
+
+// ========== VALIDATION RENDERING ==========
 function applyFilters(){
   const rule=document.getElementById('ruleFilter').value;
   const search=document.getElementById('searchInput').value.toLowerCase();
   let data=state.validation.data;
   if(rule) data=data.filter(r=>r.rule===rule);
-  if(search) data=data.filter(r=>(r.emp_id||'').toLowerCase().includes(search)||(r.message||'').toLowerCase().includes(search)||(r.detail||'').toLowerCase().includes(search));
+  if(search) data=data.filter(r=>
+    (r.emp_id||'').toLowerCase().includes(search)||
+    (r.message||'').toLowerCase().includes(search)||
+    (r.detail||'').toLowerCase().includes(search)
+  );
   state.validation.filtered=data;
   state.validation.page=1;
   renderStats();
@@ -373,17 +509,16 @@ function applyFilters(){
   renderRuleBars();
   document.getElementById('filterBarV').style.display='flex';
   document.getElementById('tableWrapV').style.display='block';
-  document.getElementById('statsV').style.display='grid';
-  document.getElementById('ruleBarsV').style.display='block';
 }
 
 function renderStats(){
   const d=state.validation.filtered;
   const uniq=new Set(d.map(r=>r.emp_id));
-  document.getElementById('totalWarnings').textContent=d.filter(r=>r.level==='warning').length;
-  document.getElementById('totalErrors').textContent=d.filter(r=>r.level==='error').length;
-  document.getElementById('totalEmployees').textContent=uniq.size;
-  document.getElementById('totalRecords').textContent=d.length;
+  document.getElementById('statsV').innerHTML=
+    '<div class="stat-card orange"><div class="num">'+d.filter(r=>r.level==='warning').length+'</div><div class="label">Warning</div><div class="sub">需关注</div></div>'+
+    '<div class="stat-card red"><div class="num">'+d.filter(r=>r.level==='error').length+'</div><div class="label">Error</div><div class="sub">需处理</div></div>'+
+    '<div class="stat-card blue"><div class="num">'+uniq.size+'</div><div class="label">异常员工数</div><div class="sub">去重</div></div>'+
+    '<div class="stat-card"><div class="num">'+d.length+'</div><div class="label">明细记录数</div><div class="sub">总行数</div></div>';
   document.getElementById('statsV').style.display='grid';
 }
 
@@ -391,14 +526,16 @@ function renderRuleBars(){
   const d=state.validation.filtered;
   const grp={};
   d.forEach(r=>{grp[r.rule]=(grp[r.rule]||0)+1});
-  const el=document.getElementById('ruleBars');
-  el.innerHTML='';
+  const el=document.getElementById('ruleBarsV');
+  el.innerHTML='<h3 style="font-size:14px;margin:0 0 8px;color:#333">按规则分布</h3>'+
+    '<div id="ruleBars"></div>';
+  const rb=document.getElementById('ruleBars');
   const max=Math.max(...Object.values(grp),1);
   Object.entries(grp).sort((a,b)=>b[1]-a[1]).forEach(([rule,cnt])=>{
     const row=document.createElement('div');row.className='bar-row';
     const pct=cnt/max*100;
     row.innerHTML='<span class="bar-label">'+esc(rule)+'</span><div style="flex:1;background:#f0f0f0;border-radius:3px"><div class="bar-fill" style="width:'+pct+'%;background:'+(COLORS[rule]||'#0E66FB')+'"></div></div><span class="bar-num">'+cnt+'条</span>';
-    el.appendChild(row);
+    rb.appendChild(row);
   });
 }
 
@@ -419,7 +556,8 @@ function renderTable(){
     tbody.appendChild(tr);
   });
   if(!page.length) tbody.innerHTML='<tr><td colspan="5" class="empty">无匹配数据</td></tr>';
-  document.getElementById('tableInfo').textContent='共 '+d.length+' 条，显示 '+(start+1)+'-'+Math.min(start+ps,d.length);
+  const end = Math.min(start+ps, d.length);
+  document.getElementById('tableInfo').textContent='共 '+d.length+' 条，显示 '+(d.length?(start+1):0)+'-'+end;
   document.getElementById('pageInfo').textContent=p+'/'+total;
   document.getElementById('prevBtn').disabled=p<=1;
   document.getElementById('nextBtn').disabled=p>=total;
@@ -431,12 +569,56 @@ document.getElementById('ruleFilter').addEventListener('change',applyFilters);
 document.getElementById('searchInput').addEventListener('input',applyFilters);
 document.getElementById('pageSize').addEventListener('change',renderTable);
 
+// ========== EXPORT CSV ==========
+function exportCSV(){
+  if(!state.validation.validated || !state.validation.data.length) return;
+  const d = state.validation.filtered.length ? state.validation.filtered : state.validation.data;
+  const headers = ['rule','emp_id','level','message','detail'];
+  const rows = [headers.join(',')];
+  d.forEach(r => {
+    const vals = headers.map(h => {
+      const v = (r[h]||'').replace(/"/g,'""');
+      return '"'+v+'"';
+    });
+    rows.push(vals.join(','));
+  });
+  const blob = new Blob([rows.join('\n')], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '校验结果_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
 // ========== CONFIRMATION ==========
+function loadConfirmation(){
+  // Auto-detect: scan all files for columns matching emp_id + confirm_status
+  let found = null, maxRows = 0;
+  Object.entries(state.files).forEach(([name, rows]) => {
+    if(!rows || !rows.length) return;
+    const sample = rows[0];
+    const hasEmp = sample.emp_id || sample.emp || sample['员工编号'];
+    const hasConfirm = sample.confirm_status || sample.send_status || sample['确认状态'];
+    if(hasEmp && hasConfirm && rows.length > maxRows){
+      found = {name, rows};
+      maxRows = rows.length;
+    }
+  });
+  if(found){
+    state.confirmation.rows = found.rows.filter(r=>r.emp_id||r.emp||r['员工编号']);
+    state.confirmation.loaded = true;
+    buildConfirmation();
+  } else {
+    alert('未找到确认状态文件（需包含 emp_id 和 confirm_status 列）');
+  }
+}
+
 function buildConfirmation(){
   const rows=state.confirmation.rows;
-  if(!rows.length) return;
-  state.confirmation.loaded=true;
-
+  if(!rows.length){
+    document.getElementById('statsC').innerHTML='<div class="empty">暂无数据</div>';
+    return;
+  }
   const total=rows.length;
   const confirmed=rows.filter(r=>r.confirm_status==='已确认'||r.confirm_status==='confirmed').length;
   const objection=rows.filter(r=>r.objection_reason&&r.objection_reason.trim()).length;
@@ -448,14 +630,12 @@ function buildConfirmation(){
   document.getElementById('objectionCount').textContent=objection;
   document.getElementById('statsC').style.display='grid';
 
-  // Progress bar
   const pb=document.getElementById('progressBar');
   const pc=[confirmed/total*100, pending/total*100, objection/total*100];
   pb.innerHTML='<div class="seg success" style="width:'+pc[0]+'%"></div><div class="seg warning" style="width:'+pc[1]+'%"></div><div class="seg danger" style="width:'+pc[2]+'%"></div>';
   document.getElementById('progressLabels').innerHTML='<span>&#9989; 已确认 '+confirmed+' ('+Math.round(pc[0])+'%)</span><span>&#9203; 待确认 '+pending+' ('+Math.round(pc[1])+'%)</span><span>&#9888;&#65039; 有异议 '+objection+' ('+Math.round(pc[2])+'%)</span>';
   document.getElementById('progressSection').style.display='block';
 
-  // Department tree
   const depts={};
   rows.forEach(r=>{
     const d=r.department||'未知';
@@ -473,7 +653,6 @@ function buildConfirmation(){
     dt.appendChild(card);
   });
 
-  // Objection list
   const objRows=rows.filter(r=>r.objection_reason&&r.objection_reason.trim());
   const ol=document.getElementById('objectionList');
   ol.innerHTML='';
