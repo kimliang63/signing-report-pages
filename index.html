@@ -206,22 +206,14 @@ tr:hover td{background:#fafbfc}
 
   <!-- =================== PANEL: 员工确认 =================== -->
   <div id="panel-confirmation" class="panel">
-    <div class="upload-zone" id="dropZoneC">
-      <div style="font-size:28px;margin-bottom:4px">&#128203;</div>
-      <div><strong>上传确认数据</strong></div>
-      <div class="hint">需要 "校验报告" 和 "确认状态" 文件 &middot; 可拖放</div>
-      <div id="uploadLoadingC" style="display:none;color:#0E66FB;margin-top:6px;font-size:13px">&#8987; 处理中...</div>
-    </div>
-    <div class="file-status" id="fileStatusC"></div>
-
-    <div class="action-bar" id="actionBarC" style="display:none">
-      <span class="file-badge" id="fileCountBadgeC">0 个文件</span>
-      <button class="btn btn-primary" onclick="loadConfirmation()">&#9654; 加载确认数据</button>
-      <button class="btn" onclick="clearAllData()">&#128465; 清空重选</button>
+    <div class="action-bar" id="actionBarC">
+      <span class="file-badge" id="confirmBadge">0 个待确认员工</span>
+      <button class="btn btn-primary" onclick="buildConfirmationList()">🔄 从校验结果生成确认名单</button>
+      <button class="btn btn-success" onclick="sendAllFeishuCards()" id="sendAllBtn" disabled>📨 批量发送飞书卡片</button>
     </div>
 
     <div class="stats" id="statsC" style="display:none">
-      <div class="stat-card blue"><div class="num" id="totalEmp">0</div><div class="label">总员工</div></div>
+      <div class="stat-card blue"><div class="num" id="totalEmp">0</div><div class="label">异常员工</div></div>
       <div class="stat-card green"><div class="num" id="confirmedCount">0</div><div class="label">已确认</div></div>
       <div class="stat-card orange"><div class="num" id="pendingCount">0</div><div class="label">待确认</div></div>
       <div class="stat-card red"><div class="num" id="objectionCount">0</div><div class="label">有异议</div></div>
@@ -233,11 +225,18 @@ tr:hover td{background:#fafbfc}
       <div class="progress-labels" id="progressLabels"></div>
     </div>
 
-    <h3 style="font-size:14px;margin-bottom:6px;color:#333">按部门统计</h3>
-    <div class="dept-tree" id="deptTree"></div>
-
-    <h3 style="font-size:14px;margin:12px 0 6px;color:#333">异议原因明细</h3>
-    <div id="objectionList" class="obj-list"></div>
+    <h3 style="font-size:14px;margin-bottom:6px;color:#333">员工确认名单</h3>
+    <table style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead><tr style="background:#f4f7fe">
+        <th style="padding:8px 10px;text-align:left;border-bottom:1px solid #e5e5e5;font-weight:600;color:#555">工号</th>
+        <th style="padding:8px 10px;text-align:left;border-bottom:1px solid #e5e5e5;font-weight:600;color:#555">员工</th>
+        <th style="padding:8px 10px;text-align:left;border-bottom:1px solid #e5e5e5;font-weight:600;color:#555">部门</th>
+        <th style="padding:8px 10px;text-align:center;border-bottom:1px solid #e5e5e5;font-weight:600;color:#555">异常条数</th>
+        <th style="padding:8px 10px;text-align:center;border-bottom:1px solid #e5e5e5;font-weight:600;color:#555">状态</th>
+        <th style="padding:8px 10px;text-align:center;border-bottom:1px solid #e5e5e5;font-weight:600;color:#555">操作</th>
+      </tr></thead>
+      <tbody id="confirmTbody"></tbody>
+    </table>
   </div>
 </div>
 <script>
@@ -1000,80 +999,194 @@ function showAllRules(){
 }
 
 // ========== CONFIRMATION ==========
-function loadConfirmation(){
-  // Auto-detect: scan all files for columns matching emp_id + confirm_status
-  let found = null, maxRows = 0;
-  Object.entries(state.files).forEach(([name, rows]) => {
-    if(!rows || !rows.length) return;
-    const sample = rows[0];
-    const hasEmp = sample.emp_id || sample.emp || sample['员工编号'] || sample.empId || sample['工号'] || sample['员工ID'];
-    const hasConfirm = sample.confirm_status || sample.send_status || sample['确认状态'];
-    if(hasEmp && hasConfirm && rows.length > maxRows){
-      found = {name, rows};
-      maxRows = rows.length;
-    }
-  });
-  if(found){
-    state.confirmation.rows = found.rows.filter(r=>r.emp_id||r.emp||r['员工编号']||r.empId||r['工号']||r['员工ID']);
-    state.confirmation.loaded = true;
-    buildConfirmation();
-  } else {
-    alert('未找到确认状态文件（需包含 emp_id 和 confirm_status 列）');
-  }
-}
-
-function buildConfirmation(){
-  const rows=state.confirmation.rows;
-  if(!rows.length){
-    document.getElementById('statsC').innerHTML='<div class="empty">暂无数据</div>';
+function buildConfirmationList(){
+  if(!state.validation.validated || !state.validation.data.length){
+    alert('请先在「数据校验」面板上传文件并点击「开始校验」');
     return;
   }
-  const total=rows.length;
-  const confirmed=rows.filter(r=>r.confirm_status==='已确认'||r.confirm_status==='confirmed').length;
-  const objection=rows.filter(r=>r.objection_reason&&r.objection_reason.trim()).length;
-  const pending=total-confirmed-objection;
 
-  document.getElementById('totalEmp').textContent=total;
-  document.getElementById('confirmedCount').textContent=confirmed;
-  document.getElementById('pendingCount').textContent=pending;
-  document.getElementById('objectionCount').textContent=objection;
-  document.getElementById('statsC').style.display='grid';
-
-  const pb=document.getElementById('progressBar');
-  const pc=[confirmed/total*100, pending/total*100, objection/total*100];
-  pb.innerHTML='<div class="seg success" style="width:'+pc[0]+'%"></div><div class="seg warning" style="width:'+pc[1]+'%"></div><div class="seg danger" style="width:'+pc[2]+'%"></div>';
-  document.getElementById('progressLabels').innerHTML='<span>&#9989; 已确认 '+confirmed+' ('+Math.round(pc[0])+'%)</span><span>&#9203; 待确认 '+pending+' ('+Math.round(pc[1])+'%)</span><span>&#9888;&#65039; 有异议 '+objection+' ('+Math.round(pc[2])+'%)</span>';
-  document.getElementById('progressSection').style.display='block';
-
-  const depts={};
-  rows.forEach(r=>{
-    const d=r.department||'未知';
-    if(!depts[d]) depts[d]={total:0,confirmed:0,pending:0,objection:0};
-    depts[d].total++;
-    if(r.confirm_status==='已确认') depts[d].confirmed++;
-    else if(r.objection_reason&&r.objection_reason.trim()) depts[d].objection++;
-    else depts[d].pending++;
-  });
-  const dt=document.getElementById('deptTree');
-  dt.innerHTML='';
-  Object.entries(depts).sort((a,b)=>b[1].total-a[1].total).forEach(([dept,info])=>{
-    const card=document.createElement('div');card.className='dept-card';
-    card.innerHTML='<div class="dept-name">'+esc(dept)+'</div><div class="dept-stat"><span>总:'+info.total+'</span><span style="color:#12CC7E">已确认:'+info.confirmed+'</span><span style="color:#FFAA0E">待确认:'+info.pending+'</span><span style="color:#D9001B">异议:'+info.objection+'</span></div>';
-    dt.appendChild(card);
+  // 从校验结果去重
+  const all = state.validation.data;
+  const empMap = {};
+  all.forEach(r => {
+    const key = r.emp_id;
+    if(!key) return;
+    if(!empMap[key]){
+      empMap[key] = {
+        emp_id: key,
+        name: r.name || '',
+        dept3: r.dept3 || '',
+        dept4: r.dept4 || '',
+        dept5: r.dept5 || '',
+        count: 0,
+        status: '待确认',
+        rules: [],
+        errors: []
+      };
+    }
+    empMap[key].count++;
+    empMap[key].rules.push(r.rule || '未知');
+    empMap[key].errors.push(r.message || r.detail || '');
   });
 
-  const objRows=rows.filter(r=>r.objection_reason&&r.objection_reason.trim());
-  const ol=document.getElementById('objectionList');
-  ol.innerHTML='';
-  if(!objRows.length){
-    ol.innerHTML='<div class="empty">暂无异议记录</div>';
-  }else{
-    objRows.forEach(r=>{
-      const item=document.createElement('div');item.className='obj-item';
-      item.innerHTML='<div class="obj-emp">'+esc(r.emp_id)+' - '+esc(r.name)+'</div><div class="obj-reason">异议原因：'+esc(r.objection_reason)+'</div>';
-      ol.appendChild(item);
+  state.confirmation.rows = Object.values(empMap);
+  state.confirmation.loaded = true;
+  renderConfirmation();
+}
+
+function renderConfirmation(){
+  const rows = state.confirmation.rows;
+  if(!rows.length){
+    document.getElementById('confirmTbody').innerHTML = '<tr><td colspan="6" class="empty">暂无数据</td></tr>';
+    return;
+  }
+
+  const total = rows.length;
+  const confirmed = rows.filter(r => r.status === '已确认').length;
+  const objection = rows.filter(r => r.status === '有异议').length;
+  const pending = total - confirmed - objection;
+
+  document.getElementById('totalEmp').textContent = total;
+  document.getElementById('confirmedCount').textContent = confirmed;
+  document.getElementById('pendingCount').textContent = pending;
+  document.getElementById('objectionCount').textContent = objection;
+  document.getElementById('statsC').style.display = 'grid';
+
+  document.getElementById('confirmBadge').textContent = pending + ' 个待确认员工';
+
+  // progress bar
+  const pb = document.getElementById('progressBar');
+  const pc = [confirmed/total*100, pending/total*100, objection/total*100];
+  pb.innerHTML = '<div class="seg success" style="width:'+pc[0]+'%"></div><div class="seg warning" style="width:'+pc[1]+'%"></div><div class="seg danger" style="width:'+pc[2]+'%"></div>';
+  document.getElementById('progressLabels').innerHTML =
+    '<span>&#9989; 已确认 '+confirmed+' ('+Math.round(pc[0])+'%)</span>'+
+    '<span>&#9203; 待确认 '+pending+' ('+Math.round(pc[1])+'%)</span>'+
+    '<span>&#9888;&#65039; 有异议 '+objection+' ('+Math.round(pc[2])+'%)</span>';
+  document.getElementById('progressSection').style.display = 'block';
+
+  // table rows
+  const tbody = document.getElementById('confirmTbody');
+  tbody.innerHTML = rows.map(r => {
+    const dept = [r.dept3, r.dept4, r.dept5].filter(Boolean).join(' / ');
+    const statusBadge = r.status === '已确认' ? 'badge-success' : r.status === '有异议' ? 'badge-error' : 'badge-pending';
+    const statusLabel = r.status === '待确认' ? '⏳ 待确认' : r.status === '已确认' ? '✅ 已确认' : '⚠️ 有异议';
+    return '<tr>'+
+      '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-weight:600">'+esc(r.emp_id)+'</td>'+
+      '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0">'+esc(r.name)+'</td>'+
+      '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-size:12px;color:#666">'+esc(dept)+'</td>'+
+      '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:center;font-weight:600;color:#D9001B">'+r.count+'</td>'+
+      '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:center"><span class="badge '+statusBadge+'">'+statusLabel+'</span></td>'+
+      '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:center">'+
+        '<button class="btn btn-sm" onclick="showEmpClock(\''+esc(r.emp_id)+'\')" style="margin-right:4px">⏰ 考勤记录</button>'+
+        '<button class="btn btn-sm" onclick="showEmpErrors(\''+esc(r.emp_id)+'\')" style="margin-right:4px">📋 异常明细</button>'+
+        (r.status === '待确认' ?
+          '<button class="btn btn-sm btn-success" onclick="markConfirmed(\''+esc(r.emp_id)+'\')">✅ 标记已确认</button>' :
+          '')+
+      '</td></tr>';
+  }).join('');
+
+  document.getElementById('sendAllBtn').disabled = false;
+}
+
+function markConfirmed(eid){
+  const row = state.confirmation.rows.find(r => r.emp_id === eid);
+  if(row) row.status = '已确认';
+  renderConfirmation();
+}
+
+function sendAllFeishuCards(){
+  alert('飞书卡片推送功能需要在服务端运行。\n\n已为你生成推送脚本，请在终端执行：\n\npython3 /tmp/feishu_send_cards.py');
+}
+
+function showEmpClock(eid){
+  // 从所有上传文件中查找该员工的数据（打卡记录或签字报表）
+  const clockRows = [];
+  // 优先从打卡记录文件中找
+  let clockFile = null;
+  Object.keys(state.files).forEach(fname => {
+    if(fname.toLowerCase().includes('打卡')) clockFile = state.files[fname];
+  });
+  if(clockFile){
+    clockFile.forEach(r => {
+      const reid = r.emp_id || r.emp || r['工号'] || r['员工编号'] || r['员工ID'] || r.employee_number;
+      if(reid && String(reid).trim() === eid) clockRows.push(r);
     });
   }
+  // 如果打卡文件中没找到，再从签字报表中找
+  if(!clockRows.length){
+    Object.entries(state.files).forEach(([fname, rows]) => {
+      if(fname.toLowerCase().includes('签字') || fname.toLowerCase().includes('报表') || fname.toLowerCase().includes('美区')){
+        rows.forEach(r => {
+          const reid = r.emp_id || r.emp || r['工号'] || r['员工编号'] || r['员工ID'] || r.employee_number;
+          if(reid && String(reid).trim() === eid){
+            // 构建一行简洁展示
+            clockRows.push({
+              '考勤日期': r['考勤日期']||r.date||'',
+              '姓名': r['姓名']||r.name||'',
+              '工号': r['工号']||r.emp_id||'',
+              '三级部门': r['三级部门']||r.dept3||'',
+              '四级部门': r['四级部门']||r.dept4||'',
+              '五级部门': r['五级部门']||r.dept5||'',
+              'REG': r['计薪出勤']||r['REG']||r.reg||'',
+              'OT': r['OT']||r.ot||'',
+              '每日总工时': r['每日总工时']||r.day_total||'',
+            });
+          }
+        });
+      }
+    });
+  }
+
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.onclick = function(e){if(e.target===overlay) overlay.remove()};
+
+  let html = '';
+  if(!clockRows.length){
+    html = '<div class="empty">未找到该员工的打卡记录</div>';
+  } else {
+    // Get all unique keys from the first row for columns
+    const keys = Object.keys(clockRows[0]);
+    html = '<table class="modal-table"><thead><tr>'+
+      keys.slice(0,12).map(k => '<th>'+esc(k)+'</th>').join('')+
+      '</tr></thead><tbody>'+
+      clockRows.slice(0, 30).map(r =>
+        '<tr>'+keys.slice(0,12).map(k => '<td>'+esc(r[k]||'')+'</td>').join('')+'</tr>'
+      ).join('')+
+      '</tbody></table>'+
+      (clockRows.length > 30 ? '<div style="text-align:center;padding:8px;font-size:12px;color:#888">显示前30条，共'+clockRows.length+'条记录</div>' : '');
+  }
+
+  overlay.innerHTML =
+    '<div class="modal-box" style="max-width:800px">'+
+    '<button class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</button>'+
+    '<h2>⏰ 员工考勤记录 — '+esc(eid)+'</h2>'+
+    html+'</div>';
+  document.body.appendChild(overlay);
+}
+
+function showEmpErrors(eid){
+  const all = state.validation.data;
+  const errs = all.filter(r => r.emp_id === eid);
+  if(!errs.length) return alert('无异常记录');
+
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.onclick = function(e){if(e.target===overlay) overlay.remove()};
+  overlay.innerHTML =
+    '<div class="modal-box">'+
+    '<button class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</button>'+
+    '<h2>📋 异常明细 — '+esc(eid)+'</h2>'+
+    '<table class="modal-table"><thead><tr>'+
+    '<th>规则</th><th>风险</th><th>错误详情</th></tr></thead><tbody>'+
+    errs.map(r =>
+      '<tr>'+
+      '<td style="font-weight:600">'+esc(r.rule)+'</td>'+
+      '<td><span class="badge '+(r.level==='error'?'badge-error':'badge-warning')+'">'+esc(r.level)+'</span></td>'+
+      '<td style="color:#666;font-size:12px">'+esc(r.detail||r.message||'')+'</td></tr>'
+    ).join('')+
+    '</tbody></table></div>';
+  document.body.appendChild(overlay);
 }
 
 function esc(s){if(!s) return ''; const d=document.createElement('div'); d.textContent=s; return d.innerHTML;}
