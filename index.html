@@ -780,6 +780,8 @@ function startValidation(){
 
         state.validation.data = results;
         state._signEmp = signEmp; state._signRows = signRows;
+        state._punchByEmp = punchByEmp; state._suppByEmp = suppByEmp;
+        state._leaveByEmp = leaveByEmp; state._busByEmp = busByEmp; state._tripByEmp = tripByEmp;
 
         // Enrich results with employee info + signing report raw data
         const signReportFields = ['考勤日期','姓名','工号','三级部门','四级部门','五级部门',
@@ -1087,7 +1089,12 @@ function buildConfirmationList(){
       status: a ? '待确认' : '无异常',
       rules: a ? a.rules : [],
       errors: a ? a.errors : [],
-      dailyRows: (state._signRows && state._signRows[eid]) ? state._signRows[eid].slice(0, 31) : []
+      dailyRows: (state._signRows && state._signRows[eid]) ? state._signRows[eid].slice(0, 31) : [],
+      punches: (state._punchByEmp && state._punchByEmp[eid]) ? state._punchByEmp[eid].slice(0, 62) : [],
+      supps: (state._suppByEmp && state._suppByEmp[eid]) ? state._suppByEmp[eid].slice(0, 10) : [],
+      leave: (state._leaveByEmp && state._leaveByEmp[eid]) ? state._leaveByEmp[eid] : null,
+      buses: (state._busByEmp && state._busByEmp[eid]) ? state._busByEmp[eid].slice(0, 10) : [],
+      trips: (state._tripByEmp && state._tripByEmp[eid]) ? state._tripByEmp[eid].slice(0, 10) : []
     };
     delete anomalyMap[eid]; // remove handled
   });
@@ -1226,6 +1233,15 @@ function buildCardContent(emp){
   const totalPeople = state.confirmation?.rows?.length || 0;
   const dept = [emp.dept3, emp.dept4, emp.dept5].filter(Boolean).join(' / ');
 
+  // Build punch clock lookup by date
+  const punchByDate = {};
+  if(emp.punches && emp.punches.length){
+    emp.punches.forEach(p => {
+      if(!punchByDate[p.date]) punchByDate[p.date] = [];
+      punchByDate[p.date].push(p.datetime);
+    });
+  }
+
   // Build daily rows table (limit 15 for card size)
   let dailyRowsText = '';
   if(emp.dailyRows && emp.dailyRows.length){
@@ -1233,10 +1249,12 @@ function buildCardContent(emp){
     dailyRowsText = rows.map(dr => {
       const r = dr._rawRow || {};
       const date = dr.date || '';
+      const clocks = punchByDate[date] || [];
+      const clockStr = clocks.length ? clocks.map(c=>c.slice(11,16)).join(', ') : '—';
       const reg = r['计薪出勤时长合计(REG)'] || r['REG'] || r['计薪出勤'] || '-';
       const ot15 = r['OT1.5合计'] || r['OT1.5'] || '-';
       const ot20 = r['OT2.0合计'] || r['OT2.0'] || '-';
-      return date+'  REG:'+reg+'  1.5x:'+ot15+'  2.0x:'+ot20;
+      return date+'  '+clockStr+'  REG:'+reg+'  1.5x:'+ot15+'  2.0x:'+ot20;
     }).join('\\n');
     if(emp.dailyRows.length > 15) dailyRowsText += '\\n...等'+emp.dailyRows.length+'条记录';
   }
@@ -1246,9 +1264,41 @@ function buildCardContent(emp){
   const totalOt20 = typeof emp.ot20 === 'number' ? emp.ot20.toFixed(1)+'h' : (emp.ot20 || '-');
   const totalHome = typeof emp.home_off === 'number' ? emp.home_off.toFixed(1)+'h' : (emp.home_off || '-');
 
+  // Build attendance process modules
+  let moduleText = '';
+
+  // Leave
+  if(emp.leave && emp.leave.type){
+    moduleText += '\\n---\\n🏖️ 休假：'+emp.leave.type+'  '+emp.leave.start+' ~ '+emp.leave.end;
+  }
+
+  // Business errand
+  if(emp.buses && emp.buses.length){
+    moduleText += '\\n---\\n🚗 公出：共'+emp.buses.length+'条';
+    emp.buses.slice(0, 5).forEach(b => {
+      moduleText += '\\n  ·'+ (b.start||'-')+' ('+(b.status||'-')+')';
+    });
+  }
+
+  // Business trip
+  if(emp.trips && emp.trips.length){
+    moduleText += '\\n---\\n✈️ 出差：共'+emp.trips.length+'条';
+    emp.trips.slice(0, 5).forEach(b => {
+      moduleText += '\\n  ·'+ (b.start||'-')+' ('+(b.status||'-')+')';
+    });
+  }
+
+  // Supplementary sign
+  if(emp.supps && emp.supps.length){
+    moduleText += '\\n---\\n🔏 补签：共'+emp.supps.length+'条';
+    emp.supps.slice(0, 5).forEach(s => {
+      moduleText += '\\n  ·'+s.date+' '+ (s.status||'-');
+    });
+  }
+
   // Build body elements
   const elements = [
-    { tag: 'div', text: { tag: 'lark_md', content: '**'+emp.name+'** ('+emp.emp_id+')\\n部门：'+dept } },
+    { tag: 'div', text: { tag: 'lark_md', content: '**'+esc(emp.name)+'** ('+emp.emp_id+')\\n部门：'+dept } },
     { tag: 'hr' },
     { tag: 'div', text: { tag: 'lark_md', content: '📋 **考勤确认通知**' } }
   ];
@@ -1267,13 +1317,21 @@ function buildCardContent(emp){
     content: '**— 月度合计 —**\\nREG: '+totalReg+' | OT1.5: '+totalOt15+' | OT2.0: '+totalOt20+' | 居家: '+totalHome
   }});
 
-  // Daily details
+  // Daily details with clock times
   if(dailyRowsText){
     elements.push({ tag: 'div', text: { tag: 'lark_md',
       content: '**— 每日明细（最近15天） —**\\n'+dailyRowsText
     }});
   } else {
     elements.push({ tag: 'div', text: { tag: 'lark_md', content: '每日明细：无签字报表明细数据' } });
+  }
+
+  // Attendance process modules
+  if(moduleText){
+    elements.push({ tag: 'hr' });
+    elements.push({ tag: 'div', text: { tag: 'lark_md',
+      content: '**— 其他考勤流程 —**'+moduleText
+    }});
   }
 
   elements.push({ tag: 'hr' });
@@ -1320,27 +1378,40 @@ function renderCardContent(emp){
   const dept = [emp.dept3, emp.dept4, emp.dept5].filter(Boolean).join(' / ');
   const isClean = emp.status === '无异常';
 
-  // Build daily attendance rows from signing report data
+  // Build punch clock lookup by date
+  const punchByDate = {};
+  if(emp.punches && emp.punches.length){
+    emp.punches.forEach(p => {
+      if(!punchByDate[p.date]) punchByDate[p.date] = [];
+      punchByDate[p.date].push(p.datetime);
+    });
+  }
+
+  // Build daily attendance rows with clock times
   let dailyHtml = '';
   if(emp.dailyRows && emp.dailyRows.length){
     emp.dailyRows.forEach(dr => {
       const r = dr._rawRow || {};
       const date = dr.date || '';
+      // Get clock times for this date
+      const clocks = punchByDate[date] || [];
+      const clockStr = clocks.length ? clocks.join(', ') : '—';
       const reg = r['计薪出勤时长合计(REG)'] || r['REG'] || r['计薪出勤'] || '-';
       const ot15 = r['OT1.5合计'] || r['OT1.5'] || '-';
       const ot20 = r['OT2.0合计'] || r['OT2.0'] || '-';
       const home_off = r['居家办公合计'] || r['居家'] || '-';
       dailyHtml +=
-        '<div style="display:flex;gap:8px;font-size:11px;padding:3px 0;border-bottom:1px solid #f0f0f0">'+
-        '<span style="width:95px;color:#555">'+esc(date)+'</span>'+
-        '<span style="width:75px;color:#333">REG: '+esc(reg)+'</span>'+
-        '<span style="width:75px;color:#333">OT1.5: '+esc(ot15)+'</span>'+
-        '<span style="width:75px;color:#333">OT2.0: '+esc(ot20)+'</span>'+
-        '<span style="width:75px;color:#333">居家: '+esc(home_off)+'</span>'+
-        '</div>';
+        '<tr>'+
+        '<td style="padding:2px 4px;white-space:nowrap;color:#555">'+esc(date)+'</td>'+
+        '<td style="padding:2px 4px;white-space:nowrap;color:#333;font-family:monospace;font-size:10px">'+esc(clockStr)+'</td>'+
+        '<td style="padding:2px 4px;text-align:right">'+esc(reg)+'</td>'+
+        '<td style="padding:2px 4px;text-align:right">'+esc(ot15)+'</td>'+
+        '<td style="padding:2px 4px;text-align:right">'+esc(ot20)+'</td>'+
+        '<td style="padding:2px 4px;text-align:right">'+esc(home_off)+'</td>'+
+        '</tr>';
     });
   } else {
-    dailyHtml = '<div style="font-size:11px;color:#999;padding:4px 0">无签字报表明细数据</div>';
+    dailyHtml = '<tr><td colspan="6" style="padding:6px;color:#999;text-align:center">无签字报表明细数据</td></tr>';
   }
 
   // Monthly totals
@@ -1348,6 +1419,42 @@ function renderCardContent(emp){
   const totalOt15 = typeof emp.ot15 === 'number' ? emp.ot15.toFixed(1) : (emp.ot15 || '-');
   const totalOt20 = typeof emp.ot20 === 'number' ? emp.ot20.toFixed(1) : (emp.ot20 || '-');
   const totalHome = typeof emp.home_off === 'number' ? emp.home_off.toFixed(1) : (emp.home_off || '-');
+
+  // Build leave module
+  let leaveHtml = '';
+  if(emp.leave && emp.leave.type){
+    leaveHtml =
+      '<div class="card-section-title">🏖️ 休假</div>'+
+      '<table class="card-table"><tr><th>类型</th><th>开始</th><th>结束</th></tr>'+
+      '<tr><td>'+esc(emp.leave.type)+'</td><td>'+esc(emp.leave.start)+'</td><td>'+esc(emp.leave.end)+'</td></tr></table>';
+  }
+
+  // Build business errand module
+  let busHtml = '';
+  if(emp.buses && emp.buses.length){
+    busHtml = '<div class="card-section-title">🚗 公出</div><table class="card-table"><tr><th>#</th><th>开始时间</th><th>审批状态</th></tr>'+
+      emp.buses.map((b,i) =>
+        '<tr><td>'+(i+1)+'</td><td>'+esc(b.start||'-')+'</td><td>'+esc(b.status||'-')+'</td></tr>'
+      ).join('')+'</table>';
+  }
+
+  // Build business trip module
+  let tripHtml = '';
+  if(emp.trips && emp.trips.length){
+    tripHtml = '<div class="card-section-title">✈️ 出差</div><table class="card-table"><tr><th>#</th><th>开始时间</th><th>审批状态</th></tr>'+
+      emp.trips.map((b,i) =>
+        '<tr><td>'+(i+1)+'</td><td>'+esc(b.start||'-')+'</td><td>'+esc(b.status||'-')+'</td></tr>'
+      ).join('')+'</table>';
+  }
+
+  // Build supplementary sign module
+  let suppHtml = '';
+  if(emp.supps && emp.supps.length){
+    suppHtml = '<div class="card-section-title">🔏 补签</div><table class="card-table"><tr><th>#</th><th>日期</th><th>状态</th><th>原因</th></tr>'+
+      emp.supps.map((s,i) =>
+        '<tr><td>'+(i+1)+'</td><td>'+esc(s.date||'-')+'</td><td>'+esc(s.status||'-')+'</td><td>'+esc(s.reason||'-')+'</td></tr>'
+      ).join('')+'</table>';
+  }
 
   return '<div class="card-preview-item'+(isClean?' card-preview-clean':'')+'">'+
     '<div class="card-preview-header">'+
@@ -1357,38 +1464,43 @@ function renderCardContent(emp){
     '<div class="card-preview-body">'+
       // Anomaly section
       (isClean
-        ? '<div style="margin-bottom:6px;color:#27AE60;font-size:12px">✅ 本周期考勤无异常</div>'
+        ? '<div style="margin-bottom:8px;color:#27AE60;font-size:12px">✅ 本周期考勤无异常</div>'
         : '<div style="margin-bottom:6px;font-size:12px;color:#D9001B">⚠️ 异常条数：<strong>'+emp.count+'</strong> 条</div>'+
-          '<div style="font-size:11px;margin-bottom:6px">'+
+          '<div style="font-size:11px;margin-bottom:8px">'+
             emp.errors.map((e, i) =>
               '<div style="padding:2px 0"><span class="badge '+(emp.count>1?'badge-error':'badge-warning')+'" style="margin-right:4px">规则 '+emp.rules[i]+'</span>'+esc(e)+'</div>'
             ).join('')+
           '</div>'
       )+
-      // Divider
-      '<div style="border-top:1px solid #eee;margin:6px 0"></div>'+
-      // Section: 签字报表明细
-      '<div style="font-size:12px;font-weight:600;color:#333;margin-bottom:4px">📋 签字报表明细</div>'+
+      // Section: 签字报表明细（含打卡时间）
+      '<div class="card-section-title">📋 签字报表明细</div>'+
       '<div style="font-size:11px;color:#888;margin-bottom:4px">考勤日期范围: ' +
         (emp.days && emp.days.length ? emp.days[0] + ' ~ ' + emp.days[emp.days.length-1] : '-') +
-      ' &middot; 共 ' + (emp.days ? emp.days.length : 0) + ' 天</div>'+
-      // Column header
-      '<div style="display:flex;gap:8px;font-size:11px;font-weight:600;color:#666;padding:3px 0;border-bottom:1px solid #ddd;margin-bottom:2px">'+
-      '<span style="width:95px">考勤日期</span>'+
-      '<span style="width:75px">REG</span>'+
-      '<span style="width:75px">OT1.5</span>'+
-      '<span style="width:75px">OT2.0</span>'+
-      '<span style="width:75px">居家</span>'+
-      '</div>'+
+      ' · 共 ' + (emp.days ? emp.days.length : 0) + ' 天</div>'+
+      '<table class="card-table" style="width:100%;border-collapse:collapse;font-size:11px">'+
+      '<thead><tr>'+
+      '<th style="text-align:left;padding:3px 4px;border-bottom:1px solid #ddd">考勤日期</th>'+
+      '<th style="text-align:left;padding:3px 4px;border-bottom:1px solid #ddd">打卡时间</th>'+
+      '<th style="text-align:right;padding:3px 4px;border-bottom:1px solid #ddd">REG</th>'+
+      '<th style="text-align:right;padding:3px 4px;border-bottom:1px solid #ddd">OT1.5</th>'+
+      '<th style="text-align:right;padding:3px 4px;border-bottom:1px solid #ddd">OT2.0</th>'+
+      '<th style="text-align:right;padding:3px 4px;border-bottom:1px solid #ddd">居家</th>'+
+      '</tr></thead><tbody>'+
       dailyHtml+
-      // Monthly total row
-      '<div style="display:flex;gap:8px;font-size:11px;font-weight:600;color:#333;padding:4px 0;border-top:2px solid #ddd;margin-top:2px">'+
-      '<span style="width:95px">📊 合计</span>'+
-      '<span style="width:75px">'+esc(totalReg)+'</span>'+
-      '<span style="width:75px">'+esc(totalOt15)+'</span>'+
-      '<span style="width:75px">'+esc(totalOt20)+'</span>'+
-      '<span style="width:75px">'+esc(totalHome)+'</span>'+
-      '</div>'+
+      '</tbody>'+
+      '<tfoot><tr style="font-weight:600;border-top:2px solid #ddd">'+
+      '<td style="padding:4px">📊 合计</td><td></td>'+
+      '<td style="text-align:right">'+esc(totalReg)+'</td>'+
+      '<td style="text-align:right">'+esc(totalOt15)+'</td>'+
+      '<td style="text-align:right">'+esc(totalOt20)+'</td>'+
+      '<td style="text-align:right">'+esc(totalHome)+'</td>'+
+      '</tr></tfoot></table>'+
+
+      // Other attendance modules
+      (leaveHtml ? '<div style="border-top:1px solid #eee;margin:10px 0"></div>'+leaveHtml : '')+
+      (busHtml ? '<div style="border-top:1px solid #eee;margin:10px 0"></div>'+busHtml : '')+
+      (tripHtml ? '<div style="border-top:1px solid #eee;margin:10px 0"></div>'+tripHtml : '')+
+      (suppHtml ? '<div style="border-top:1px solid #eee;margin:10px 0"></div>'+suppHtml : '')+
     '</div>'+
   '</div>';
 }
