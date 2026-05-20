@@ -577,7 +577,7 @@ function startValidation(){
             if(!emp.dept4&&d4) emp.dept4=d4;
             if(!emp.dept5&&d5) emp.dept5=d5;
             if(!emp.name&&n) emp.name=n;
-            emp.reg += gn(cv(r,['计薪出勤时长合计（REG)','REG','计薪出勤']));
+            emp.reg += gn(cv(r,['计薪出勤时长合计(REG)','REG','计薪出勤']));
             emp.ot15 += gn(cv(r,['OT1.5合计','OT1.5']));
             emp.ot20 += gn(cv(r,['OT2.0合计','OT2.0']));
             emp.home_off += gn(cv(r,['居家办公合计','居家']));
@@ -783,7 +783,7 @@ function startValidation(){
 
         // Enrich results with employee info + signing report raw data
         const signReportFields = ['考勤日期','姓名','工号','三级部门','四级部门','五级部门',
-          '计薪出勤时长合计（REG)','REG','计薪出勤','OT1.5合计','OT1.5','OT2.0合计','OT2.0',
+          '计薪出勤时长合计(REG)','REG','计薪出勤','OT1.5合计','OT1.5','OT2.0合计','OT2.0',
           '每日总工时','每日工时','工作日出勤合计','OT0.5合计','OT0.5','居家办公合计','居家',
           '公出合计','出差合计','休息日出勤合计','法定假出勤合计','年假合计','调休假合计','病假合计','事假合计'];
         state.validation.data.forEach(r=>{
@@ -937,7 +937,7 @@ function renderTable(){
       const rd = r.rawData;
       const parts = [];
       const keyOrder = ['考勤日期','姓名','工号','三级部门','四级部门','五级部门',
-        '计薪出勤时长合计（REG)','REG','OT1.5合计','OT1.5','OT2.0合计','OT2.0',
+        '计薪出勤时长合计(REG)','REG','OT1.5合计','OT1.5','OT2.0合计','OT2.0',
         '每日总工时','居家办公合计','公出合计','出差合计','年假合计','病假合计','事假合计'];
       keyOrder.forEach(k => {
         if(rd[k] !== undefined && rd[k] !== '') parts.push(k+': '+rd[k]);
@@ -1544,7 +1544,7 @@ function showEmpErrors(eid){
     rawDatas.forEach((rd, ri) => {
       const parts = [];
       ['考勤日期','姓名','工号','三级部门','四级部门','五级部门',
-        '计薪出勤时长合计（REG)','REG','OT1.5合计','OT1.5','OT2.0合计','OT2.0',
+        '计薪出勤时长合计(REG)','REG','OT1.5合计','OT1.5','OT2.0合计','OT2.0',
         '每日总工时','居家办公合计','公出合计','出差合计','年假合计','病假合计','事假合计'
       ].forEach(k => {
         if(rd[k] !== undefined && rd[k] !== '') parts.push(k+': '+rd[k]);
