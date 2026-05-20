@@ -161,6 +161,7 @@ tr:hover td{background:#fafbfc}
       <div class="collapsible-body">
         <div class="stats" id="statsV"></div>
         <div id="ruleBarsV"></div>
+        <div id="ruleDetailV" style="margin-top:12px"></div>
       </div>
     </div>
 
@@ -827,6 +828,28 @@ function renderStats(){
     '<div class="stat-card blue"><div class="num">'+uniq.size+'</div><div class="label">异常员工数</div><div class="sub">去重</div></div>'+
     '<div class="stat-card"><div class="num">'+d.length+'</div><div class="label">明细记录数</div><div class="sub">总行数</div></div>';
   document.getElementById('statsV').style.display='grid';
+
+  // Render rule reference table
+  const RULE_DEFS = [
+    {rule:'R1.1', risk:'warning', desc:'周末有打卡但休假未涵盖 — 周末打卡了但未覆盖休假记录'},
+    {rule:'接近卡未舍去', risk:'warning', desc:'接近卡未舍去 — 同一人同一日打卡间隔 < 10分钟'},
+    {rule:'R3', risk:'warning', desc:'加班工时偏差 > 5% — 签字报表OT vs 系统估算偏差超过5%'},
+    {rule:'R4', risk:'warning', desc:'补签审批中 — 补签申请尚未审批完成'},
+    {rule:'R5', risk:'error', desc:'REG=0但有打卡记录 — 计薪出勤时长为0却存在打卡记录'},
+    {rule:'R6', risk:'warning', desc:'公出/出差审批中但REG=0 — 出差/公出审批中但计薪出勤为0'},
+    {rule:'R7', risk:'warning', desc:'居家办公审批中但报表居家时长=0 — 居家办公审批中但签字报表未体现'},
+  ];
+  const rdiv = document.getElementById('ruleDetailV');
+  rdiv.innerHTML = '<h3 style="font-size:14px;margin:0 0 8px;color:#333">规则说明</h3>'+
+    '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="background:#f5f5f5">'+
+    '<th style="padding:6px 8px;text-align:left;border:1px solid #ddd">规则</th>'+
+    '<th style="padding:6px 8px;text-align:left;border:1px solid #ddd">风险</th>'+
+    '<th style="padding:6px 8px;text-align:left;border:1px solid #ddd">说明</th></tr></thead><tbody>'+
+    RULE_DEFS.map(d =>
+      '<tr><td style="padding:5px 8px;border:1px solid #ddd;font-weight:600">'+esc(d.rule)+'</td>'+
+      '<td style="padding:5px 8px;border:1px solid #ddd"><span class="'+(d.risk==='error'?'badge badge-error':'badge badge-warning')+'">'+esc(d.risk)+'</span></td>'+
+      '<td style="padding:5px 8px;border:1px solid #ddd;color:#666">'+esc(d.desc)+'</td></tr>'
+    ).join('')+'</tbody></table>';
 }
 
 function renderRuleBars(){
