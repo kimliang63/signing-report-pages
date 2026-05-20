@@ -107,6 +107,8 @@ tr:hover td{background:#fafbfc}
 .panel.active{display:block}
 .v-divider{width:1px;height:20px;background:#ddd;margin:0 4px}
 .btn-sm{padding:5px 12px;font-size:12px}
+.btn-warning{background:#E67E22;color:#fff;border-color:#E67E22}
+.btn-warning:hover{background:#D35400}
 /* modal */
 .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.35);z-index:1000;display:flex;align-items:center;justify-content:center}
 .modal-box{background:#fff;border-radius:12px;padding:24px;max-width:560px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.15)}
@@ -1122,7 +1124,7 @@ function renderConfirmation(){
   document.getElementById('cleanCount').textContent = clean;
   document.getElementById('statsC').style.display = 'grid';
 
-  document.getElementById('confirmBadge').textContent = pending + ' 个待确认员工';
+  document.getElementById('confirmBadge').innerHTML = '👥 共 <strong>'+total+'</strong> 人 · 待确认 <strong>'+pending+'</strong> 人 · 已确认 <strong>'+confirmed+'</strong> 人 · 有异议 <strong>'+objection+'</strong> 人 · 无异常 <strong>'+clean+'</strong> 人';
 
   // progress bar
   const pb = document.getElementById('progressBar');
@@ -1154,7 +1156,9 @@ function renderConfirmation(){
           '<button class="btn btn-sm" onclick="showEmpClock(\''+esc(r.emp_id)+'\')" style="margin-right:4px">⏰ 考勤记录</button>'+
           '<button class="btn btn-sm" onclick="showEmpErrors(\''+esc(r.emp_id)+'\')" style="margin-right:4px">📋 异常明细</button>'+
           (r.status === '待确认' ?
-            '<button class="btn btn-sm btn-success" onclick="markConfirmed(\''+esc(r.emp_id)+'\')">✅ 标记已确认</button>' : ''))+
+            '<button class="btn btn-sm btn-success" onclick="markConfirmed(\''+esc(r.emp_id)+'\')">✅ 标记已确认</button>' : '')+
+          (r.status === '有异议' ?
+            '<button class="btn btn-sm btn-warning" onclick="showObjectionDetail(\''+esc(r.emp_id)+'\')" style="margin-left:4px">📋 查看异议</button>' : ''))+
       '</td></tr>';
   }).join('');
 
@@ -1167,6 +1171,42 @@ function markConfirmed(eid){
   renderConfirmation();
 }
 
+function showObjectionDetail(eid){
+  const row = state.confirmation.rows.find(r => r.emp_id === eid);
+  if(!row) return;
+  const dept = [row.dept3, row.dept4, row.dept5].filter(Boolean).join(' / ');
+  const errorsHtml = row.errors.map((e, i) =>
+    '<div style="padding:4px 0;font-size:12px"><span class="badge badge-error" style="margin-right:4px">'+esc(row.rules[i])+'</span>'+esc(e)+'</div>'
+  ).join('');
+
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.onclick = function(e){if(e.target===overlay) overlay.remove()};
+  overlay.innerHTML =
+    '<div class="modal-box" style="max-width:600px">'+
+    '<button class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</button>'+
+    '<h2>⚠️ 异议详情</h2>'+
+    '<div style="background:#fef9ef;border:1px solid #fce5cd;border-radius:8px;padding:12px;margin-bottom:12px">'+
+    '<div style="font-weight:600;font-size:14px">'+esc(row.name)+' ('+esc(row.emp_id)+')</div>'+
+    '<div style="font-size:12px;color:#666;margin:4px 0">'+esc(dept)+'</div>'+
+    '<div style="font-size:12px;color:#888">异常条数：<strong style="color:#D9001B">'+row.count+'</strong> 条</div>'+
+    '</div>'+
+    '<div style="font-size:13px;font-weight:600;margin-bottom:6px;color:#333">员工异常明细</div>'+
+    '<div style="margin-bottom:12px">'+errorsHtml+'</div>'+
+    '<div style="background:#f4f4f4;border-radius:8px;padding:12px">'+
+    '<div style="font-size:12px;font-weight:600;color:#888;margin-bottom:4px">员工反馈（异议理由）</div>'+
+    '<div style="font-size:13px;color:#333;font-style:italic">'+
+    (row.objection || '<span style="color:#aaa">（异议理由待员工填写，需运行本地回调服务器接收）</span>')+
+    '</div>'+
+    '</div>'+
+    '<div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end">'+
+    '<button class="btn btn-sm" onclick="this.closest(\'.modal-overlay\').remove()">关闭</button>'+
+    '<button class="btn btn-sm btn-success" onclick="this.closest(\'.modal-overlay\').remove();markConfirmed(\''+esc(eid)+'\')">✅ 标记为已确认</button>'+
+    '</div>'+
+    '</div>';
+  document.body.appendChild(overlay);
+}
+
 // ========== 飞书卡片预览与发送 ==========
 const FEISHU_CONFIG = {
   APP_ID: 'cli_aa8057da9238dccd',
@@ -1176,21 +1216,22 @@ const FEISHU_CONFIG = {
 function buildCardContent(emp){
   // 构建飞书消息卡片内容
   const dept = [emp.dept3, emp.dept4, emp.dept5].filter(Boolean).join(' / ');
+  const isClean = emp.status === '无异常';
   const errors = emp.errors || [];
   const rules = emp.rules || [];
-  const errorHtml = errors.map((e, i) => '规则 '+rules[i]+': '+e).join('\n');
+  const errorHtml = isClean ? '本周期考勤无异常' : errors.map((e, i) => '规则 '+rules[i]+': '+e).join('\\n');
   return {
     config: { wide_screen_mode: true },
     header: {
-      title: { tag: 'plain_text', content: '⚠️ 考勤异常确认通知' },
-      template: emp.count > 1 ? 'red' : 'yellow'
+      title: { tag: 'plain_text', content: isClean ? '✅ 考勤确认通知' : '⚠️ 考勤异常确认通知' },
+      template: isClean ? 'green' : (emp.count > 1 ? 'red' : 'yellow')
     },
     elements: [
       { tag: 'div', text: { tag: 'lark_md', content: '**'+emp.name+'** ('+emp.emp_id+')' } },
       { tag: 'div', text: { tag: 'lark_md', content: '部门：'+dept } },
-      { tag: 'div', text: { tag: 'lark_md', content: '异常条数：**'+emp.count+'** 条' } },
+      { tag: 'div', text: { tag: 'lark_md', content: isClean ? '本周期考勤无异常，请确认' : '异常条数：**'+emp.count+'** 条' } },
       { tag: 'hr' },
-      { tag: 'div', text: { tag: 'lark_md', content: '**异常明细：**\n'+errorHtml } },
+      { tag: 'div', text: { tag: 'lark_md', content: '**'+(isClean?'确认状态：':'异常明细：')+'**\\n'+errorHtml } },
       { tag: 'hr' },
       { tag: 'div', text: { tag: 'lark_md', content: '请点击下方按钮确认或提出异议：' } },
       {
@@ -1206,25 +1247,24 @@ function buildCardContent(emp){
 
 function renderCardPreview(emp, index){
   const dept = [emp.dept3, emp.dept4, emp.dept5].filter(Boolean).join(' / ');
-  const errorsHtml = emp.errors.map((e, i) =>
-    '<div style="padding:3px 0;font-size:12px;color:#555">'+
-    '<span class="badge '+(emp.count>1?'badge-error':'badge-warning')+'" style="margin-right:4px">规则 '+emp.rules[i]+'</span>'+
-    esc(e)+'</div>'
-  ).join('');
-  return '<div class="card-preview-item">'+
+  const isClean = emp.status === '无异常';
+  const errorsHtml = isClean ? '<div style="padding:6px 0;font-size:12px;color:#27AE60">本周期考勤无异常</div>'
+    : emp.errors.map((e, i) =>
+      '<div style="padding:3px 0;font-size:12px;color:#555">'+
+      '<span class="badge '+(emp.count>1?'badge-error':'badge-warning')+'" style="margin-right:4px">规则 '+emp.rules[i]+'</span>'+
+      esc(e)+'</div>'
+    ).join('');
+  return '<div class="card-preview-item'+(isClean?' card-preview-clean':'')+'">'+
     '<div class="card-preview-header">'+
       '<span class="badge badge-info" style="margin-right:8px">#'+(index+1)+'</span>'+
       '<strong>'+esc(emp.name)+'</strong> ('+esc(emp.emp_id)+')'+
       '<span style="margin-left:auto;font-size:12px;color:#888">'+esc(dept)+'</span>'+
     '</div>'+
     '<div class="card-preview-body">'+
-      '<div style="margin-bottom:4px">异常条数：<strong style="color:#D9001B">'+emp.count+'</strong> 条</div>'+
+      (isClean ? '<div style="margin-bottom:4px;color:#27AE60">✅ 本周期考勤无异常</div>'
+        : '<div style="margin-bottom:4px">异常条数：<strong style="color:#D9001B">'+emp.count+'</strong> 条</div>')+
       '<div style="border-top:1px solid #eee;padding-top:4px;margin-top:4px">'+
         errorsHtml +
-      '</div>'+
-      '<div style="border-top:1px solid #eee;margin-top:6px;padding-top:6px;display:flex;gap:8px">'+
-        '<span class="badge badge-success">✅ 已确认</span>'+
-        '<span class="badge badge-error">⚠️ 有异议</span>'+
       '</div>'+
     '</div>'+
   '</div>';
@@ -1237,9 +1277,9 @@ function sendAllFeishuCards(){
     return;
   }
 
-  const pending = rows.filter(r => r.status === '待确认');
-  if(!pending.length){
-    alert('所有员工已确认，无需发送');
+  const toSend = rows.filter(r => r.status === '待确认' || r.status === '无异常');
+  if(!toSend.length){
+    alert('所有员工已完成确认，无需发送');
     return;
   }
 
@@ -1249,17 +1289,17 @@ function sendAllFeishuCards(){
   overlay.id = 'cardPreviewOverlay';
   overlay.onclick = function(e){if(e.target===overlay) overlay.remove()};
 
-  const previewCards = pending.map((emp, i) => renderCardPreview(emp, i)).join('');
+  const previewCards = toSend.map((emp, i) => renderCardPreview(emp, i)).join('');
 
   overlay.innerHTML =
     '<div class="modal-box" style="max-width:800px;max-height:90vh;overflow-y:auto">'+
     '<button class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</button>'+
     '<h2>📨 飞书卡片预览</h2>'+
-    '<p style="font-size:13px;color:#888;margin-bottom:12px">将向 <strong>'+pending.length+'</strong> 位员工发送考勤异常确认卡片</p>'+
+    '<p style="font-size:13px;color:#888;margin-bottom:12px">将向 <strong>'+toSend.length+'</strong> 位员工发送考勤确认卡片（含无异常人员）</p>'+
     '<div id="cardPreviewList">'+previewCards+'</div>'+
     '<div style="margin-top:16px;display:flex;gap:8px;justify-content:center">'+
     '<button class="btn" onclick="document.getElementById(\'cardPreviewOverlay\').remove()">取消</button>'+
-    '<button class="btn btn-success" onclick="doSendFeishuCards()">🚀 确认发送 '+pending.length+' 张卡片</button>'+
+    '<button class="btn btn-success" onclick="doSendFeishuCards()">🚀 确认发送 '+toSend.length+' 张卡片</button>'+
     '</div>'+
     '</div>';
   document.body.appendChild(overlay);
@@ -1269,10 +1309,10 @@ function doSendFeishuCards(){
   const overlay = document.getElementById('cardPreviewOverlay');
   if(overlay) overlay.remove();
 
-  const pending = state.confirmation.rows.filter(r => r.status === '待确认');
+  const toSend = state.confirmation.rows.filter(r => r.status === '待确认' || r.status === '无异常');
 
   // Build the data JSON for the Python script
-  const cardsData = pending.map(emp => {
+  const cardsData = toSend.map(emp => {
     const dept = [emp.dept3, emp.dept4, emp.dept5].filter(Boolean).join(' / ');
     const errorsRows = emp.errors.map((e, i) => '规则 '+emp.rules[i]+': '+e).join('\\n');
     return {
