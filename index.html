@@ -102,6 +102,21 @@ tr:hover td{background:#fafbfc}
 .progress-bar .seg.danger{background:#D9001B}
 .progress-bar .seg.clean{background:#27AE60}
 .progress-labels{display:flex;justify-content:space-between;font-size:11px;color:#888;margin-top:2px}
+/* checkbox in confirmation list */
+.confirm-chk{width:16px;height:16px;cursor:pointer;accent-color:#0E66FB;margin:0;vertical-align:middle}
+.chk-col{width:30px;text-align:center}
+.chk-all{width:16px;height:16px;cursor:pointer;accent-color:#0E66FB;margin:0;vertical-align:middle}
+/* send status badges */
+.test-mode-bar{display:flex;align-items:center;gap:8px;font-size:12px;color:#555;margin-left:12px;flex-shrink:0}
+.test-mode-bar input[type=checkbox]{width:14px;height:14px;cursor:pointer;accent-color:#0E66FB;margin:0}
+.test-mode-bar .test-emp-input{padding:3px 8px;border:1px solid #ccc;border-radius:4px;font-size:12px;width:120px;display:none}
+.test-mode-bar .test-emp-input:focus{border-color:#0E66FB;outline:none}
+.send-count{font-size:12px;color:#888;margin-left:auto}
+.status-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;white-space:nowrap}
+.status-badge-pending{background:#F0F0F0;color:#999}
+.status-badge-ok{background:#E8F5E9;color:#2E7D32}
+.status-badge-fail{background:#FFEBEE;color:#C62828}
+.status-badge-sending{background:#FFF3E0;color:#E65100}
 .empty{text-align:center;padding:30px;color:#999;font-size:13px}
 .panel{display:none}
 .panel.active{display:block}
@@ -213,7 +228,13 @@ tr:hover td{background:#fafbfc}
     <div class="action-bar" id="actionBarC">
       <span class="file-badge" id="confirmBadge">0 个待确认员工</span>
       <button class="btn btn-primary" onclick="buildConfirmationList()">🔄 从校验结果生成确认名单</button>
-      <button class="btn btn-success" onclick="sendAllFeishuCards()" id="sendAllBtn" disabled>📨 批量发送飞书卡片</button>
+      <button class="btn btn-success" onclick="sendAllFeishuCards()" id="sendAllBtn" disabled>📨 发送飞书卡片</button>
+      <div class="test-mode-bar">
+        <input type="checkbox" id="testModeSwitch" onchange="toggleTestMode()">
+        <label for="testModeSwitch" style="cursor:pointer;user-select:none">🧪 测试</label>
+        <input type="text" class="test-emp-input" id="testEmpIdInline" placeholder="输入工号">
+      </div>
+      <span class="send-count" id="sendCountBadge"></span>
     </div>
 
     <div class="stats" id="statsC" style="display:none">
@@ -233,11 +254,13 @@ tr:hover td{background:#fafbfc}
     <h3 style="font-size:14px;margin-bottom:6px;color:#333">员工确认名单</h3>
     <table style="width:100%;border-collapse:collapse;font-size:13px">
       <thead><tr style="background:#f4f7fe">
+        <th class="chk-col" style="padding:8px 4px;text-align:center;border-bottom:1px solid #e5e5e5"><input type="checkbox" class="chk-all" id="chkAll" onchange="toggleSelectAll(this.checked)"></th>
         <th style="padding:8px 10px;text-align:left;border-bottom:1px solid #e5e5e5;font-weight:600;color:#555">工号</th>
         <th style="padding:8px 10px;text-align:left;border-bottom:1px solid #e5e5e5;font-weight:600;color:#555">员工</th>
         <th style="padding:8px 10px;text-align:left;border-bottom:1px solid #e5e5e5;font-weight:600;color:#555">部门</th>
         <th style="padding:8px 10px;text-align:center;border-bottom:1px solid #e5e5e5;font-weight:600;color:#555">异常条数</th>
         <th style="padding:8px 10px;text-align:center;border-bottom:1px solid #e5e5e5;font-weight:600;color:#555">状态</th>
+        <th style="padding:8px 10px;text-align:center;border-bottom:1px solid #e5e5e5;font-weight:600;color:#555">发送状态</th>
         <th style="padding:8px 10px;text-align:center;border-bottom:1px solid #e5e5e5;font-weight:600;color:#555">操作</th>
       </tr></thead>
       <tbody id="confirmTbody"></tbody>
@@ -1094,7 +1117,9 @@ function buildConfirmationList(){
       supps: (state._suppByEmp && state._suppByEmp[eid]) ? state._suppByEmp[eid].slice(0, 10) : [],
       leave: (state._leaveByEmp && state._leaveByEmp[eid]) ? state._leaveByEmp[eid] : null,
       buses: (state._busByEmp && state._busByEmp[eid]) ? state._busByEmp[eid].slice(0, 10) : [],
-      trips: (state._tripByEmp && state._tripByEmp[eid]) ? state._tripByEmp[eid].slice(0, 10) : []
+      trips: (state._tripByEmp && state._tripByEmp[eid]) ? state._tripByEmp[eid].slice(0, 10) : [],
+      _selected: true, // default checked
+      _sendStatus: 'pending' // 'pending' | 'ok' | 'fail' | 'sending'
     };
     delete anomalyMap[eid]; // remove handled
   });
@@ -1121,7 +1146,7 @@ function buildConfirmationList(){
 function renderConfirmation(){
   const rows = state.confirmation.rows;
   if(!rows.length){
-    document.getElementById('confirmTbody').innerHTML = '<tr><td colspan="6" class="empty">暂无数据</td></tr>';
+    document.getElementById('confirmTbody').innerHTML = '<tr><td colspan="8" class="empty">暂无数据</td></tr>';
     return;
   }
 
@@ -1151,6 +1176,9 @@ function renderConfirmation(){
     '<span>&#9989; 无异常 '+clean+' ('+Math.round(pc[3])+'%)</span>';
   document.getElementById('progressSection').style.display = 'block';
 
+  // Update all-checked state and send count
+  updateSendCount();
+
   // table rows
   const tbody = document.getElementById('confirmTbody');
   tbody.innerHTML = rows.map(r => {
@@ -1160,12 +1188,27 @@ function renderConfirmation(){
     const statusLabel = r.status === '待确认' ? '⏳ 待确认' : r.status === '已确认' ? '✅ 已确认' : r.status === '无异常' ? '✅ 无异常' : '⚠️ 有异议';
     const countStyle = isClean ? 'color:#27AE60' : 'color:#D9001B;font-weight:600';
     const cleanClass = isClean ? 'row-clean' : '';
+    // Send status display
+    let sendDisplay = '';
+    if(r._sendStatus === 'pending'){
+      sendDisplay = '<span class="status-badge status-badge-pending">— 未发送</span>';
+    } else if(r._sendStatus === 'ok'){
+      sendDisplay = '<span class="status-badge status-badge-ok">✅ 已发送 '+(r._sendTime||'')+'</span>';
+    } else if(r._sendStatus === 'fail'){
+      sendDisplay = '<span class="status-badge status-badge-fail">❌ 失败 '+(r._sendTime||'')+'</span>';
+    } else if(r._sendStatus === 'sending'){
+      sendDisplay = '<span class="status-badge status-badge-sending">⏳ 发送中...</span>';
+    }
     return '<tr class="'+cleanClass+'">'+
+      '<td class="chk-col" style="padding:8px 4px;text-align:center;border-bottom:1px solid #f0f0f0">'+
+        '<input type="checkbox" class="confirm-chk" '+(r._selected?'checked':'')+' onchange="toggleRowSelect(\''+esc(r.emp_id)+'\',this.checked)">'+
+      '</td>'+
       '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-weight:600'+(isClean?';color:#27AE60':'')+'">'+esc(r.emp_id)+'</td>'+
       '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0">'+esc(r.name)+'</td>'+
       '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-size:12px;color:#666">'+esc(dept)+'</td>'+
       '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:center;'+countStyle+'">'+(isClean?'—':r.count)+'</td>'+
       '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:center"><span class="badge '+statusBadge+'">'+statusLabel+'</span></td>'+
+      '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:center">'+sendDisplay+'</td>'+
       '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:center">'+
         '<button class="btn btn-sm" onclick="showEmpClock(\''+esc(r.emp_id)+'\')" style="margin-right:4px">⏰ 考勤记录</button>'+
         (isClean ? '' :
@@ -1179,6 +1222,39 @@ function renderConfirmation(){
   }).join('');
 
   document.getElementById('sendAllBtn').disabled = false;
+}
+
+// Helper: toggle test mode switch
+function toggleTestMode(){
+  const sw = document.getElementById('testModeSwitch');
+  const inp = document.getElementById('testEmpIdInline');
+  inp.style.display = sw.checked ? 'inline-block' : 'none';
+}
+
+// Helper: toggle individual row checkbox
+function toggleRowSelect(eid, checked){
+  const row = state.confirmation.rows.find(r => r.emp_id === eid);
+  if(row) row._selected = checked;
+  updateSendCount();
+}
+
+// Helper: toggle select all
+function toggleSelectAll(checked){
+  state.confirmation.rows.forEach(r => r._selected = checked);
+  // Update all row checkboxes visually
+  document.querySelectorAll('#confirmTbody .confirm-chk').forEach(cb => cb.checked = checked);
+  updateSendCount();
+}
+
+// Helper: update send count badge
+function updateSendCount(){
+  const rows = state.confirmation.rows;
+  if(!rows.length){ document.getElementById('sendCountBadge').textContent = ''; return; }
+  const selected = rows.filter(r => r._selected).length;
+  const total = rows.length;
+  document.getElementById('sendCountBadge').textContent = '已选 ' + selected + ' / ' + total + ' 人';
+  const sendBtn = document.getElementById('sendAllBtn');
+  if(sendBtn) sendBtn.disabled = (selected === 0);
 }
 
 function markConfirmed(eid){
@@ -1512,10 +1588,24 @@ function sendAllFeishuCards(){
     return;
   }
 
-  const toSend = rows.filter(r => r.status === '待确认' || r.status === '无异常');
+  // Only send selected rows — supports repeat sending for already-sent employees
+  const toSend = rows.filter(r => r._selected);
   if(!toSend.length){
-    alert('所有员工已完成确认，无需发送');
+    alert('请勾选要发送的员工');
     return;
+  }
+
+  // Check test mode
+  const testMode = document.getElementById('testModeSwitch') ? document.getElementById('testModeSwitch').checked : false;
+  const testEmpId = testMode ? (document.getElementById('testEmpIdInline') ? document.getElementById('testEmpIdInline').value.trim() : '') : '';
+
+  let finalToSend = toSend;
+  if(testMode && testEmpId){
+    finalToSend = toSend.filter(r => r.emp_id === testEmpId);
+    if(!finalToSend.length){
+      alert('测试模式：未找到工号为「'+testEmpId+'」的勾选员工');
+      return;
+    }
   }
 
   // --- Step 1: Show card preview modal ---
@@ -1524,27 +1614,19 @@ function sendAllFeishuCards(){
   overlay.id = 'cardPreviewOverlay';
   overlay.onclick = function(e){if(e.target===overlay) overlay.remove()};
 
-  const previewCards = toSend.map((emp, i) => renderCardContent(emp)).join('');
+  const previewCards = finalToSend.map((emp, i) => renderCardContent(emp)).join('');
+
+  const testModeLabel = testMode && testEmpId ? ' 🧪 测试模式：'+testEmpId : '';
 
   overlay.innerHTML =
     '<div class="modal-box" style="max-width:800px;max-height:90vh;overflow-y:auto">'+
     '<button class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</button>'+
-    '<h2>📨 飞书卡片预览</h2>'+
-    '<div style="margin-bottom:12px;padding:10px 12px;background:#F5F6FA;border-radius:6px;font-size:13px">'+
-      '<label style="display:flex;align-items:center;gap:6px;margin-bottom:8px;cursor:pointer">'+
-        '<input type="checkbox" id="testModeCheck" onchange="document.getElementById(&#39;testEmpId&#39;).style.display=this.checked?&#39;inline-block&#39;:&#39;none&#39;"> '+
-        '<strong>🧪 测试模式</strong> — 仅发送给指定工号，不发送给全员'+
-      '</label>'+
-      '<div style="display:flex;align-items:center;gap:8px">'+
-        '<span style="color:#888">测试工号：</span>'+
-        '<input type="text" id="testEmpId" placeholder="输入工号" style="display:none;padding:4px 8px;border:1px solid #ccc;border-radius:4px;width:150px">'+
-      '</div>'+
-    '</div>'+
-    '<p style="font-size:13px;color:#888;margin-bottom:12px">将向 <strong>'+toSend.length+'</strong> 位员工发送考勤确认卡片（含无异常人员）</p>'+
+    '<h2>📨 飞书卡片预览'+testModeLabel+'</h2>'+
+    '<p style="font-size:13px;color:#888;margin-bottom:12px">将向 <strong>'+finalToSend.length+'</strong> 位员工发送考勤确认卡片</p>'+
     '<div id="cardPreviewList">'+previewCards+'</div>'+
     '<div style="margin-top:16px;display:flex;gap:8px;justify-content:center">'+
     '<button class="btn" onclick="document.getElementById(\'cardPreviewOverlay\').remove()">取消</button>'+
-    '<button class="btn btn-success" onclick="doSendFeishuCards()">🚀 确认发送 '+toSend.length+' 张卡片</button>'+
+    '<button class="btn btn-success" onclick="doSendFeishuCards()">🚀 确认发送 '+finalToSend.length+' 张卡片</button>'+
     '</div>'+
     '<div id="sendResultContainer" style="margin-top:12px;display:none"></div>'+
     '</div>';
@@ -1555,18 +1637,24 @@ function doSendFeishuCards(){
   const overlay = document.getElementById('cardPreviewOverlay');
   if(overlay) overlay.remove();
 
-  const testMode = document.getElementById('testModeCheck') ? document.getElementById('testModeCheck').checked : false;
-  const testEmpId = testMode ? (document.getElementById('testEmpId') ? document.getElementById('testEmpId').value.trim() : '') : '';
+  // Read test mode from inline controls (in the action bar, not modal)
+  const testMode = document.getElementById('testModeSwitch') ? document.getElementById('testModeSwitch').checked : false;
+  const testEmpId = testMode ? (document.getElementById('testEmpIdInline') ? document.getElementById('testEmpIdInline').value.trim() : '') : '';
 
-  let toSend = state.confirmation.rows.filter(r => r.status === '待确认' || r.status === '无异常');
+  // Get selected rows
+  let toSend = state.confirmation.rows.filter(r => r._selected);
 
   if(testMode && testEmpId){
     toSend = toSend.filter(r => r.emp_id === testEmpId);
     if(!toSend.length){
-      alert('测试模式：未找到工号为「'+testEmpId+'」的员工在待发送列表中');
+      alert('测试模式：未找到工号为「'+testEmpId+'」的勾选员工');
       return;
     }
   }
+
+  // Mark all as sending (show progress)
+  toSend.forEach(r => { r._sendStatus = 'sending'; });
+  renderConfirmation();
 
   // Build card data
   const cardsData = toSend.map(emp => {
@@ -1681,9 +1769,27 @@ if __name__ == '__main__':
     '2. 安装依赖：<code style="background:#eee;padding:1px 6px;border-radius:3px">pip install requests</code><br>'+
     '3. 执行：<code style="background:#eee;padding:1px 6px;border-radius:3px">python3 feishu_send_cards.py</code>'+
     '</div></div>'+
-    '<div style="font-size:12px;color:#888">发送后回到此页面手动标记已确认的员工状态</div>'+
+    '<div style="margin-top:12px;display:flex;gap:8px;justify-content:center">'+
+    '<button class="btn" onclick="this.closest(\'.modal-overlay\').remove()">关闭</button>'+
+    '<button class="btn btn-success" onclick="markAllSent()">✅ 标记已发送</button>'+
+    '</div>'+
     '</div>';
   document.body.appendChild(resultOverlay);
+}
+
+function markAllSent(){
+  // Mark all sending employees as sent
+  const now = new Date();
+  const ts = now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+  state.confirmation.rows.forEach(r => {
+    if(r._sendStatus === 'sending'){
+      r._sendStatus = 'ok';
+      r._sendTime = ts;
+    }
+  });
+  renderConfirmation();
+  const overlay = document.getElementById('sendResultOverlay');
+  if(overlay) overlay.remove();
 }
 
 function showEmpClock(eid){
