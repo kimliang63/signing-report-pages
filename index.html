@@ -105,6 +105,18 @@ tr:hover td{background:#fafbfc}
 .panel{display:none}
 .panel.active{display:block}
 .v-divider{width:1px;height:20px;background:#ddd;margin:0 4px}
+.btn-sm{padding:5px 12px;font-size:12px}
+/* modal */
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.35);z-index:1000;display:flex;align-items:center;justify-content:center}
+.modal-box{background:#fff;border-radius:12px;padding:24px;max-width:560px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.15)}
+.modal-box h2{font-size:16px;margin-bottom:12px;color:#1a1a2e}
+.modal-close{float:right;background:none;border:none;font-size:20px;cursor:pointer;color:#999;line-height:1}
+.modal-close:hover{color:#333}
+.modal-table{width:100%;border-collapse:collapse;font-size:13px}
+.modal-table th{background:#f4f7fe;padding:8px 10px;text-align:left;font-weight:600;color:#555;border-bottom:1px solid #e5e5e5}
+.modal-table td{padding:7px 10px;border-bottom:1px solid #f0f0f0}
+.modal-table tr:last-child td{border-bottom:none}
+.modal-table .num-col{text-align:center;font-weight:600}
 </style>
 </head>
 <body>
@@ -840,7 +852,9 @@ function renderStats(){
     {rule:'R7', risk:'warning', desc:'居家办公审批中但报表居家时长=0 — 居家办公审批中但签字报表未体现'},
   ];
   const rdiv = document.getElementById('ruleDetailV');
-  rdiv.innerHTML = '<h3 style="font-size:14px;margin:0 0 8px;color:#333">规则说明</h3>'+
+  rdiv.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'+
+    '<h3 style="font-size:14px;margin:0;color:#333">规则说明</h3>'+
+    '<button class="btn btn-sm" onclick="showAllRules()" style="font-size:12px">📋 查看全部规则</button></div>'+
     '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="background:#f5f5f5">'+
     '<th style="padding:6px 8px;text-align:left;border:1px solid #ddd">规则</th>'+
     '<th style="padding:6px 8px;text-align:left;border:1px solid #ddd">风险</th>'+
@@ -934,6 +948,55 @@ function exportCSV(){
   a.download = '校验结果_'+new Date().toISOString().slice(0,10)+'.csv';
   a.click();
   URL.revokeObjectURL(a.href);
+}
+
+// ========== RULE MODAL ==========
+function showAllRules(){
+  const d = state.validation.validated ? state.validation.data : [];
+  // Count hits per rule
+  const hitCount = {};
+  const levelMap = {};
+  const descMap = {
+    'R1.1':'周末有打卡但休假未涵盖',
+    '接近卡未舍去':'同一人同一日打卡间隔<10分钟',
+    'R3':'加班工时偏差超过5%',
+    'R4':'补签申请审批中',
+    'R5':'REG=0但有打卡记录',
+    'R6':'公出/出差审批中但REG=0',
+    'R7':'居家办公审批中但报表居家=0'
+  };
+  const riskMap = {
+    'R1.1':'warning','接近卡未舍去':'warning',
+    'R3':'warning','R4':'warning','R5':'error','R6':'warning','R7':'warning'
+  };
+  d.forEach(r => {
+    const key = r.rule || '其他';
+    hitCount[key] = (hitCount[key]||0) + 1;
+    levelMap[key] = r.level;
+  });
+  const allRules = ['R1.1','接近卡未舍去','R3','R4','R5','R6','R7'];
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.onclick = function(e){if(e.target===overlay) overlay.remove()};
+  overlay.innerHTML =
+    '<div class="modal-box">'+
+    '<button class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</button>'+
+    '<h2>📋 所有校验规则</h2>'+
+    '<table class="modal-table"><thead><tr>'+
+    '<th>规则</th><th>风险</th><th>说明</th><th class="num-col">命中人数</th></tr></thead><tbody>'+
+    allRules.map(code => {
+      const cnt = hitCount[code]||0;
+      const risk = riskMap[code]||'warning';
+      return '<tr>'+
+        '<td style="font-weight:600">'+esc(code)+'</td>'+
+        '<td><span class="badge '+(risk==='error'?'badge-error':'badge-warning')+'">'+esc(risk)+'</span></td>'+
+        '<td style="color:#666">'+esc(descMap[code]||'')+'</td>'+
+        '<td class="num-col" style="color:'+(cnt>0?'#D9001B':'#999')+'">'+(cnt||'-')+'</td>'+
+        '</tr>';
+    }).join('')+
+    '</tbody></table>'+
+    '</div>';
+  document.body.appendChild(overlay);
 }
 
 // ========== CONFIRMATION ==========
