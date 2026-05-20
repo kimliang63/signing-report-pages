@@ -1,95 +1,424 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>签字报表确认系统 - 报告中心</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f0f2f5;
-            color: #333;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 40px 20px;
-        }
-        .container { max-width: 800px; width: 100%; }
-        h1 { font-size: 28px; margin-bottom: 8px; color: #1a1a2e; }
-        .subtitle { color: #666; margin-bottom: 32px; font-size: 14px; }
-        .card {
-            background: #fff;
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
-        .card a {
-            text-decoration: none;
-            color: inherit;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-        .card-icon {
-            width: 48px; height: 48px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            flex-shrink: 0;
-        }
-        .card-content h3 { font-size: 16px; margin-bottom: 4px; }
-        .card-content p { font-size: 13px; color: #888; }
-        .icon-green { background: #e8f5e9; }
-        .icon-blue { background: #e3f2fd; }
-        .icon-purple { background: #f3e5f5; }
-        .footer { margin-top: 40px; font-size: 12px; color: #aaa; }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>签字报表确认系统 - 综合看板</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;background:#f0f2f5;color:#333;min-height:100vh;padding:20px}
+.container{max-width:1400px;margin:0 auto}
+/* header */
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.header h1{font-size:22px;color:#1a1a2e}
+.header .sub{color:#888;font-size:13px}
+/* tabs */
+.tabs{display:flex;gap:4px;margin-bottom:16px;background:#e8eaf0;border-radius:10px;padding:4px;width:fit-content}
+.tab{padding:8px 20px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:500;color:#555;border:none;background:transparent;transition:.15s}
+.tab.active{background:#fff;color:#1a1a2e;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.tab:hover:not(.active){color:#333}
+/* upload zone */
+.upload-zone{border:2px dashed #ccc;border-radius:10px;padding:24px;text-align:center;background:#fff;margin-bottom:16px;transition:.2s;cursor:pointer}
+.upload-zone.dragover{border-color:#0E66FB;background:#f0f6ff}
+.upload-zone.has-data{border-color:#12CC7E;background:#f6fff9}
+.upload-zone .hint{color:#999;font-size:13px;margin-top:4px}
+/* file status */
+.file-status{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.file-item{background:#fff;border-radius:6px;padding:6px 12px;font-size:12px;border:1px solid #e5e5e5;display:flex;align-items:center;gap:6px}
+.file-item.loaded{border-color:#12CC7E;background:#f6fff9}
+.file-item .dot{width:8px;height:8px;border-radius:50%;background:#ddd}
+.file-item.loaded .dot{background:#12CC7E}
+/* stat cards */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:20px}
+.stat-card{background:#fff;border-radius:8px;padding:16px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.stat-card .num{font-size:30px;font-weight:700;line-height:1.2}
+.stat-card .label{font-size:12px;color:#888;margin-top:4px}
+.stat-card .sub{font-size:11px;color:#bbb;margin-top:2px}
+.stat-card.blue .num{color:#0E66FB}
+.stat-card.green .num{color:#12CC7E}
+.stat-card.orange .num{color:#FFAA0E}
+.stat-card.red .num{color:#D9001B}
+/* filter bar */
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.filter-bar select,.filter-bar input{padding:6px 10px;border:1px solid #ddd;border-radius:6px;font-size:13px;background:#fff}
+.filter-bar input{flex:1;min-width:160px}
+.filter-bar .info{font-size:12px;color:#888;margin-left:auto}
+/* table */
+.table-wrap{overflow-x:auto;background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#f4f7fe;padding:10px 12px;text-align:left;font-weight:600;color:#555;border-bottom:1px solid #e5e5e5;white-space:nowrap}
+td{padding:9px 12px;border-bottom:1px solid #f0f0f0;color:#444}
+tr:hover td{background:#fafbfc}
+/* pagination */
+.pagination{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;font-size:13px}
+.pagination button{padding:4px 12px;border:1px solid #ddd;border-radius:4px;background:#fff;cursor:pointer;font-size:13px}
+.pagination button:hover{background:#f0f0f0}
+.pagination button:disabled{opacity:.4;cursor:default}
+.pagination .page-info{color:#888}
+/* badge */
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:500}
+.badge-warning{background:#fff3e0;color:#e65100}
+.badge-error{background:#fce4ec;color:#c62828}
+.badge-success{background:#e8f5e9;color:#2e7d32}
+.badge-info{background:#e3f2fd;color:#1565c0}
+.badge-pending{background:#fff8e1;color:#f57f17}
+/* dept tree */
+.dept-tree{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-bottom:16px}
+.dept-card{background:#fff;border-radius:8px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.dept-card .dept-name{font-size:13px;font-weight:600;margin-bottom:6px;color:#333}
+.dept-card .dept-stat{display:flex;gap:10px;font-size:12px;color:#666}
+.dept-card .dept-stat span{display:flex;align-items:center;gap:3px}
+/* empty */
+.empty{text-align:center;padding:40px;color:#999;font-size:14px}
+/* charts - simple bars */
+.bar-row{display:flex;align-items:center;gap:6px;margin:3px 0;font-size:12px}
+.bar-row .bar-label{width:100px;text-align:right;color:#666;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-row .bar-fill{height:16px;border-radius:3px;min-width:4px;transition:.3s;background:#0E66FB}
+.bar-row .bar-fill.warning{background:#FFAA0E}
+.bar-row .bar-fill.error{background:#D9001B}
+.bar-row .bar-fill.success{background:#12CC7E}
+.bar-row .bar-num{font-size:11px;color:#888;white-space:nowrap}
+/* objection */
+.obj-list{display:grid;gap:8px}
+.obj-item{background:#fff;border-radius:6px;padding:10px 14px;border-left:3px solid #FFAA0E;font-size:13px}
+.obj-item .obj-emp{font-weight:600;color:#333}
+.obj-item .obj-reason{color:#888;font-size:12px;margin-top:2px}
+/* progress bar */
+.progress-bar{height:8px;border-radius:4px;background:#e5e5e5;overflow:hidden;display:flex}
+.progress-bar .seg{height:100%;transition:.3s}
+.progress-bar .seg.success{background:#12CC7E}
+.progress-bar .seg.warning{background:#FFAA0E}
+.progress-bar .seg.danger{background:#D9001B}
+.progress-labels{display:flex;justify-content:space-between;font-size:11px;color:#888;margin-top:4px}
+/* hidden sections */
+.panel{display:none}
+.panel.active{display:block}
+/* btn */
+.btn{padding:6px 14px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;font-size:13px}
+.btn:hover{background:#f0f0f0}
+.btn-primary{background:#0E66FB;color:#fff;border-color:#0E66FB}
+.btn-primary:hover{background:#0a52d4}
+/* responsive */
+@media(max-width:768px){
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .dept-tree{grid-template-columns:1fr}
+  .header{flex-direction:column;align-items:flex-start}
+}
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>签字报表确认系统</h1>
-        <p class="subtitle">自动考勤确认 · 进度跟踪 · 多维看板</p>
-
-        <div class="card">
-            <a href="考勤确认统计.html" target="_blank">
-                <div class="card-icon icon-green">&#9745;</div>
-                <div class="card-content">
-                    <h3>考勤确认统计</h3>
-                    <p>员工考勤确认状态汇总统计</p>
-                </div>
-            </a>
-        </div>
-
-        <div class="card">
-            <a href="进度报告.html" target="_blank">
-                <div class="card-icon icon-blue">&#128200;</div>
-                <div class="card-content">
-                    <h3>进度报告</h3>
-                    <p>考勤确认流程整体进度追踪</p>
-                </div>
-            </a>
-        </div>
-
-        <div class="card">
-            <a href="多维表格看板.html" target="_blank">
-                <div class="card-icon icon-purple">&#128202;</div>
-                <div class="card-content">
-                    <h3>多维表格看板</h3>
-                    <p>飞书多维表格数据看板</p>
-                </div>
-            </a>
-        </div>
-
-        <div class="footer">
-            kimliang63/signing-report &middot; GitHub Pages
-        </div>
+<div class="container">
+  <div class="header">
+    <div>
+      <h1>签字报表确认系统</h1>
+      <div class="sub">综合看板 · 数据校验 + 员工确认</div>
     </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span id="dataStatus" class="badge badge-pending">未加载数据</span>
+      <button class="btn btn-primary" onclick="document.getElementById('csvInput').click()">加载CSV数据</button>
+      <input type="file" id="csvInput" accept=".csv" multiple style="display:none" onchange="loadCSVFiles(this.files)">
+    </div>
+  </div>
+
+  <div class="tabs" id="mainTabs">
+    <button class="tab active" data-panel="validation">数据校验</button>
+    <button class="tab" data-panel="confirmation">员工确认</button>
+  </div>
+
+  <!-- ========== PANEL 1: 数据校验 ========== -->
+  <div id="panel-validation" class="panel active">
+    <div class="upload-zone" id="dropZoneV">
+      <div style="font-size:24px;margin-bottom:4px">📂</div>
+      <div><strong>上传CSV数据文件</strong></div>
+      <div class="hint">点击上方"加载CSV数据"，或拖放文件到页面中</div>
+    </div>
+    <div class="file-status" id="fileStatusV"></div>
+
+    <div class="stats" id="statsV" style="display:none">
+      <div class="stat-card orange"><div class="num" id="totalWarnings">0</div><div class="label">Warning</div><div class="sub">需关注</div></div>
+      <div class="stat-card red"><div class="num" id="totalErrors">0</div><div class="label">Error</div><div class="sub">需处理</div></div>
+      <div class="stat-card blue"><div class="num" id="totalEmployees">0</div><div class="label">异常员工数</div><div class="sub">去重</div></div>
+      <div class="stat-card"><div class="num" id="totalRecords">0</div><div class="label">明细记录数</div><div class="sub">总行数</div></div>
+    </div>
+
+    <div id="ruleBarsV" style="display:none;margin-bottom:16px">
+      <h3 style="font-size:14px;margin-bottom:8px;color:#333">按规则分布</h3>
+      <div id="ruleBars"></div>
+    </div>
+
+    <div class="filter-bar" id="filterBarV" style="display:none">
+      <select id="ruleFilter"><option value="">所有规则</option><option value="R1.2">R1.2 重复打卡</option><option value="R3">R3 加班工时偏差</option><option value="R4">R4 补签审批中</option><option value="R5">R5 REG=0有打卡</option></select>
+      <input type="text" id="searchInput" placeholder="搜索员工工号/姓名/明细...">
+      <span class="info" id="tableInfo">共 0 条</span>
+    </div>
+
+    <div class="table-wrap" id="tableWrapV" style="display:none">
+      <table><thead><tr>
+        <th>规则</th><th>工号</th><th>级别</th><th>消息</th><th>明细</th>
+      </tr></thead><tbody id="tbodyV"></tbody></table>
+      <div class="pagination" id="paginationV">
+        <button onclick="prevPage()" id="prevBtn">上一页</button>
+        <span class="page-info" id="pageInfo">1/1</span>
+        <button onclick="nextPage()" id="nextBtn">下一页</button>
+        <select id="pageSize" onchange="renderTable()" style="margin-left:8px;padding:4px 6px;border:1px solid #ddd;border-radius:4px;font-size:12px">
+          <option value="20">20条/页</option><option value="50">50条/页</option><option value="100">100条/页</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== PANEL 2: 员工确认 ========== -->
+  <div id="panel-confirmation" class="panel">
+    <div class="upload-zone" id="dropZoneC">
+      <div style="font-size:24px;margin-bottom:4px">📂</div>
+      <div><strong>上传CSV数据文件</strong></div>
+      <div class="hint">需要"确认状态.csv"显示确认进度</div>
+    </div>
+    <div class="file-status" id="fileStatusC"></div>
+
+    <div class="stats" id="statsC" style="display:none">
+      <div class="stat-card blue"><div class="num" id="totalEmp">0</div><div class="label">总员工</div></div>
+      <div class="stat-card green"><div class="num" id="confirmedCount">0</div><div class="label">已确认</div></div>
+      <div class="stat-card orange"><div class="num" id="pendingCount">0</div><div class="label">待确认</div></div>
+      <div class="stat-card red"><div class="num" id="objectionCount">0</div><div class="label">有异议</div></div>
+    </div>
+
+    <div style="margin-bottom:16px;display:none" id="progressSection">
+      <h3 style="font-size:14px;margin-bottom:8px;color:#333">整体确认进度</h3>
+      <div class="progress-bar" id="progressBar"></div>
+      <div class="progress-labels" id="progressLabels"></div>
+    </div>
+
+    <h3 style="font-size:14px;margin-bottom:8px;color:#333">按部门统计</h3>
+    <div class="dept-tree" id="deptTree"></div>
+
+    <h3 style="font-size:14px;margin:16px 0 8px;color:#333">异议原因明细</h3>
+    <div id="objectionList" class="obj-list"></div>
+  </div>
+</div>
+
+<script>
+// ========== STATE ==========
+const state = {
+  validation: { data: [], filtered: [], page: 1, pageSize: 20 },
+  confirmation: { rows: [], departments: {}, loaded: false },
+  files: {}
+};
+
+const LABELS = { R1.2:'R1.2 重复打卡',R3:'R3 加班工时偏差',R4:'R4 补签审批中',R5:'R5 REG=0有打卡' };
+const COLORS = {R1.2:'#0E66FB',R3:'#FFAA0E',R4:'#9C27B0',R5:'#D9001B'};
+
+// ========== TAB SWITCH ==========
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    document.getElementById('panel-'+t.dataset.panel).classList.add('active');
+  });
+});
+
+// ========== DROP ZONE ==========
+['dropZoneV','dropZoneC'].forEach(id=>{
+  const el=document.getElementById(id);
+  el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('dragover')});
+  el.addEventListener('dragleave',()=>el.classList.remove('dragover'));
+  el.addEventListener('drop',e=>{
+    e.preventDefault();el.classList.remove('dragover');
+    if(e.dataTransfer.files.length)loadCSVFiles(e.dataTransfer.files);
+  });
+});
+
+// ========== CSV LOADING ==========
+function loadCSVFiles(files){
+  document.getElementById('dataStatus').textContent='加载中...';
+  document.getElementById('dataStatus').className='badge badge-info';
+  let pending=files.length;
+  Array.from(files).forEach(f=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      Papa.parse(e.target.result,{header:true,complete:r=>{
+        state.files[f.name]=r.data.filter(d=>d.emp_id||Object.values(d).some(v=>v));
+        pending--;
+        if(pending===0)processLoadedData();
+      }});
+    };
+    reader.readAsText(f);
+  });
+}
+
+function processLoadedData(){
+  // Validation data from 校验报告.csv
+  const vf=Object.keys(state.files).find(k=>k.includes('校验报告')||k.includes('validate'));
+  if(vf){
+    state.validation.data=state.files[vf].filter(r=>r.rule&&r.emp_id);
+    applyFilters();
+  }
+
+  // Confirmation data from 确认状态.csv
+  const cf=Object.keys(state.files).find(k=>k.includes('确认状态')||k.includes('status'));
+  if(cf){
+    state.confirmation.rows=state.files[cf].filter(r=>r.emp_id);
+    buildConfirmation();
+  }
+
+  updateFileStatus();
+  document.getElementById('dataStatus').textContent='已加载';
+  document.getElementById('dataStatus').className='badge badge-success';
+}
+
+function updateFileStatus(){
+  ['dropZoneV','dropZoneC'].forEach(id=>{
+    const el=document.getElementById(id);
+    el.classList.add('has-data');
+  });
+  ['fileStatusV','fileStatusC'].forEach((id,i)=>{
+    const el=document.getElementById(id);
+    el.innerHTML='';
+    Object.keys(state.files).forEach(name=>{
+      const div=document.createElement('div');
+      div.className='file-item loaded';
+      div.innerHTML='<span class="dot"></span>'+name+' <span style="color:#888;font-size:11px">('+state.files[name].length+'行)</span>';
+      el.appendChild(div);
+    });
+  });
+}
+
+// ========== VALIDATION: FILTER + RENDER ==========
+function applyFilters(){
+  const rule=document.getElementById('ruleFilter').value;
+  const search=document.getElementById('searchInput').value.toLowerCase();
+  let data=state.validation.data;
+  if(rule)data=data.filter(r=>r.rule===rule);
+  if(search)data=data.filter(r=>(r.emp_id||'').toLowerCase().includes(search)||(r.message||'').toLowerCase().includes(search)||(r.detail||'').toLowerCase().includes(search));
+  state.validation.filtered=data;
+  state.validation.page=1;
+  renderStats();
+  renderTable();
+  renderRuleBars();
+  document.getElementById('filterBarV').style.display='flex';
+  document.getElementById('tableWrapV').style.display='block';
+  document.getElementById('statsV').style.display='grid';
+  document.getElementById('ruleBarsV').style.display='block';
+}
+
+function renderStats(){
+  const d=state.validation.filtered;
+  const unique=new Set(d.map(r=>r.emp_id));
+  document.getElementById('totalWarnings').textContent=d.filter(r=>r.level==='warning').length;
+  document.getElementById('totalErrors').textContent=d.filter(r=>r.level==='error').length;
+  document.getElementById('totalEmployees').textContent=unique.size;
+  document.getElementById('totalRecords').textContent=d.length;
+  document.getElementById('statsV').style.display='grid';
+}
+
+function renderRuleBars(){
+  const d=state.validation.filtered;
+  const grp={};
+  d.forEach(r=>{grp[r.rule]=(grp[r.rule]||0)+1});
+  const el=document.getElementById('ruleBars');
+  el.innerHTML='';
+  const max=Math.max(...Object.values(grp),1);
+  Object.entries(grp).sort((a,b)=>b[1]-a[1]).forEach(([rule,cnt])=>{
+    const row=document.createElement('div');row.className='bar-row';
+    const pct=(cnt/max*100);
+    row.innerHTML='<span class="bar-label">'+rule+'</span><div style="flex:1;background:#f0f0f0;border-radius:3px"><div class="bar-fill" style="width:'+pct+'%;background:'+(COLORS[rule]||'#0E66FB')+'"></div></div><span class="bar-num">'+cnt+'条</span>';
+    el.appendChild(row);
+  });
+}
+
+function renderTable(){
+  const d=state.validation.filtered;
+  const ps=parseInt(document.getElementById('pageSize').value);
+  state.validation.pageSize=ps;
+  const total=Math.ceil(d.length/ps)||1;
+  const p=Math.min(state.validation.page,total);
+  const start=(p-1)*ps;
+  const page=d.slice(start,start+ps);
+  const tbody=document.getElementById('tbodyV');
+  tbody.innerHTML='';
+  page.forEach(r=>{
+    const tr=document.createElement('tr');
+    const lvl=r.level==='error'?'badge badge-error':r.level==='warning'?'badge badge-warning':'badge badge-info';
+    tr.innerHTML='<td>'+r.rule+'</td><td>'+r.emp_id+'</td><td><span class="'+lvl+'">'+r.level+'</span></td><td>'+esc(r.message)+'</td><td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(r.detail||'')+'">'+esc((r.detail||'').substring(0,60))+'</td>';
+    tbody.appendChild(tr);
+  });
+  if(!page.length)tbody.innerHTML='<tr><td colspan="5" class="empty">无匹配数据</td></tr>';
+  document.getElementById('tableInfo').textContent='共 '+d.length+' 条，显示 '+(start+1)+'-'+Math.min(start+ps,d.length);
+  document.getElementById('pageInfo').textContent=p+'/'+total;
+  document.getElementById('prevBtn').disabled=p<=1;
+  document.getElementById('nextBtn').disabled=p>=total;
+}
+
+function prevPage(){if(state.validation.page>1){state.validation.page--;renderTable()}}
+function nextPage(){const t=Math.ceil(state.validation.filtered.length/state.validation.pageSize)||1;if(state.validation.page<t){state.validation.page++;renderTable()}}
+
+document.getElementById('ruleFilter').addEventListener('change',applyFilters);
+document.getElementById('searchInput').addEventListener('input',applyFilters);
+document.getElementById('pageSize').addEventListener('change',renderTable);
+
+// ========== CONFIRMATION ==========
+function buildConfirmation(){
+  const rows=state.confirmation.rows;
+  if(!rows.length)return;
+  state.confirmation.loaded=true;
+
+  const total=rows.length;
+  const confirmed=rows.filter(r=>r.confirm_status==='已确认'||r.confirm_status==='confirmed').length;
+  const pending=rows.filter(r=>!r.confirm_status||r.confirm_status==='待确认'||r.confirm_status==='').length;
+  const objection=rows.filter(r=>r.objection_reason&&r.objection_reason.trim()).length;
+  const sent=rows.filter(r=>r.send_status==='已发送'||r.send_status==='sent').length;
+
+  document.getElementById('totalEmp').textContent=total;
+  document.getElementById('confirmedCount').textContent=confirmed;
+  document.getElementById('pendingCount').textContent=total-confirmed-objection;
+  document.getElementById('objectionCount').textContent=objection;
+  document.getElementById('statsC').style.display='grid';
+
+  // Progress bar
+  const pb=document.getElementById('progressBar');
+  const pcts=[confirmed/total*100,(total-confirmed-objection)/total*100,objection/total*100];
+  pb.innerHTML='<div class="seg success" style="width:'+pcts[0]+'%"></div><div class="seg warning" style="width:'+pcts[1]+'%"></div><div class="seg danger" style="width:'+pcts[2]+'%"></div>';
+  document.getElementById('progressLabels').innerHTML='<span>✅ 已确认 '+confirmed+' ('+Math.round(pcts[0])+'%)</span><span>⏳ 待确认 '+Math.round(total-confirmed-objection)+' ('+Math.round(pcts[1])+'%)</span><span>⚠️ 有异议 '+objection+' ('+Math.round(pcts[2])+'%)</span>';
+  document.getElementById('progressSection').style.display='block';
+
+  // Department tree
+  const depts={};
+  rows.forEach(r=>{
+    const d=r.department||'未知';
+    if(!depts[d])depts[d]={total:0,confirmed:0,pending:0,objection:0};
+    depts[d].total++;
+    if(r.confirm_status==='已确认')depts[d].confirmed++;
+    else if(r.objection_reason&&r.objection_reason.trim())depts[d].objection++;
+    else depts[d].pending++;
+  });
+  const dt=document.getElementById('deptTree');
+  dt.innerHTML='';
+  Object.entries(depts).sort((a,b)=>b[1].total-a[1].total).forEach(([dept,info])=>{
+    const card=document.createElement('div');card.className='dept-card';
+    card.innerHTML='<div class="dept-name">'+esc(dept)+'</div><div class="dept-stat"><span>总:'+info.total+'</span><span style="color:#12CC7E">已确认:'+info.confirmed+'</span><span style="color:#FFAA0E">待确认:'+info.pending+'</span><span style="color:#D9001B">异议:'+info.objection+'</span></div>';
+    dt.appendChild(card);
+  });
+
+  // Objection list
+  const objRows=rows.filter(r=>r.objection_reason&&r.objection_reason.trim());
+  const ol=document.getElementById('objectionList');
+  ol.innerHTML='';
+  if(!objRows.length){
+    ol.innerHTML='<div class="empty">暂无异议记录</div>';
+  }else{
+    objRows.forEach(r=>{
+      const item=document.createElement('div');item.className='obj-item';
+      item.innerHTML='<div class="obj-emp">'+esc(r.emp_id)+' - '+esc(r.name)+'</div><div class="obj-reason">异议原因：'+esc(r.objection_reason)+'</div>';
+      ol.appendChild(item);
+    });
+  }
+
+  document.getElementById('progressSection').style.display='block';
+}
+
+function esc(s){if(!s)return '';const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+</script>
 </body>
 </html>
