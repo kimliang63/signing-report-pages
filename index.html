@@ -1595,18 +1595,13 @@ function sendAllFeishuCards(){
     return;
   }
 
-  // Check test mode
+  // Check test mode — note: preview still shows ALL selected employees
+  // Test mode only affects which employee actually receives the cards
   const testMode = document.getElementById('testModeSwitch') ? document.getElementById('testModeSwitch').checked : false;
   const testEmpId = testMode ? (document.getElementById('testEmpIdInline') ? document.getElementById('testEmpIdInline').value.trim() : '') : '';
 
-  let finalToSend = toSend;
-  if(testMode && testEmpId){
-    finalToSend = toSend.filter(r => r.emp_id === testEmpId);
-    if(!finalToSend.length){
-      alert('测试模式：未找到工号为「'+testEmpId+'」的勾选员工');
-      return;
-    }
-  }
+  const finalToSend = toSend;
+  const testModeLabel = testMode && testEmpId ? ' 🧪 测试模式：仅发送给 <strong>'+testEmpId+'</strong>' : '';
 
   // --- Step 1: Show card preview modal ---
   const overlay = document.createElement('div');
@@ -1637,17 +1632,18 @@ function doSendFeishuCards(){
   const overlay = document.getElementById('cardPreviewOverlay');
   if(overlay) overlay.remove();
 
-  // Read test mode from inline controls (in the action bar, not modal)
+  // Read test mode from inline controls
   const testMode = document.getElementById('testModeSwitch') ? document.getElementById('testModeSwitch').checked : false;
   const testEmpId = testMode ? (document.getElementById('testEmpIdInline') ? document.getElementById('testEmpIdInline').value.trim() : '') : '';
 
-  // Get selected rows
-  let toSend = state.confirmation.rows.filter(r => r._selected);
+  // Get selected rows — ALL selected, test mode doesn't filter data
+  const toSend = state.confirmation.rows.filter(r => r._selected);
 
   if(testMode && testEmpId){
-    toSend = toSend.filter(r => r.emp_id === testEmpId);
-    if(!toSend.length){
-      alert('测试模式：未找到工号为「'+testEmpId+'」的勾选员工');
+    // Check that the test emp is in the selection
+    const hasTestEmp = toSend.some(r => r.emp_id === testEmpId);
+    if(!hasTestEmp){
+      alert('测试模式：勾选的员工中未找到工号为「'+testEmpId+'」的员工');
       return;
     }
   }
@@ -1656,7 +1652,7 @@ function doSendFeishuCards(){
   toSend.forEach(r => { r._sendStatus = 'sending'; });
   renderConfirmation();
 
-  // Build card data
+  // Build card data for ALL selected employees
   const cardsData = toSend.map(emp => {
     const dept = [emp.dept3, emp.dept4, emp.dept5].filter(Boolean).join(' / ');
     const errorsRows = emp.errors.map((e, i) => '规则 '+emp.rules[i]+': '+e).join('\\n');
