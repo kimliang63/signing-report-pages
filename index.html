@@ -228,11 +228,13 @@ tr:hover td{background:#fafbfc}
     <div class="action-bar" id="actionBarC">
       <span class="file-badge" id="confirmBadge">0 个待确认员工</span>
       <button class="btn btn-primary" onclick="buildConfirmationList()">🔄 从校验结果生成确认名单</button>
+      <button class="btn btn-primary" onclick="loadBatchFromServer()" title="拉取 server.py 已发送批次的回复状态（脚本/API 发卡也可用）">📡 同步服务器回复</button>
+      <span class="file-badge" id="serverBatchBadge" style="display:none;font-size:11px"></span>
       <button class="btn btn-success" onclick="sendAllFeishuCards()" id="sendAllBtn" disabled>📨 发送飞书卡片</button>
       <div class="test-mode-bar">
         <input type="checkbox" id="testModeSwitch" onchange="toggleTestMode()">
         <label for="testModeSwitch" style="cursor:pointer;user-select:none">🧪 测试</label>
-        <input type="text" class="test-emp-input" id="testEmpIdInline" placeholder="输入工号">
+        <input type="text" class="test-emp-input" id="testEmpIdInline" value="zt28219" readonly title="测试模式固定收件人，不可修改">
       </div>
       <span class="send-count" id="sendCountBadge"></span>
     </div>
@@ -271,10 +273,11 @@ tr:hover td{background:#fafbfc}
 // ========== STATE ==========
 const state = {
   validation: { data: [], filtered: [], page: 1, pageSize: 20, validated: false },
-  confirmation: { rows: [], loaded: false },
+  confirmation: { rows: [], loaded: false, currentBatchId: '' },
   files: {},
   serverUrl: 'http://localhost:8899'
 };
+window.state = state;
 const COLORS = {'R1.1':'#0E66FB','R1.2':'#0E66FB','R3':'#FFAA0E','R4':'#9C27B0','R5':'#D9001B','R6':'#E67E22','R7':'#2ECC71'};
 
 // ========== PERSISTENCE (localStorage) ==========
@@ -282,7 +285,7 @@ function saveState(){
   try{
     const cpy = {
       validation: { data: state.validation.data, filtered: [], page: 1, pageSize: state.validation.pageSize, validated: state.validation.validated },
-      confirmation: { rows: state.confirmation.rows, loaded: state.confirmation.loaded },
+      confirmation: { rows: state.confirmation.rows, loaded: state.confirmation.loaded, currentBatchId: state.confirmation.currentBatchId || '' },
       files: state.files,
       serverUrl: state.serverUrl
     };
@@ -314,8 +317,31 @@ function loadState(){
     const fkeys = JSON.parse(localStorage.getItem('signing_report_files_keys') || '[]');
     fkeys.forEach(k => { state.files[k] = []; }); // empty placeholders
     console.log('State restored from localStorage (files omitted)');
+    refreshUIFromState();
     return true;
   } catch(e){ console.warn('loadState error:', e); return false; }
+}
+function refreshUIFromState(){
+  try {
+    updateFileUI();
+    if(state.validation && state.validation.validated){
+      if(!state.validation.filtered || !state.validation.filtered.length){
+        state.validation.filtered = (state.validation.data || []).slice();
+      }
+      if(state.validation.filtered.length){
+        renderTable();
+        const statsV = document.getElementById('statsV');
+        if(statsV) statsV.style.display = 'grid';
+        const btnExport = document.getElementById('btnExportCSV');
+        if(btnExport) btnExport.disabled = false;
+        const btnStart = document.getElementById('btnStartValidation');
+        if(btnStart) btnStart.disabled = true;
+      }
+    }
+    if(state.confirmation && state.confirmation.rows && state.confirmation.rows.length){
+      renderConfirmation();
+    }
+  } catch(e){ console.warn('refreshUIFromState:', e); }
 }
 function getServerUrl(){ return state.serverUrl || 'http://localhost:8899'; }
 
@@ -483,7 +509,17 @@ function toggleCollapse(id){
 
 // ========== START VALIDATION (built-in rule engine) ==========
 const WEEKEND_DATES = {};
-(function(){const d=new Date(2026,4,1);const e=new Date(2026,4,31);while(d<=e){if(d.getDay()===0||d.getDay()===6)WEEKEND_DATES[d.toISOString().slice(0,10)]=1;d.setDate(d.getDate()+1)}})();
+(function(){
+  const d=new Date(2026,4,1);
+  const e=new Date(2026,4,31);
+  while(d<=e){
+    if(d.getDay()===0||d.getDay()===6){
+      const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0');
+      WEEKEND_DATES[y+'-'+m+'-'+day]=1;
+    }
+    d.setDate(d.getDate()+1);
+  }
+})();
 
 function gn(v){const n=parseFloat(v);return isNaN(n)?0:n}
 
@@ -694,7 +730,8 @@ function startValidation(){
             leaveByEmp[eid]={
               type: cv(r,['休假类型','leave_type','type']),
               start: (cv(r,['开始时间','start_time','start'])+'').slice(0,10),
-              end: (cv(r,['结束时间','end_time','end'])+'').slice(0,10)
+              end: (cv(r,['结束时间','end_time','end'])+'').slice(0,10),
+              status: cv(r,['审批状态','status'])
             };
           });
         }
@@ -850,6 +887,7 @@ function startValidation(){
         state._signEmp = signEmp; state._signRows = signRows;
         state._punchByEmp = punchByEmp; state._suppByEmp = suppByEmp;
         state._leaveByEmp = leaveByEmp; state._busByEmp = busByEmp; state._tripByEmp = tripByEmp;
+        state._homeByEmp = homeByEmp;
 
         // Enrich results with employee info + signing report raw data
         const signReportFields = ['考勤日期','姓名','工号','三级部门','四级部门','五级部门',
@@ -1115,13 +1153,17 @@ function showAllRules(){
 
 // ========== CONFIRMATION ==========
 function buildConfirmationList(){
-  if(!state.validation.validated || !state.validation.data.length){
+  if(!state.validation.validated){
     alert('请先在「数据校验」面板上传文件并点击「开始校验」');
     return;
   }
 
-  // 从签字报表获取全部员工
+  // 从签字报表获取全部员工（无校验异常时也应能发确认）
   const signEmp = state._signEmp || {};
+  if(!Object.keys(signEmp).length){
+    alert('签字报表无员工数据，请确认已上传美区签字报表并完成校验');
+    return;
+  }
   const allEmps = Object.keys(signEmp);
 
   // 从校验结果统计异常
@@ -1159,10 +1201,11 @@ function buildConfirmationList(){
       errors: a ? a.errors : [],
       dailyRows: (state._signRows && state._signRows[eid]) ? state._signRows[eid].slice(0, 31) : [],
       punches: (state._punchByEmp && state._punchByEmp[eid]) ? state._punchByEmp[eid].slice(0, 62) : [],
-      supps: (state._suppByEmp && state._suppByEmp[eid]) ? state._suppByEmp[eid].slice(0, 10) : [],
+      supps: (state._suppByEmp && state._suppByEmp[eid]) ? state._suppByEmp[eid] : [],
       leave: (state._leaveByEmp && state._leaveByEmp[eid]) ? state._leaveByEmp[eid] : null,
-      buses: (state._busByEmp && state._busByEmp[eid]) ? state._busByEmp[eid].slice(0, 10) : [],
-      trips: (state._tripByEmp && state._tripByEmp[eid]) ? state._tripByEmp[eid].slice(0, 10) : [],
+      buses: (state._busByEmp && state._busByEmp[eid]) ? state._busByEmp[eid] : [],
+      trips: (state._tripByEmp && state._tripByEmp[eid]) ? state._tripByEmp[eid] : [],
+      homes: (state._homeByEmp && state._homeByEmp[eid]) ? state._homeByEmp[eid] : [],
       _selected: true, // default checked
       _sendStatus: 'pending' // 'pending' | 'ok' | 'fail' | 'sending'
     };
@@ -1231,6 +1274,7 @@ function renderConfirmation(){
     const isClean = r.status === '无异常';
     const statusBadge = r.status === '已确认' ? 'badge-success' : r.status === '有异议' ? 'badge-error' : r.status === '无异常' ? 'badge-success' : 'badge-pending';
     const statusLabel = r.status === '待确认' ? '⏳ 待确认' : r.status === '已确认' ? '✅ 已确认' : r.status === '无异常' ? '✅ 无异常' : '⚠️ 有异议';
+    const replyBadge = r.reply_count ? '<div style="font-size:10px;color:#888;margin-top:2px">'+r.reply_count+' 条回复</div>' : '';
     const countStyle = isClean ? 'color:#27AE60' : 'color:#D9001B;font-weight:600';
     const cleanClass = isClean ? 'row-clean' : '';
     // Send status display
@@ -1252,7 +1296,7 @@ function renderConfirmation(){
       '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0">'+esc(r.name)+'</td>'+
       '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-size:12px;color:#666">'+esc(dept)+'</td>'+
       '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:center;'+countStyle+'">'+(isClean?'—':r.count)+'</td>'+
-      '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:center"><span class="badge '+statusBadge+'">'+statusLabel+'</span></td>'+
+      '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:center"><span class="badge '+statusBadge+'">'+statusLabel+'</span>'+replyBadge+'</td>'+
       '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:center">'+sendDisplay+'</td>'+
       '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:center">'+
         '<button class="btn btn-sm" onclick="showEmpClock(\''+esc(r.emp_id)+'\')" style="margin-right:4px">⏰ 考勤记录</button>'+
@@ -1260,8 +1304,8 @@ function renderConfirmation(){
           '<button class="btn btn-sm" onclick="showEmpErrors(\''+esc(r.emp_id)+'\')" style="margin-right:4px">📋 异常明细</button>')+
         (r.status === '待确认' || r.status === '无异常' ?
           '<button class="btn btn-sm btn-success" onclick="markConfirmed(\''+esc(r.emp_id)+'\')">✅ 标记已确认</button>' : '')+
-        (r.status === '有异议' ?
-          '<button class="btn btn-sm btn-warning" onclick="showObjectionDetail(\''+esc(r.emp_id)+'\')" style="margin-left:4px">📋 查看异议</button>' : '')+
+        (r.status === '有异议' || (r.replies && r.replies.length) ?
+          '<button class="btn btn-sm btn-warning" onclick="showObjectionDetail(\''+esc(r.emp_id)+'\')" style="margin-left:4px">📋 查看回复</button>' : '')+
         '<button class="btn btn-sm" onclick="showCardPreview(\''+esc(r.emp_id)+'\')" style="margin-left:4px">📨 卡片预览</button>'+
       '</td></tr>';
   }).join('');
@@ -1303,6 +1347,287 @@ function updateSendCount(){
   if(sendBtn) sendBtn.disabled = (selected === 0);
 }
 
+function makeBatchId(){
+  const d = new Date();
+  const p = n => String(n).padStart(2,'0');
+  return d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'-'+p(d.getHours())+p(d.getMinutes())+p(d.getSeconds())+'-'+Math.random().toString(36).slice(2,6);
+}
+
+let replyPollTimer = null;
+function stopReplyPolling(){
+  if(replyPollTimer){ clearInterval(replyPollTimer); replyPollTimer = null; }
+}
+function startReplyPolling(batchId){
+  stopReplyPolling();
+  if(!batchId) return;
+  state.confirmation.currentBatchId = batchId;
+  saveState();
+  syncRepliesFromServer(batchId, true);
+  replyPollTimer = setInterval(function(){ syncRepliesFromServer(batchId, true); }, 12000);
+}
+function getBatchFromUrl(){
+  return new URLSearchParams(location.search).get('batch') || '';
+}
+function showSyncToast(msg, loading){
+  let el = document.getElementById('syncToast');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'syncToast';
+    el.style.cssText = 'position:fixed;top:16px;right:16px;z-index:99999;padding:10px 16px;border-radius:8px;font-size:13px;box-shadow:0 4px 12px rgba(0,0,0,.15);max-width:360px';
+    document.body.appendChild(el);
+  }
+  el.style.background = loading ? '#fff7e6' : '#eafaf1';
+  el.style.border = loading ? '1px solid #ffd591' : '1px solid #95de64';
+  el.style.color = '#333';
+  el.textContent = msg;
+  el.style.display = 'block';
+  if(!loading){
+    clearTimeout(el._hideTimer);
+    el._hideTimer = setTimeout(function(){ el.style.display = 'none'; }, 3500);
+  }
+}
+function collectBatchIds(){
+  const ids = new Set();
+  const urlBatch = getBatchFromUrl();
+  if(urlBatch) ids.add(urlBatch);
+  if(state.confirmation && state.confirmation.currentBatchId){
+    ids.add(state.confirmation.currentBatchId);
+  }
+  (state.confirmation.rows || []).forEach(function(r){
+    if(r.batch_id) ids.add(r.batch_id);
+    if(r._sendStatus === 'ok' && r.batch_id) ids.add(r.batch_id);
+  });
+  return [...ids];
+}
+function fetchBatchSync(batchId, doPoll){
+  const poll = doPoll ? '&poll=1' : '';
+  return fetch(getServerUrl() + '/api/replies/sync?batch_id=' + encodeURIComponent(batchId) + poll)
+    .then(function(r){
+      if(!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    });
+}
+function syncRepliesFromServer(batchId, doPoll){
+  const id = batchId || state.confirmation.currentBatchId || getBatchFromUrl();
+  if(!id) return Promise.resolve(null);
+  return fetchBatchSync(id, !!doPoll)
+    .then(function(data){
+      if(data && data.batch_id) applyReplySync(data, { keepCurrentBatch: true });
+      return data;
+    })
+    .catch(function(err){
+      console.warn('syncRepliesFromServer', err);
+      return null;
+    });
+}
+function loadBatchFromServer(batchId){
+  showSyncToast('正在同步服务器回复…', true);
+  if(batchId){
+    return fetchBatchSync(batchId, true)
+      .then(function(data){
+        if(!data || !data.batch_id){
+          showSyncToast('未找到批次：' + batchId, false);
+          alert('未找到批次：' + batchId);
+          return;
+        }
+        applyReplySync(data);
+        updateServerBatchBadge(data);
+        startReplyPolling(data.batch_id);
+        var n = Object.keys(data.employees || {}).length;
+        var replies = Object.values(data.employees || {}).reduce(function(s, e){ return s + (e.reply_count || 0); }, 0);
+        showSyncToast('已同步批次 ' + data.batch_id + ' · ' + n + ' 人 · ' + replies + ' 条回复', false);
+      })
+      .catch(function(err){
+        showSyncToast('同步失败', false);
+        alert('无法连接后端 ' + getServerUrl() + '\n' + err.message);
+      });
+  }
+  var batchIds = collectBatchIds();
+  if(!batchIds.length){
+    return fetch(getServerUrl() + '/api/status')
+      .then(function(r){ return r.json(); })
+      .then(function(s){
+        var ids = (s.batch_ids && s.batch_ids.length) ? s.batch_ids.slice(-5) : (s.latest_batch_id ? [s.latest_batch_id] : []);
+        if(!ids.length){
+          showSyncToast('暂无批次', false);
+          alert('服务器暂无批次记录，请先发送卡片');
+          return;
+        }
+        return ids.reduce(function(chain, id){
+          return chain.then(function(){
+            return fetchBatchSync(id, true).then(function(data){
+              if(data && data.batch_id) applyReplySync(data, { keepCurrentBatch: true });
+            });
+          });
+        }, Promise.resolve()).then(function(){
+          var primary = getBatchFromUrl() || ids[ids.length - 1];
+          if(primary){
+            state.confirmation.currentBatchId = primary;
+            startReplyPolling(primary);
+          }
+          var rows = state.confirmation.rows || [];
+          var withReplies = rows.filter(function(r){ return r.replies && r.replies.length; }).length;
+          showSyncToast('已同步最近 ' + ids.length + ' 个批次 · ' + withReplies + ' 人有回复', false);
+          updateServerBatchBadge({ batch_id: primary, batch: { label: ids.join(', ') }, stats: { total: rows.length } });
+          renderConfirmation();
+          saveState();
+        });
+      })
+      .catch(function(err){
+        showSyncToast('同步失败', false);
+        alert('无法连接后端：' + err.message);
+      });
+  }
+  return batchIds.reduce(function(chain, id){
+    return chain.then(function(){
+      return fetchBatchSync(id, true).then(function(data){
+        if(data && data.batch_id) applyReplySync(data, { keepCurrentBatch: true });
+      });
+    });
+  }, Promise.resolve()).then(function(){
+    var primary = getBatchFromUrl() || state.confirmation.currentBatchId || batchIds[batchIds.length - 1];
+    if(primary){
+      state.confirmation.currentBatchId = primary;
+      startReplyPolling(primary);
+    }
+    var rows = state.confirmation.rows || [];
+    var withReplies = rows.filter(function(r){ return r.replies && r.replies.length; }).length;
+    showSyncToast('已同步 ' + batchIds.length + ' 个批次 · ' + withReplies + ' 人有回复', false);
+    updateServerBatchBadge({ batch_id: primary, batch: { label: batchIds.join(', ') }, stats: { total: rows.length } });
+    renderConfirmation();
+    saveState();
+  }).catch(function(err){
+    showSyncToast('同步失败', false);
+    alert('同步失败：' + err.message);
+  });
+}
+function refreshRepliesForEmployee(eid){
+  var row = state.confirmation.rows.find(function(r){ return r.emp_id === eid; });
+  if(!row){ alert('未找到员工'); return; }
+  var batchId = row.batch_id || getBatchFromUrl() || state.confirmation.currentBatchId;
+  if(!batchId){
+    alert('该员工暂无关联批次。请先发送卡片，或 URL 加 ?batch=批次ID');
+    return;
+  }
+  var overlay = document.querySelector('.modal-overlay');
+  var refreshBtn = overlay && overlay.querySelector('[data-action="refresh-replies"]');
+  if(refreshBtn){
+    refreshBtn.disabled = true;
+    refreshBtn.textContent = '⏳ 刷新中…';
+  }
+  showSyncToast('正在刷新 ' + eid + ' 的回复…', true);
+  fetchBatchSync(batchId, true)
+    .then(function(data){
+      if(!data || !data.batch_id) throw new Error('批次无数据');
+      applyReplySync(data, { keepCurrentBatch: true });
+      var updated = state.confirmation.rows.find(function(r){ return r.emp_id === eid; });
+      var n = updated && updated.replies ? updated.replies.length : 0;
+      showSyncToast('已刷新 ' + n + ' 条回复（批次 ' + batchId + '）', false);
+      if(overlay) overlay.remove();
+      showObjectionDetail(eid);
+    })
+    .catch(function(err){
+      showSyncToast('刷新失败', false);
+      alert('刷新失败：' + err.message + '\n请确认 server.py 已启动');
+    })
+    .finally(function(){
+      if(refreshBtn){
+        refreshBtn.disabled = false;
+        refreshBtn.textContent = '🔄 刷新回复';
+      }
+    });
+}
+function updateServerBatchBadge(data){
+  const el = document.getElementById('serverBatchBadge');
+  if(!el || !data) return;
+  const label = (data.batch && data.batch.label) ? data.batch.label : data.batch_id;
+  const stats = data.stats || {};
+  el.style.display = 'inline-block';
+  el.textContent = '📡 服务器批次 ' + label + ' · 共 ' + (stats.total||0) + ' 人';
+}
+function applyReplySync(data, opts){
+  opts = opts || {};
+  if(!data || !data.employees) return;
+  if(!state.confirmation) state.confirmation = { rows: [], loaded: false };
+  if(!state.confirmation.rows) state.confirmation.rows = [];
+  const rows = state.confirmation.rows;
+  Object.entries(data.employees).forEach(function(entry){
+    const eid = entry[0];
+    const info = entry[1];
+    let row = rows.find(function(r){ return r.emp_id === eid; });
+    if(!row){
+      row = {
+        emp_id: eid,
+        name: info.name || eid,
+        dept3: info.dept3 || '',
+        dept4: info.dept4 || '',
+        dept5: info.dept5 || '',
+        count: '—',
+        status: '待确认',
+        rules: [],
+        errors: [],
+        dailyRows: [],
+        punches: [],
+        replies: [],
+        reply_count: 0,
+        _selected: false,
+        _sendStatus: info.message_id ? 'ok' : 'pending',
+        _sendTime: (info.sent_at || '').split(' ').slice(1).join(' ') || info.sent_at || '',
+        batch_id: data.batch_id
+      };
+      rows.push(row);
+    }
+    // 有飞书回复时始终更新（即使本地标记为无异常）
+    const hasServerReply = (info.reply_count || 0) > 0 || info.delivery_status === 'objection' || info.delivery_status === 'confirmed';
+    if(row.status === '无异常' && !hasServerReply) return;
+    if(info.status === '已确认') row.status = '已确认';
+    else if(info.status === '有异议') row.status = '有异议';
+    else if(info.delivery_status === 'confirmed') row.status = '已确认';
+    else if(info.delivery_status === 'objection') row.status = '有异议';
+    else if(!row.status || row.status === '待确认') row.status = info.status || '待确认';
+    row.replies = info.replies || [];
+    row.reply_count = info.reply_count || 0;
+    row.objection = info.objection_summary || '';
+    row.last_reply_at = info.last_reply_at || '';
+    row.batch_id = data.batch_id;
+    if(info.message_id) row._sendStatus = 'ok';
+    if(info.sent_at) row._sendTime = info.sent_at.split(' ').slice(1).join(' ') || info.sent_at;
+  });
+  state.confirmation.loaded = true;
+  if(!opts.keepCurrentBatch || !state.confirmation.currentBatchId){
+    state.confirmation.currentBatchId = data.batch_id;
+  }
+  updateServerBatchBadge(data);
+  renderConfirmation();
+  saveState();
+}
+function formatReplyItem(r){
+  const typeLabel = {
+    button_confirm: '✅ 点击已确认',
+    button_object: '⚠️ 点击有异议',
+    text: '💬 文字回复',
+    file: '📎 文件',
+    image: '🖼 图片',
+    other: '📝 消息'
+  }[r.type] || r.type;
+  let body = esc(r.content || '');
+  if(r.file){
+    const fname = r.file.file_name || r.file.file_key || '附件';
+    body = '📎 ' + esc(fname);
+    if(r.file.local_path && r.id){
+      body += ' <a href="'+esc(getServerUrl()+'/api/attachments/serve?reply_id='+encodeURIComponent(r.id))+'" target="_blank" style="margin-left:6px;color:#0E66FB">下载</a>';
+      if(r.file.size) body += ' <span style="font-size:11px;color:#888">('+Math.round(r.file.size/1024)+'KB)</span>';
+    } else if(r.file.download_error){
+      body += ' <span style="font-size:11px;color:#D9001B">保存失败</span>';
+    }
+  } else if(r.type === 'image' && r.file && r.file.local_path && r.id){
+    body = '🖼 图片 <a href="'+esc(getServerUrl()+'/api/attachments/serve?reply_id='+encodeURIComponent(r.id))+'" target="_blank" style="margin-left:6px;color:#0E66FB">下载</a>';
+  }
+  return '<div style="padding:8px 0;border-bottom:1px dashed #eee">'+
+    '<div style="font-size:11px;color:#888">'+esc(r.created_at||'')+' · '+typeLabel+'</div>'+
+    '<div style="font-size:13px;margin-top:2px">'+body+'</div></div>';
+}
+
 function markConfirmed(eid){
   const row = state.confirmation.rows.find(r => r.emp_id === eid);
   if(row) row.status = '已确认';
@@ -1313,31 +1638,42 @@ function showObjectionDetail(eid){
   const row = state.confirmation.rows.find(r => r.emp_id === eid);
   if(!row) return;
   const dept = [row.dept3, row.dept4, row.dept5].filter(Boolean).join(' / ');
-  const errorsHtml = row.errors.map((e, i) =>
-    '<div style="padding:4px 0;font-size:12px"><span class="badge badge-error" style="margin-right:4px">'+esc(row.rules[i])+'</span>'+esc(e)+'</div>'
-  ).join('');
+  const errors = row.errors || [];
+  const rules = row.rules || [];
+  const errorsHtml = errors.length
+    ? errors.map((e, i) =>
+        '<div style="padding:4px 0;font-size:12px"><span class="badge badge-error" style="margin-right:4px">'+esc(rules[i]||'—')+'</span>'+esc(e)+'</div>'
+      ).join('')
+    : '<div style="font-size:12px;color:#888;padding:4px 0">（无本地校验明细'+(row.batch_id?' · 名单来自服务器同步':'')+'）</div>';
+  const replies = row.replies || [];
+  const repliesHtml = replies.length
+    ? replies.map(formatReplyItem).join('')
+    : (row.objection
+      ? '<div style="font-size:13px">'+esc(row.objection)+'</div>'
+      : '<span style="color:#aaa">暂无员工回复。员工点击「有异议」后可在对话中多次发送文字或文件。</span>');
+  const batchHint = row.batch_id || state.confirmation.currentBatchId || '';
 
   const overlay = document.createElement('div');
   overlay.className = 'modal-overlay';
   overlay.onclick = function(e){if(e.target===overlay) overlay.remove()};
   overlay.innerHTML =
-    '<div class="modal-box" style="max-width:600px">'+
+    '<div class="modal-box" style="max-width:600px;max-height:85vh;overflow-y:auto">'+
     '<button class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</button>'+
     '<h2>⚠️ 异议详情</h2>'+
     '<div style="background:#fef9ef;border:1px solid #fce5cd;border-radius:8px;padding:12px;margin-bottom:12px">'+
     '<div style="font-weight:600;font-size:14px">'+esc(row.name)+' ('+esc(row.emp_id)+')</div>'+
     '<div style="font-size:12px;color:#666;margin:4px 0">'+esc(dept)+'</div>'+
-    '<div style="font-size:12px;color:#888">异常条数：<strong style="color:#D9001B">'+row.count+'</strong> 条</div>'+
+    '<div style="font-size:12px;color:#888">异常条数：<strong style="color:#D9001B">'+row.count+'</strong> 条'+
+    (batchHint ? ' · 批次 <code style="font-size:11px">'+esc(batchHint)+'</code>' : '')+'</div>'+
     '</div>'+
     '<div style="font-size:13px;font-weight:600;margin-bottom:6px;color:#333">员工异常明细</div>'+
     '<div style="margin-bottom:12px">'+errorsHtml+'</div>'+
     '<div style="background:#f4f4f4;border-radius:8px;padding:12px">'+
-    '<div style="font-size:12px;font-weight:600;color:#888;margin-bottom:4px">员工反馈（异议理由）</div>'+
-    '<div style="font-size:13px;color:#333;font-style:italic">'+
-    (row.objection || '<span style="color:#aaa">（异议理由待员工填写，需运行本地回调服务器接收）</span>')+
-    '</div>'+
+    '<div style="font-size:12px;font-weight:600;color:#888;margin-bottom:4px">员工反馈（共 '+(replies.length|| (row.objection?1:0))+' 条）</div>'+
+    '<div style="font-size:13px;color:#333">'+repliesHtml+'</div>'+
     '</div>'+
     '<div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end">'+
+    '<button class="btn btn-sm" data-action="refresh-replies" onclick="refreshRepliesForEmployee(\''+esc(eid)+'\')">🔄 刷新回复</button>'+
     '<button class="btn btn-sm" onclick="this.closest(\'.modal-overlay\').remove()">关闭</button>'+
     '<button class="btn btn-sm btn-success" onclick="this.closest(\'.modal-overlay\').remove();markConfirmed(\''+esc(eid)+'\')">✅ 标记为已确认</button>'+
     '</div>'+
@@ -1350,107 +1686,271 @@ const FEISHU_CONFIG = {
   APP_ID: 'cli_aa8ef6308ae41cb6',
   APP_SECRET: 'qVdoVV7M4QMPsBAhm5ETucG6VVwIcAja'
 };
+/** 测试模式唯一允许收件人工号 */
+const TEST_RECIPIENT_EMP_ID = 'zt28219';
+function getTestEmpId(){
+  return TEST_RECIPIENT_EMP_ID;
+}
 
-function buildCardContent(emp){
-  const dept = [emp.dept3, emp.dept4, emp.dept5].filter(Boolean).join(' / ');
+function normalizeDateKey(v){
+  if(v === null || v === undefined || v === '') return '';
+  if(v instanceof Date && !isNaN(v.getTime())){
+    return v.getFullYear()+'-'+String(v.getMonth()+1).padStart(2,'0')+'-'+String(v.getDate()).padStart(2,'0');
+  }
+  if(typeof v === 'number' && isFinite(v)){
+    const d = new Date(Math.round((v - 25569) * 86400 * 1000));
+    if(!isNaN(d.getTime())) return d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0')+'-'+String(d.getUTCDate()).padStart(2,'0');
+  }
+  const s = String(v).trim();
+  const m = s.match(/(\d{4})[-\/年.](\d{1,2})[-\/月.](\d{1,2})/);
+  if(m) return m[1]+'-'+m[2].padStart(2,'0')+'-'+m[3].padStart(2,'0');
+  return s.slice(0,10).replace(/\//g,'-');
+}
 
-  // Build punch clock lookup by date
-  const punchByDate = {};
-  if(emp.punches && emp.punches.length){
-    emp.punches.forEach(p => {
-      if(!punchByDate[p.date]) punchByDate[p.date] = [];
-      punchByDate[p.date].push(p.datetime);
+function formatDateForCard(v){
+  const key = normalizeDateKey(v);
+  const m = key.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return m ? m[1]+'/'+m[2]+'/'+m[3] : (key || '-');
+}
+
+function formatClockTime(v){
+  if(v === null || v === undefined || v === '') return '';
+  if(v instanceof Date && !isNaN(v.getTime())){
+    return String(v.getHours()).padStart(2,'0')+':'+String(v.getMinutes()).padStart(2,'0')+':'+String(v.getSeconds()).padStart(2,'0');
+  }
+  if(typeof v === 'number' && isFinite(v)){
+    const seconds = Math.round((v % 1) * 86400);
+    const h = Math.floor(seconds / 3600) % 24;
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  }
+  const s = String(v).trim().replace(/\//g,'-');
+  const m = s.match(/(?:^|\s)(\d{1,2}):(\d{2})(?::(\d{2}))?/);
+  if(m) return m[1].padStart(2,'0')+':'+m[2]+':'+(m[3] || '00');
+  return '';
+}
+
+function buildProcessTableRows(emp){
+  const rows = [];
+  if(emp.leave && (emp.leave.type || emp.leave.start || emp.leave.end)){
+    rows.push({
+      type: '🏖️ 休假',
+      date: formatDateForCard(emp.leave.start)+' ~ '+formatDateForCard(emp.leave.end),
+      detail: emp.leave.type || '-',
+      status: emp.leave.status || '-'
     });
   }
-
-  // Build daily rows table (limit 15 for card size)
-  let dailyRowsText = '';
-  if(emp.dailyRows && emp.dailyRows.length){
-    const rows = emp.dailyRows.slice(0, 15);
-    dailyRowsText = rows.map(dr => {
-      const r = dr._rawRow || {};
-      const date = dr.date || '';
-      const clocks = punchByDate[date] || [];
-      // Time-only format: 13:01:06, 08:30:02
-      const clockStr = clocks.length ? clocks.map(c=>c.replace(/-/g,'/').slice(11)).join(', ') : '—';
-      return date+' │ '+clockStr;
-    }).join('\\n');
-    if(emp.dailyRows.length > 15) dailyRowsText += '\\n...等'+emp.dailyRows.length+'条记录';
-  }
-
-  // Build attendance process modules
-  let moduleText = '';
-
-  // Leave
-  if(emp.leave && emp.leave.type){
-    moduleText += '\\n---\\n🏖️ 休假：'+emp.leave.type+'  '+emp.leave.start+' ~ '+emp.leave.end;
-  }
-
-  // Business errand
-  if(emp.buses && emp.buses.length){
-    moduleText += '\\n---\\n🚗 公出：共'+emp.buses.length+'条';
-    emp.buses.slice(0, 5).forEach(b => {
-      moduleText += '\\n  ·'+ (b.start||'-')+' ('+(b.status||'-')+')';
+  (emp.buses || []).forEach(function(b){
+    rows.push({
+      type: '🚗 公出',
+      date: formatDateForCard(b.start),
+      detail: (b.reason || formatClockTime(b.start) || '-'),
+      status: b.status || '-'
     });
-  }
-
-  // Business trip
-  if(emp.trips && emp.trips.length){
-    moduleText += '\\n---\\n✈️ 出差：共'+emp.trips.length+'条';
-    emp.trips.slice(0, 5).forEach(b => {
-      moduleText += '\\n  ·'+ (b.start||'-')+' ('+(b.status||'-')+')';
-    });
-  }
-
-  // Supplementary sign
-  if(emp.supps && emp.supps.length){
-    moduleText += '\\n---\\n🔏 补签：共'+emp.supps.length+'条';
-    emp.supps.slice(0, 5).forEach(s => {
-      moduleText += '\\n  ·'+s.date+' '+ (s.status||'-');
-    });
-  }
-
-  // Build body elements
-  const elements = [
-    { tag: 'div', text: { tag: 'lark_md', content: '**'+esc(emp.name)+'** ('+emp.emp_id+')\n部门：'+dept } },
-    { tag: 'hr' },
-    { tag: 'div', text: { tag: 'lark_md', content: '📋 **考勤确认通知**' } }
-  ];
-
-  // Daily details with clock times — only date + full clock times (no REG/OT)
-  if(dailyRowsText){
-    elements.push({ tag: 'div', text: { tag: 'lark_md',
-      content: dailyRowsText
-    }});
-  } else {
-    elements.push({ tag: 'div', text: { tag: 'lark_md', content: '每日明细：无签字报表明细数据' } });
-  }
-
-  // Attendance process modules
-  if(moduleText){
-    elements.push({ tag: 'hr' });
-    elements.push({ tag: 'div', text: { tag: 'lark_md',
-      content: '**— 其他考勤流程 —**'+moduleText
-    }});
-  }
-
-  elements.push({ tag: 'div', text: { tag: 'lark_md', content: '请确认以上考勤数据是否正确。如有疑问请联系HR。' } });
-  elements.push({ tag: 'hr' });
-  elements.push({
-    tag: 'action',
-    actions: [
-      { tag: 'button', text: { tag: 'plain_text', content: '✅ 已确认' }, type: 'primary', value: { action: 'confirm', emp_id: emp.emp_id } },
-      { tag: 'button', text: { tag: 'plain_text', content: '⚠️ 有异议' }, type: 'danger', value: { action: 'object', emp_id: emp.emp_id } }
-    ]
   });
+  (emp.trips || []).forEach(function(t){
+    rows.push({
+      type: '✈️ 出差',
+      date: formatDateForCard(t.start),
+      detail: (t.reason || formatClockTime(t.start) || '-'),
+      status: t.status || '-'
+    });
+  });
+  (emp.supps || []).forEach(function(s){
+    rows.push({
+      type: '🔏 补签',
+      date: formatDateForCard(s.date),
+      detail: s.reason || '-',
+      status: s.status || '-'
+    });
+  });
+  (emp.homes || []).forEach(function(h){
+    rows.push({
+      type: '🏠 居家',
+      date: formatDateForCard(h.start)+' ~ '+formatDateForCard(h.end || h.start),
+      detail: h.reason || '-',
+      status: h.status || '-'
+    });
+  });
+  return rows;
+}
+function feishuMarkdown(content){
+  return { tag: 'markdown', content: content, margin: '4px 0px 0px 0px' };
+}
+
+function feishuHr(){
+  return { tag: 'hr', margin: '8px 0px 0px 0px' };
+}
+
+function feishuTable(elementId, columns, rows, pageSize){
+  return {
+    tag: 'table',
+    element_id: elementId,
+    page_size: Math.min(10, Math.max(1, pageSize || 5)),
+    row_height: 'low',
+    header_style: {
+      text_align: 'left',
+      text_size: 'normal',
+      background_style: 'grey',
+      text_color: 'default',
+      bold: true,
+      lines: 1
+    },
+    columns: columns,
+    rows: rows,
+    margin: '4px 0px 0px 0px'
+  };
+}
+
+function feishuTextColumn(name, displayName, width){
+  return {
+    name: name,
+    display_name: displayName,
+    data_type: 'text',
+    width: width || 'auto',
+    horizontal_align: 'left',
+    vertical_align: 'top'
+  };
+}
+
+function feishuConfirmButtons(empId, batchId){
+  const payload = function(action){
+    return { action: action, emp_id: empId, batch_id: batchId || '' };
+  };
+  return {
+    tag: 'column_set',
+    flex_mode: 'flow',
+    horizontal_spacing: '8px',
+    margin: '8px 0px 0px 0px',
+    columns: [
+      {
+        tag: 'column',
+        width: 'weighted',
+        weight: 1,
+        vertical_align: 'top',
+        elements: [{
+          tag: 'button',
+          element_id: 'btn_confirm',
+          type: 'primary',
+          width: 'fill',
+          text: { tag: 'plain_text', content: '✅ 已确认' },
+          behaviors: [{ type: 'callback', value: payload('confirm') }]
+        }]
+      },
+      {
+        tag: 'column',
+        width: 'weighted',
+        weight: 1,
+        vertical_align: 'top',
+        elements: [{
+          tag: 'button',
+          element_id: 'btn_object',
+          type: 'danger',
+          width: 'fill',
+          text: { tag: 'plain_text', content: '⚠️ 有异议' },
+          behaviors: [{ type: 'callback', value: payload('object') }]
+        }]
+      }
+    ]
+  };
+}
+
+function buildCardContent(emp, batchId){
+  const vm = buildCardViewModel(emp);
+  const elements = [];
+
+  elements.push(feishuMarkdown('**员工信息**\n'+vm.empId+' · '+vm.name+' · '+vm.dept));
+  elements.push(feishuHr());
+
+  const dailySubtitle = vm.dailyTotal
+    ? '考勤日期范围: '+vm.dateRange+' · 共 '+vm.dailyTotal+' 天'
+    : '';
+  elements.push(feishuMarkdown('📋 **每日打卡明细**'+(dailySubtitle ? '\n'+dailySubtitle : '')));
+
+  if(vm.dailyRows.length){
+    elements.push(feishuTable('daily_punch', [
+      feishuTextColumn('date', '考勤日期', '120px'),
+      feishuTextColumn('times', '打卡时间', 'auto')
+    ], vm.dailyRows.map(function(row){
+      return {
+        date: row.date,
+        times: row.clockText === '—' ? '无打卡记录' : row.clockText
+      };
+    }), 10));
+  } else {
+    elements.push(feishuMarkdown('无签字报表明细数据'));
+  }
+
+  if(vm.processTableRows.length){
+    elements.push(feishuHr());
+    elements.push(feishuMarkdown('**其他考勤流程** · 共 '+vm.processTableRows.length+' 条'));
+    elements.push(feishuTable('proc_all', [
+      feishuTextColumn('type', '流程', '80px'),
+      feishuTextColumn('date', '日期/时段', '130px'),
+      feishuTextColumn('detail', '说明', 'auto'),
+      feishuTextColumn('status', '审批状态', '90px')
+    ], vm.processTableRows, 10));
+  }
+
+  elements.push(feishuHr());
+  elements.push(feishuMarkdown(vm.footer));
+  elements.push(feishuConfirmButtons(emp.emp_id, batchId));
 
   return {
-    config: { wide_screen_mode: true },
+    schema: '2.0',
+    config: {
+      wide_screen_mode: true,
+      update_multi: true,
+      width_mode: 'fill'
+    },
     header: {
       title: { tag: 'plain_text', content: '📋 考勤确认通知' },
       template: 'blue'
     },
-    elements: elements
+    body: {
+      direction: 'vertical',
+      padding: '12px 12px 12px 12px',
+      elements: elements
+    }
+  };
+}
+
+function buildCardViewModel(emp){
+  const dept = [emp.dept3, emp.dept4, emp.dept5].filter(Boolean).join(' / ') || '-';
+  const punchByDate = {};
+  (emp.punches || []).forEach(p => {
+    const dateKey = normalizeDateKey(p.date || p.datetime);
+    const time = formatClockTime(p.datetime);
+    if(!dateKey || !time) return;
+    if(!punchByDate[dateKey]) punchByDate[dateKey] = [];
+    punchByDate[dateKey].push(time);
+  });
+  Object.keys(punchByDate).forEach(k => {
+    punchByDate[k] = [...new Set(punchByDate[k])];
+  });
+
+  const allDailyRows = (emp.dailyRows || []).map(dr => {
+    const dateKey = normalizeDateKey(dr.date);
+    const clocks = punchByDate[dateKey] || [];
+    return {
+      dateKey: dateKey,
+      date: formatDateForCard(dateKey || dr.date),
+      clockText: clocks.length ? clocks.join(', ') : '—'
+    };
+  }).filter(r => r.dateKey || r.date).sort((a,b) => String(a.dateKey).localeCompare(String(b.dateKey)));
+
+  return {
+    empId: emp.emp_id || '-',
+    name: emp.name || '-',
+    dept: dept,
+    isClean: emp.status === '无异常',
+    dailyRows: allDailyRows,
+    dailyTotal: allDailyRows.length,
+    dailyHiddenCount: 0,
+    dateRange: allDailyRows.length ? allDailyRows[0].date+' ~ '+allDailyRows[allDailyRows.length-1].date : '-',
+    processTableRows: buildProcessTableRows(emp),
+    footer: '请确认以上考勤数据是否正确。如有问题，请点击「有异议」并回复原因。'
   };
 }
 
@@ -1458,7 +1958,6 @@ function showCardPreview(eid){
   const rows = state.confirmation?.rows || [];
   const emp = rows.find(r => r.emp_id === eid);
   if(!emp) return;
-  const idx = rows.indexOf(emp);
   // Build card preview - employee's signing report data only
   const overlay = document.createElement('div');
   overlay.className = 'modal-overlay';
@@ -1473,97 +1972,56 @@ function showCardPreview(eid){
 }
 
 function renderCardContent(emp){
-  const dept = [emp.dept3, emp.dept4, emp.dept5].filter(Boolean).join(' / ');
-  const isClean = emp.status === '无异常';
-
-  // Build punch clock lookup by date
-  const punchByDate = {};
-  if(emp.punches && emp.punches.length){
-    emp.punches.forEach(p => {
-      if(!punchByDate[p.date]) punchByDate[p.date] = [];
-      punchByDate[p.date].push(p.datetime);
-    });
-  }
-
-  // Build daily attendance rows with clock times — only date + full clock times
-  let dailyHtml = '';
-  if(emp.dailyRows && emp.dailyRows.length){
-    emp.dailyRows.forEach(dr => {
-      const r = dr._rawRow || {};
-      const date = dr.date || '';
-      // Get clock times for this date — time-only format
-      const clocks = punchByDate[date] || [];
-      const clockStr = clocks.length ? clocks.map(c=>c.replace(/-/g,'/').slice(11)).join(', ') : '—';
-      dailyHtml +=
+  const previewVm = buildCardViewModel(emp);
+  const previewDailyHtml = previewVm.dailyRows.length
+    ? previewVm.dailyRows.map(row =>
         '<tr>'+
-        '<td style="padding:2px 4px;white-space:nowrap;color:#555">'+esc(date)+'<span style="color:#ccc;margin:0 4px">│</span>'+esc(clockStr)+'</td>'+
-        '</tr>';
-    });
-  } else {
-    dailyHtml = '<tr><td colspan="2" style="padding:6px;color:#999;text-align:center">无签字报表明细数据</td></tr>';
-  }
-
-  // Build leave module
-  let leaveHtml = '';
-  if(emp.leave && emp.leave.type){
-    leaveHtml =
-      '<div class="card-section-title">🏖️ 休假</div>'+
-      '<table class="card-table"><tr><th>类型</th><th>开始</th><th>结束</th></tr>'+
-      '<tr><td>'+esc(emp.leave.type)+'</td><td>'+esc(emp.leave.start)+'</td><td>'+esc(emp.leave.end)+'</td></tr></table>';
-  }
-
-  // Build business errand module
-  let busHtml = '';
-  if(emp.buses && emp.buses.length){
-    busHtml = '<div class="card-section-title">🚗 公出</div><table class="card-table"><tr><th>#</th><th>开始时间</th><th>审批状态</th></tr>'+
-      emp.buses.map((b,i) =>
-        '<tr><td>'+(i+1)+'</td><td>'+esc(b.start||'-')+'</td><td>'+esc(b.status||'-')+'</td></tr>'
-      ).join('')+'</table>';
-  }
-
-  // Build business trip module
-  let tripHtml = '';
-  if(emp.trips && emp.trips.length){
-    tripHtml = '<div class="card-section-title">✈️ 出差</div><table class="card-table"><tr><th>#</th><th>开始时间</th><th>审批状态</th></tr>'+
-      emp.trips.map((b,i) =>
-        '<tr><td>'+(i+1)+'</td><td>'+esc(b.start||'-')+'</td><td>'+esc(b.status||'-')+'</td></tr>'
-      ).join('')+'</table>';
-  }
-
-  // Build supplementary sign module
-  let suppHtml = '';
-  if(emp.supps && emp.supps.length){
-    suppHtml = '<div class="card-section-title">🔏 补签</div><table class="card-table"><tr><th>#</th><th>日期</th><th>状态</th><th>原因</th></tr>'+
-      emp.supps.map((s,i) =>
-        '<tr><td>'+(i+1)+'</td><td>'+esc(s.date||'-')+'</td><td>'+esc(s.status||'-')+'</td><td>'+esc(s.reason||'-')+'</td></tr>'
-      ).join('')+'</table>';
-  }
-
-  return '<div class="card-preview-item'+(isClean?' card-preview-clean':'')+'">'+
-    '<div class="card-preview-header">'+
-      '<strong>'+esc(emp.name)+'</strong> ('+esc(emp.emp_id)+')'+
-      '<span style="margin-left:auto;font-size:12px;color:#888">'+esc(dept)+'</span>'+
-    '</div>'+
-    '<div class="card-preview-body">'+
-      // Section: 签字报表明细（含打卡时间）
-      '<div class="card-section-title">📋 签字报表明细</div>'+
-      '<div style="font-size:11px;color:#888;margin-bottom:4px">考勤日期范围: ' +
-        (emp.days && emp.days.length ? emp.days[0] + ' ~ ' + emp.days[emp.days.length-1] : '-') +
-      ' · 共 ' + (emp.days ? emp.days.length : 0) + ' 天</div>'+
+        '<td style="padding:4px 6px;border-bottom:1px solid #f0f0f0;color:#555;white-space:nowrap">'+esc(row.date)+'</td>'+
+        '<td style="padding:4px 6px;border-bottom:1px solid #f0f0f0;color:#333">'+esc(row.clockText === '—' ? '无打卡记录' : row.clockText)+'</td>'+
+        '</tr>'
+      ).join('')
+    : '<tr><td colspan="2" style="padding:6px;color:#999;text-align:center">无签字报表明细数据</td></tr>';
+  const previewProcessHtml = previewVm.processTableRows.length
+    ? '<div style="border-top:1px solid #eee;margin:10px 0"></div>'+
+      '<div class="card-section-title" style="font-weight:600;margin-bottom:4px">其他考勤流程 <span style="font-size:11px;color:#888;font-weight:400">共'+previewVm.processTableRows.length+'条</span></div>'+
       '<table class="card-table" style="width:100%;border-collapse:collapse;font-size:11px">'+
       '<thead><tr>'+
-      '<th style="text-align:left;padding:3px 4px;border-bottom:1px solid #ddd">考勤日期 · 打卡时间</th>'+
+      '<th style="padding:4px 6px;border-bottom:1px solid #ddd;background:#f8f9fb">流程</th>'+
+      '<th style="padding:4px 6px;border-bottom:1px solid #ddd;background:#f8f9fb">日期/时段</th>'+
+      '<th style="padding:4px 6px;border-bottom:1px solid #ddd;background:#f8f9fb">说明</th>'+
+      '<th style="padding:4px 6px;border-bottom:1px solid #ddd;background:#f8f9fb">审批状态</th>'+
       '</tr></thead><tbody>'+
-      dailyHtml+
-      '</tbody></table>'+
+      previewVm.processTableRows.map(function(r){
+        return '<tr><td>'+esc(r.type)+'</td><td>'+esc(r.date)+'</td><td>'+esc(r.detail)+'</td><td>'+esc(r.status)+'</td></tr>';
+      }).join('')+
+      '</tbody></table>'
+    : '';
 
-      // Other attendance modules
-      (leaveHtml ? '<div style="border-top:1px solid #eee;margin:10px 0"></div>'+leaveHtml : '')+
-      (busHtml ? '<div style="border-top:1px solid #eee;margin:10px 0"></div>'+busHtml : '')+
-      (tripHtml ? '<div style="border-top:1px solid #eee;margin:10px 0"></div>'+tripHtml : '')+
-      (suppHtml ? '<div style="border-top:1px solid #eee;margin:10px 0"></div>'+suppHtml : '')+
+  return '<div class="card-preview-item'+(previewVm.isClean?' card-preview-clean':'')+'" style="border:1px solid #e5e5e5;border-radius:8px;overflow:hidden;margin-bottom:12px">'+
+    '<div class="card-preview-header" style="display:flex;gap:8px;align-items:center;background:#f4f7fe;padding:10px 12px">'+
+      '<strong>'+esc(previewVm.name)+'</strong> ('+esc(previewVm.empId)+')'+
+      '<span style="margin-left:auto;font-size:12px;color:#888">'+esc(previewVm.dept)+'</span>'+
+    '</div>'+
+    '<div class="card-preview-body" style="padding:12px">'+
+      '<div class="card-section-title" style="font-weight:600;margin-bottom:4px">📋 每日打卡明细</div>'+
+      '<div style="font-size:11px;color:#888;margin-bottom:4px">考勤日期范围: '+esc(previewVm.dateRange)+' · 共 '+previewVm.dailyTotal+' 天</div>'+
+      '<table class="card-table" style="width:100%;border-collapse:collapse;font-size:11px">'+
+      '<thead><tr>'+
+      '<th style="text-align:left;padding:4px 6px;border-bottom:1px solid #ddd;background:#f8f9fb;width:120px">考勤日期</th>'+
+      '<th style="text-align:left;padding:4px 6px;border-bottom:1px solid #ddd;background:#f8f9fb">打卡时间</th>'+
+      '</tr></thead><tbody>'+
+      previewDailyHtml+
+      '</tbody></table>'+
+      previewProcessHtml+
+      '<div style="border-top:1px solid #eee;margin:10px 0"></div>'+
+      '<div style="font-size:12px;color:#555;margin-bottom:10px">'+esc(previewVm.footer)+'</div>'+
+      '<div style="display:flex;gap:8px">'+
+      '<button class="btn btn-sm btn-success" disabled>✅ 已确认</button>'+
+      '<button class="btn btn-sm btn-warning" disabled>⚠️ 有异议</button>'+
+      '</div>'+
     '</div>'+
   '</div>';
+
 }
 
 function sendAllFeishuCards(){
@@ -1583,10 +2041,10 @@ function sendAllFeishuCards(){
   // Test mode: show all selected cards, preview normally
   // Test mode ONLY changes who receives — not what data is shown
   const testMode = document.getElementById('testModeSwitch') ? document.getElementById('testModeSwitch').checked : false;
-  const testEmpId = testMode ? (document.getElementById('testEmpIdInline') ? document.getElementById('testEmpIdInline').value.trim() : '') : '';
+  const testEmpId = testMode ? getTestEmpId() : '';
 
   const finalToSend = toSend;
-  const testModeLabel = testMode && testEmpId
+  const testModeLabel = testMode
     ? ' 🧪 测试模式：所有卡片全部发送给 <strong>'+testEmpId+'</strong>'
     : '';
 
@@ -1618,7 +2076,7 @@ function doSendFeishuCards(){
 
   // Read test mode from inline controls
   const testMode = document.getElementById('testModeSwitch') ? document.getElementById('testModeSwitch').checked : false;
-  const testEmpId = testMode ? (document.getElementById('testEmpIdInline') ? document.getElementById('testEmpIdInline').value.trim() : '') : '';
+  const testEmpId = testMode ? getTestEmpId() : '';
 
   // Get selected rows
   const toSend = state.confirmation.rows.filter(r => r._selected);
@@ -1643,11 +2101,12 @@ function doSendFeishuCards(){
     '</div>';
   document.body.appendChild(progressOverlay);
 
-  // Build card data
+  // Build card data — 同一批次共用 batch_id，用于关联员工回复
+  const batchId = makeBatchId();
+  state.confirmation.currentBatchId = batchId;
   const cardsData = toSend.map(emp => {
     const dept = [emp.dept3, emp.dept4, emp.dept5].filter(Boolean).join(' / ');
-    const card = buildCardContent(emp);
-    // Ensure card is an object (not a string)
+    const card = buildCardContent(emp, batchId);
     return {
       emp_id: emp.emp_id,
       name: emp.name,
@@ -1669,6 +2128,8 @@ function doSendFeishuCards(){
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
       cards: cardsData,
+      batch_id: batchId,
+      batch_label: '考勤确认 ' + new Date().toLocaleString('zh-CN'),
       test_mode: testMode,
       test_emp_id: testEmpId,
       app_id: FEISHU_CONFIG.APP_ID,
@@ -1724,6 +2185,7 @@ function doSendFeishuCards(){
         if(r.status === 'ok'){
           row._sendStatus = 'ok';
           row._sendTime = ts;
+          row.batch_id = batchId;
           ok++;
         } else {
           row._sendStatus = 'fail';
@@ -1734,6 +2196,7 @@ function doSendFeishuCards(){
     });
     renderConfirmation();
     saveState();
+    startReplyPolling(batchId);
     fillEl.style.width = '100%';
     textEl.textContent = '✅ 完成！成功 ' + ok + '，失败 ' + fail;
     detailEl.innerHTML += '<div style="font-weight:600;color:#333;margin-top:8px">✅ 成功 ' + ok + ' | ❌ 失败 ' + fail + '</div>';
@@ -1817,9 +2280,16 @@ function showEmpClock(eid){
 }
 
 function showEmpErrors(eid){
-  const all = state.validation.data;
+  const all = state.validation.data || [];
   const errs = all.filter(r => r.emp_id === eid);
-  if(!errs.length) return alert('无异常记录');
+  if(!errs.length){
+    const row = state.confirmation.rows.find(r => r.emp_id === eid);
+    if(row && ((row.replies && row.replies.length) || row.status === '有异议')){
+      showObjectionDetail(eid);
+      return;
+    }
+    return alert('无异常记录');
+  }
 
   // Collect unique rawData from all errors for this employee
   const rawDatas = [];
@@ -1876,6 +2346,21 @@ function esc(s){if(!s) return ''; const d=document.createElement('div'); d.textC
 
 // Restore state from localStorage on page load
 loadState();
+(function initReplySync(){
+  const urlBatch = new URLSearchParams(location.search).get('batch');
+  if(urlBatch){
+    loadBatchFromServer(urlBatch);
+    return;
+  }
+  if(state.confirmation && state.confirmation.currentBatchId){
+    loadBatchFromServer(state.confirmation.currentBatchId);
+    return;
+  }
+  // 本地无名单时（脚本/API 发卡），自动拉取服务器最新批次
+  if(!state.confirmation || !state.confirmation.rows || !state.confirmation.rows.length){
+    loadBatchFromServer();
+  }
+})();
 </script>
 </body>
 </html>
