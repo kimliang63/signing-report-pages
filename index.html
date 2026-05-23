@@ -13,10 +13,82 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px}
 .header h1{font-size:22px;color:#1a1a2e}
 .header .sub{color:#888;font-size:13px}
-.tabs{display:flex;gap:4px;margin-bottom:16px;background:#e8eaf0;border-radius:10px;padding:4px;width:fit-content}
-.tab{padding:8px 20px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:500;color:#555;border:none;background:transparent;transition:.15s}
+.tabs{display:flex;gap:4px;margin-bottom:16px;background:#e8eaf0;border-radius:10px;padding:4px;width:fit-content;flex-wrap:wrap}
+.tab{padding:8px 18px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:500;color:#555;border:none;background:transparent;transition:.15s;display:flex;align-items:center;gap:6px}
 .tab.active{background:#fff;color:#1a1a2e;box-shadow:0 1px 4px rgba(0,0,0,.08)}
 .tab:hover:not(.active){color:#333}
+.tab .dot{width:7px;height:7px;border-radius:50%;background:#ccc}
+.tab .dot.ok{background:#12CC7E}
+.tab .dot.warn{background:#FFAA0E}
+.stepper{display:flex;align-items:center;gap:0;margin-bottom:20px;background:#fff;border-radius:12px;padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,.06);flex-wrap:wrap}
+.step{display:flex;align-items:center;gap:10px;cursor:pointer;padding:6px 10px;border-radius:8px;transition:.15s;flex:1;min-width:180px}
+.step:hover{background:#f8f9fb}
+.step-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.step.done .step-num{background:#12CC7E;color:#fff}
+.step.active .step-num{background:#0E66FB;color:#fff}
+.step.pending .step-num{background:#e5e7eb;color:#888}
+.step-text{font-size:13px;font-weight:600;color:#333}
+.step-sub{font-size:11px;color:#888;margin-top:1px}
+.step-arrow{color:#ccc;font-size:18px;padding:0 4px}
+.stats-inline-row{display:flex;gap:16px;align-items:stretch;background:#fff;border-radius:10px;padding:14px 16px;border:1px solid #eee;margin-bottom:12px}
+.stats-inline-left{flex:0 0 240px;display:grid;grid-template-columns:1fr 1fr;gap:8px;border-right:1px solid #f0f0f0;padding-right:16px}
+.stats-inline-right{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center}
+.stats-inline-right .chart-title{font-size:12px;color:#888;margin-bottom:8px;font-weight:500}
+.stat-mini{padding:8px 10px;border-radius:8px;background:#f8f9fb;cursor:pointer;border:1px solid transparent;transition:.12s;text-align:center}
+.stat-mini:hover{background:#f0f4ff}
+.stat-mini.active{border-color:#0E66FB;background:#eef4ff}
+.stat-mini .num{font-size:22px;font-weight:700;line-height:1.1}
+.stat-mini .label{font-size:11px;color:#888;margin-top:3px}
+.stat-mini.orange .num{color:#FFAA0E}
+.stat-mini.red .num{color:#D9001B}
+.stat-mini.green .num{color:#12CC7E}
+.stat-mini.blue .num{color:#0E66FB}
+.stat-mini.gray .num{color:#6b7280}
+@media(max-width:768px){
+  .stats-inline-row{flex-direction:column}
+  .stats-inline-left{flex:none;border-right:none;border-bottom:1px solid #f0f0f0;padding-right:0;padding-bottom:12px}
+}
+.stack-bar{height:28px;border-radius:6px;overflow:hidden;display:flex;background:#e5e7eb}
+.stack-bar .seg{height:100%;transition:width .3s;cursor:pointer}
+.stack-bar .seg:hover{opacity:.85}
+.stack-legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;font-size:11px;color:#666}
+.stack-legend span{display:flex;align-items:center;gap:4px;cursor:pointer}
+.stack-legend i{display:inline-block;width:8px;height:8px;border-radius:2px}
+.dept-bars-wrap{max-height:140px;overflow-y:auto}
+.dept-bar-row{display:flex;align-items:center;gap:8px;margin:3px 0;font-size:11px;cursor:pointer;padding:3px 4px;border-radius:4px}
+.dept-bar-row:hover,.dept-bar-row.active{background:#f5f8ff}
+.dept-bar-name{width:88px;text-align:right;color:#555;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0}
+.dept-bar-stack{flex:1;height:12px;border-radius:3px;overflow:hidden;display:flex;background:#eee}
+.dept-bar-stack .s{height:100%}
+.dept-bar-num{width:72px;text-align:right;color:#888;font-size:10px;flex-shrink:0}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:#eef4ff;border:1px solid #bfdbfe;border-radius:999px;font-size:12px;color:#1d4ed8}
+.chip button{background:none;border:none;cursor:pointer;color:#64748b;font-size:14px;line-height:1;padding:0 2px}
+.chip button:hover{color:#D9001B}
+.view-toggle{display:flex;gap:4px;background:#e8eaf0;border-radius:8px;padding:3px;margin-bottom:10px;width:fit-content}
+.view-toggle button{padding:5px 12px;border:none;border-radius:6px;font-size:12px;cursor:pointer;background:transparent;color:#555}
+.view-toggle button.active{background:#fff;color:#1a1a2e;box-shadow:0 1px 3px rgba(0,0,0,.08);font-weight:600}
+.collapsible-header .summary{font-size:12px;font-weight:500;color:#888;margin-left:12px;flex:1}
+.bar-row{cursor:pointer;padding:4px 6px;border-radius:6px;transition:.12s}
+.bar-row:hover{background:#f5f8ff}
+.bar-row.active{background:#eef4ff}
+.bar-label{width:48px;text-align:right;color:#666;font-weight:600;flex-shrink:0}
+.bar-track{flex:1;height:16px;background:#f0f0f0;border-radius:4px;overflow:hidden}
+.seg-ok{background:#12CC7E}
+.seg-pending{background:#94a3b8}
+.seg-obj{background:#D9001B}
+.action-bar .row2{width:100%;display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding-top:8px;border-top:1px solid #f0f0f0;margin-top:4px}
+.obj-strip{background:#fff;border-radius:10px;border-left:4px solid #FFAA0E;padding:12px 14px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,.06);cursor:pointer;transition:.15s}
+.obj-strip:hover{background:#fffbf0}
+.obj-strip .title{font-size:13px;font-weight:600;color:#333}
+.obj-strip .preview{font-size:12px;color:#888;margin-top:4px}
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:200;display:none;align-items:flex-end;justify-content:flex-end}
+.drawer-overlay.open{display:flex}
+.drawer{background:#fff;width:100%;max-width:420px;height:100%;box-shadow:-4px 0 24px rgba(0,0,0,.15);padding:20px;overflow-y:auto;animation:slideIn .2s ease}
+@keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+.drawer h3{font-size:16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+.drawer-close{background:none;border:none;font-size:22px;cursor:pointer;color:#999}
+.hint-bar{font-size:12px;color:#64748b;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 12px;margin-bottom:12px}
 .upload-zone{border:2px dashed #ccc;border-radius:10px;padding:24px;text-align:center;background:#fff;margin-bottom:16px;transition:.2s;cursor:pointer}
 .upload-zone:hover{border-color:#0E66FB;background:#f5f8ff}
 .upload-zone.dragover{border-color:#0E66FB;background:#f0f6ff}
@@ -136,10 +208,70 @@ tr:hover td{background:#fafbfc}
 .modal-table td{padding:7px 10px;border-bottom:1px solid #f0f0f0}
 .modal-table tr:last-child td{border-bottom:none}
 .modal-table .num-col{text-align:center;font-weight:600}
+/* period bar (4A) */
+.period-bar{background:#fff;border-bottom:1px solid #e5e7eb;padding:12px 20px;position:sticky;top:0;z-index:50;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.period-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.period-label{font-size:12px;color:#888}
+.period-select-wrap{position:relative}
+.period-trigger{display:flex;align-items:center;gap:8px;padding:8px 14px;background:#f8f9fb;border:1px solid #dde1e8;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;color:#1a1a2e;min-width:220px}
+.period-trigger:hover{border-color:#0E66FB;background:#f5f8ff}
+.period-trigger.disabled{opacity:.55;cursor:default}
+.period-dropdown{position:absolute;top:calc(100% + 6px);left:0;min-width:300px;background:#fff;border:1px solid #e5e7eb;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.12);display:none;z-index:100;max-height:320px;overflow-y:auto}
+.period-dropdown.open{display:block}
+.period-option{padding:12px 14px;cursor:pointer;border-bottom:1px solid #f0f0f0;display:flex;gap:10px;align-items:flex-start}
+.period-option:hover{background:#f5f8ff}
+.period-option.active{background:#eef4ff}
+.period-option .meta{flex:1}
+.period-option .title{font-weight:600;font-size:13px}
+.period-option .sub{font-size:11px;color:#888;margin-top:2px}
+.status-pill{font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.status-active{background:#e8f5e9;color:#2e7d32}
+.status-draft{background:#fff8e1;color:#f57f17}
+.status-closed{background:#f3f4f6;color:#6b7280}
+.period-actions{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
+.readonly-banner{max-width:1400px;margin:12px auto 0;padding:0 20px}
+.readonly-banner-inner{background:#fef3c7;border:1px solid #fcd34d;border-radius:8px;padding:10px 14px;font-size:13px;color:#92400e}
+.no-period-wrap{max-width:560px;margin:48px auto;padding:40px 32px;background:#fff;border-radius:12px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.no-period-wrap h2{font-size:18px;color:#1a1a2e;margin-bottom:8px}
+.no-period-wrap p{font-size:13px;color:#888;line-height:1.7;margin-bottom:20px}
 </style>
 </head>
 <body>
-<div class="container">
+
+<div class="period-bar">
+  <div class="period-inner">
+    <span class="period-label">考勤周期</span>
+    <div class="period-select-wrap">
+      <div class="period-trigger disabled" id="periodTrigger" onclick="togglePeriodDropdown(event)">
+        <span id="periodTriggerLabel">未选择</span>
+        <span class="status-pill status-draft" id="periodTriggerStatus" style="display:none"></span>
+        <span style="color:#999;font-size:10px;margin-left:auto">▼</span>
+      </div>
+      <div class="period-dropdown" id="periodDropdown"></div>
+    </div>
+    <div class="period-actions">
+      <button class="btn btn-primary" onclick="createNewPeriod()">＋ 新建周期</button>
+      <button class="btn" onclick="openPeriodHistory()">📂 历史记录</button>
+      <button class="btn" onclick="openEditPeriodModal()" id="btnEditPeriod" disabled>✎ 编辑周期</button>
+      <button class="btn" onclick="closeCurrentPeriod()" id="btnArchivePeriod" disabled title="归档后只读">归档当前周期</button>
+    </div>
+  </div>
+</div>
+
+<div class="readonly-banner" id="periodReadonlyBanner" style="display:none">
+  <div class="readonly-banner-inner">🔒 已归档周期 — 可查看校验与回复，不可上传、校验或发送</div>
+</div>
+
+<div id="noPeriodState" class="container">
+  <div class="no-period-wrap">
+    <div style="font-size:40px;margin-bottom:12px">📅</div>
+    <h2>请先新建考勤周期</h2>
+    <p>每次双周确认请先创建一个周期，再上传 7 份 Excel、执行校验并发送飞书卡片。<br>历史周期可在顶栏「历史记录」中切换查看。</p>
+    <button class="btn btn-primary" onclick="createNewPeriod()">＋ 新建周期</button>
+  </div>
+</div>
+
+<div class="container" id="mainWorkspace" style="display:none">
   <div class="header">
     <div>
       <h1>签字报表确认系统</h1>
@@ -147,6 +279,23 @@ tr:hover td{background:#fafbfc}
     </div>
     <div style="display:flex;gap:8px;align-items:center">
       <span id="dataStatus" class="badge badge-pending">未上传文件</span>
+    </div>
+  </div>
+
+  <div class="stepper" id="stepper">
+    <div class="step pending" data-goto="validation" onclick="gotoStep('validation')">
+      <div class="step-num">1</div>
+      <div><div class="step-text">① 上传并校验</div><div class="step-sub" id="stepSub1">等待上传</div></div>
+    </div>
+    <span class="step-arrow">›</span>
+    <div class="step pending" data-goto="confirmation" onclick="gotoStep('confirmation')">
+      <div class="step-num">2</div>
+      <div><div class="step-text">② 生成确认名单</div><div class="step-sub" id="stepSub2">未生成</div></div>
+    </div>
+    <span class="step-arrow">›</span>
+    <div class="step pending" data-goto="confirmation" onclick="gotoStep('confirmation')">
+      <div class="step-num">3</div>
+      <div><div class="step-text">③ 发送并同步</div><div class="step-sub" id="stepSub3">未发送</div></div>
     </div>
   </div>
 
@@ -187,12 +336,18 @@ tr:hover td{background:#fafbfc}
     <div class="collapsible" id="overviewPanel">
       <div class="collapsible-header" onclick="toggleCollapse('overviewPanel')">
         <span>&#128202; 校验总览</span>
+        <span class="summary" id="overviewSummary"></span>
         <span class="arrow">&#9654;</span>
       </div>
       <div class="collapsible-body">
-        <div class="stats" id="statsV"></div>
-        <div id="ruleBarsV"></div>
-        <div id="ruleDetailV" style="margin-top:12px"></div>
+        <div class="stats-inline-row" id="valStatsRow" style="display:none">
+          <div class="stats-inline-left" id="statsV"></div>
+          <div class="stats-inline-right">
+            <div class="chart-title">按规则分布（点击筛选）</div>
+            <div id="ruleBarsV"></div>
+          </div>
+        </div>
+        <div id="ruleDetailV" style="margin-top:12px;display:none"></div>
       </div>
     </div>
 
@@ -200,16 +355,23 @@ tr:hover td{background:#fafbfc}
     <div class="collapsible" id="detailPanel">
       <div class="collapsible-header" onclick="toggleCollapse('detailPanel')">
         <span>&#128203; 明细数据</span>
+        <span class="summary" id="detailSummary"></span>
         <span class="arrow">&#9654;</span>
       </div>
       <div class="collapsible-body">
-        <div class="filter-bar" id="filterBarV">
+        <div class="view-toggle" id="valViewToggle" style="display:none">
+          <button class="active" id="viewRowBtn" onclick="setValView('row')">逐条明细</button>
+          <button id="viewEmpBtn" onclick="setValView('emp')">按员工汇总</button>
+        </div>
+        <div class="filter-bar" id="filterBarV" style="display:none">
           <input type="text" id="searchInput" placeholder="搜索工号或姓名...">
-          <select id="ruleFilter"><option value="">所有错误类型</option><option value="warning">Warning</option><option value="error">Error</option></select>
+          <select id="levelFilter"><option value="">全部级别</option><option value="warning">需关注</option><option value="error">需处理</option></select>
+          <select id="ruleFilter"><option value="">全部规则</option><option value="R1.1">R1.1 周末考勤</option><option value="R1.2">R1.2 打卡重卡</option><option value="R3">R3 加班偏差</option><option value="R4">R4 补签审批</option><option value="R5">R5 REG归零</option><option value="R6">R6 公出出差</option><option value="R7">R7 居家办公</option></select>
           <span class="info" id="tableInfo">共 0 条</span>
         </div>
-        <div class="table-wrap" id="tableWrapV">
-          <table><thead><tr><th>工号</th><th>员工</th><th>部门</th><th>考勤日期</th><th>错误类型</th><th>错误详情</th></tr></thead><tbody id="tbodyV"></tbody></table>
+        <div class="chips" id="valChips"></div>
+        <div class="table-wrap" id="tableWrapV" style="display:none">
+          <table><thead id="valThead"><tr><th>工号</th><th>员工</th><th>部门</th><th>考勤日期</th><th>规则</th><th>级别</th><th>说明</th><th style="text-align:center">操作</th></tr></thead><tbody id="tbodyV"></tbody></table>
           <div class="pagination" id="paginationV">
             <button onclick="prevPage()" id="prevBtn">上一页</button>
             <span class="page-info" id="pageInfo">1/1</span>
@@ -226,119 +388,558 @@ tr:hover td{background:#fafbfc}
   <!-- =================== PANEL: 员工确认 =================== -->
   <div id="panel-confirmation" class="panel">
     <div class="action-bar" id="actionBarC">
-      <span class="file-badge" id="confirmBadge">0 个待确认员工</span>
-      <button class="btn btn-primary" onclick="buildConfirmationList()">🔄 从校验结果生成确认名单</button>
-      <button class="btn btn-primary" onclick="loadBatchFromServer()" title="拉取 server.py 已发送批次的回复状态（脚本/API 发卡也可用）">📡 同步服务器回复</button>
+      <button class="btn btn-primary btn-sm" onclick="buildConfirmationList()">🔄 生成确认名单</button>
+      <button class="btn btn-sm" onclick="loadBatchFromServer()" title="拉取 server.py 已发送批次的回复状态">📡 同步服务器回复</button>
       <span class="file-badge" id="serverBatchBadge" style="display:none;font-size:11px"></span>
-      <button class="btn btn-success" onclick="sendAllFeishuCards()" id="sendAllBtn" disabled>📨 发送飞书卡片</button>
-      <div class="test-mode-bar">
-        <input type="checkbox" id="testModeSwitch" onchange="toggleTestMode()">
-        <label for="testModeSwitch" style="cursor:pointer;user-select:none">🧪 测试</label>
-        <input type="text" class="test-emp-input" id="testEmpIdInline" value="zt28219" readonly title="测试模式固定收件人，不可修改">
-      </div>
       <span class="send-count" id="sendCountBadge"></span>
+      <div class="row2">
+        <button class="btn btn-success btn-sm" onclick="sendAllFeishuCards()" id="sendAllBtn" disabled>📨 发送飞书卡片</button>
+        <div class="test-mode-bar">
+          <input type="checkbox" id="testModeSwitch" onchange="toggleTestMode()">
+          <label for="testModeSwitch" style="cursor:pointer;user-select:none">🧪 测试</label>
+          <input type="text" class="test-emp-input" id="testEmpIdInline" value="zt28219" readonly title="测试模式固定收件人，不可修改">
+        </div>
+        <span class="file-badge" id="confirmBadge" style="margin-left:auto">0 个待确认员工</span>
+      </div>
     </div>
 
-    <div class="stats" id="statsC" style="display:none">
-      <div class="stat-card blue"><div class="num" id="totalEmp">0</div><div class="label">异常员工</div></div>
-      <div class="stat-card green"><div class="num" id="confirmedCount">0</div><div class="label">已确认</div></div>
-      <div class="stat-card orange"><div class="num" id="pendingCount">0</div><div class="label">待确认</div></div>
-      <div class="stat-card red"><div class="num" id="objectionCount">0</div><div class="label">有异议</div></div>
-      <div class="stat-card" style="background:#eafaf1;border-color:#27AE60"><div class="num" id="cleanCount" style="color:#27AE60">0</div><div class="label">无异常</div></div>
+    <div class="stats-inline-row" id="confirmStatsPanel" style="display:none">
+      <div class="stats-inline-left" id="statsC"></div>
+      <div class="stats-inline-right">
+        <div class="chart-title">整体确认进度（点击图例筛选）</div>
+        <div class="stack-bar" id="confirmStackBar"></div>
+        <div class="stack-legend" id="confirmLegend"></div>
+        <div class="chart-title" style="margin-top:12px">部门进度 · 按三级部门 <span style="color:#bbb">（点击筛选）</span></div>
+        <div class="dept-bars-wrap" id="deptBars"></div>
+      </div>
     </div>
 
-    <div id="progressSection" style="display:none;margin-bottom:12px">
-      <h3 style="font-size:14px;margin-bottom:6px;color:#333">整体确认进度</h3>
-      <div class="progress-bar" id="progressBar"></div>
-      <div class="progress-labels" id="progressLabels"></div>
-    </div>
+    <div class="obj-strip" id="objectionStrip" style="display:none" onclick="filterConfirmByStatus('有异议')"></div>
 
     <h3 style="font-size:14px;margin-bottom:6px;color:#333">员工确认名单</h3>
+    <div id="orphanSentBanner" style="display:none;margin-bottom:10px;padding:10px 12px;background:#fff8e1;border:1px solid #ffe082;border-radius:8px;font-size:12px;color:#795548"></div>
+    <div class="filter-bar" id="filterBarC" style="display:none">
+      <input type="text" id="confirmSearchInput" placeholder="搜索工号或姓名..." oninput="onConfirmFilterChange()">
+      <select id="confirmDeptFilter" onchange="onConfirmFilterChange()"><option value="">全部部门</option></select>
+      <select id="confirmStatusFilter" onchange="onConfirmFilterChange()">
+        <option value="">全部状态</option>
+        <option value="待确认">待确认</option>
+        <option value="已确认">已确认</option>
+        <option value="有异议">有异议</option>
+      </select>
+      <span class="info" id="confirmTableInfo">共 0 人</span>
+    </div>
+    <div class="chips" id="confirmChips"></div>
+    <div class="table-wrap">
     <table style="width:100%;border-collapse:collapse;font-size:13px">
       <thead><tr style="background:#f4f7fe">
         <th class="chk-col" style="padding:8px 4px;text-align:center;border-bottom:1px solid #e5e5e5"><input type="checkbox" class="chk-all" id="chkAll" onchange="toggleSelectAll(this.checked)"></th>
         <th style="padding:8px 10px;text-align:left;border-bottom:1px solid #e5e5e5;font-weight:600;color:#555">工号</th>
         <th style="padding:8px 10px;text-align:left;border-bottom:1px solid #e5e5e5;font-weight:600;color:#555">员工</th>
         <th style="padding:8px 10px;text-align:left;border-bottom:1px solid #e5e5e5;font-weight:600;color:#555">部门</th>
-        <th style="padding:8px 10px;text-align:center;border-bottom:1px solid #e5e5e5;font-weight:600;color:#555">异常条数</th>
-        <th style="padding:8px 10px;text-align:center;border-bottom:1px solid #e5e5e5;font-weight:600;color:#555">状态</th>
+        <th style="padding:8px 10px;text-align:center;border-bottom:1px solid #e5e5e5;font-weight:600;color:#555">确认状态</th>
         <th style="padding:8px 10px;text-align:center;border-bottom:1px solid #e5e5e5;font-weight:600;color:#555">发送状态</th>
         <th style="padding:8px 10px;text-align:center;border-bottom:1px solid #e5e5e5;font-weight:600;color:#555">操作</th>
       </tr></thead>
       <tbody id="confirmTbody"></tbody>
     </table>
+    </div>
+    <div class="pagination" id="confirmPagination" style="display:none">
+      <button onclick="confirmPage(-1)" id="cPrev">上一页</button>
+      <span id="cPageInfo">1 / 1</span>
+      <button onclick="confirmPage(1)" id="cNext">下一页</button>
+      <select id="confirmPageSize" onchange="state.confirmation.page=1;renderConfirmation()" style="margin-left:6px;padding:3px 6px;border:1px solid #ddd;border-radius:4px;font-size:12px">
+        <option value="20">20条/页</option><option value="50">50条/页</option>
+      </select>
+    </div>
   </div>
 </div>
+
+<div class="modal-overlay" id="editPeriodOverlay" style="display:none" onclick="if(event.target===this)closeEditPeriodModal()">
+  <div class="modal-box" style="max-width:420px">
+    <button class="modal-close" onclick="closeEditPeriodModal()">&times;</button>
+    <h2>✎ 编辑考勤周期</h2>
+    <p style="font-size:13px;color:#666;margin-bottom:12px">起止日期用于标识双周范围；保存时会校验是否与其他周期重叠。</p>
+    <div style="display:flex;gap:10px;margin-bottom:16px">
+      <label style="flex:1;font-size:13px">开始日期<br><input type="date" id="editPeriodStart" style="width:100%;margin-top:4px;padding:6px;border:1px solid #ddd;border-radius:6px"></label>
+      <label style="flex:1;font-size:13px">结束日期<br><input type="date" id="editPeriodEnd" style="width:100%;margin-top:4px;padding:6px;border:1px solid #ddd;border-radius:6px"></label>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn" onclick="closeEditPeriodModal()">取消</button>
+      <button class="btn btn-primary" onclick="saveEditPeriodDates()">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="periodHistoryOverlay" style="display:none" onclick="if(event.target===this)closePeriodHistory()">
+  <div class="modal-box" style="max-width:520px">
+    <button class="modal-close" onclick="closePeriodHistory()">&times;</button>
+    <h2>📂 历史周期</h2>
+    <div id="periodHistoryList" style="margin-top:12px;max-height:360px;overflow-y:auto"></div>
+  </div>
+</div>
+
+<div class="drawer-overlay" id="drawer" onclick="if(event.target===this)closeDrawer()">
+  <div class="drawer">
+    <h3><span id="drawerTitle">员工详情</span><button class="drawer-close" onclick="closeDrawer()">×</button></h3>
+    <div id="drawerBody"></div>
+  </div>
+</div>
+
 <script>
 // ========== STATE ==========
 const state = {
-  validation: { data: [], filtered: [], page: 1, pageSize: 20, validated: false },
-  confirmation: { rows: [], loaded: false, currentBatchId: '' },
+  validation: { data: [], filtered: [], page: 1, pageSize: 20, validated: false, view: 'row', filters: { level: '', rule: '' } },
+  confirmation: { rows: [], loaded: false, currentBatchId: '', filter: { q: '', dept: '', status: '' }, orphanSent: [], page: 1, pageSize: 20 },
   files: {},
-  serverUrl: 'http://localhost:8899'
+  serverUrl: 'http://localhost:8899',
+  period: { currentId: '', list: [], current: null }
 };
 window.state = state;
 const COLORS = {'R1.1':'#0E66FB','R1.2':'#0E66FB','R3':'#FFAA0E','R4':'#9C27B0','R5':'#D9001B','R6':'#E67E22','R7':'#2ECC71'};
+const CURRENT_PERIOD_KEY = 'signing_report_current_period_id';
 
-// ========== PERSISTENCE (localStorage) ==========
-function saveState(){
-  try{
-    const cpy = {
-      validation: { data: state.validation.data, filtered: [], page: 1, pageSize: state.validation.pageSize, validated: state.validation.validated },
-      confirmation: { rows: state.confirmation.rows, loaded: state.confirmation.loaded, currentBatchId: state.confirmation.currentBatchId || '' },
-      files: state.files,
-      serverUrl: state.serverUrl
-    };
-    const json = JSON.stringify(cpy);
-    // localStorage max ~5MB; if too large, skip files data
-    if(json.length > 4_000_000){
-      cpy.files = {};
-      const json2 = JSON.stringify(cpy);
-      localStorage.setItem('signing_report_state', json2);
-      localStorage.setItem('signing_report_files_keys', JSON.stringify(Object.keys(state.files)));
-      console.warn('Files data too large for localStorage, saved keys only');
-    } else {
-      localStorage.setItem('signing_report_state', json);
-      const fkeys = Object.keys(state.files);
-      localStorage.setItem('signing_report_files_keys', JSON.stringify(fkeys));
-    }
-  } catch(e){ console.warn('saveState error:', e); }
+function periodStorageKey(id){ return 'signing_report_period_' + id; }
+var _snapshotPushTimer = null;
+var IDB_NAME = 'signing_report_files_v1';
+var IDB_STORE = 'period_files';
+
+function openFilesDB(){
+  return new Promise(function(resolve, reject){
+    var req = indexedDB.open(IDB_NAME, 1);
+    req.onupgradeneeded = function(){ req.result.createObjectStore(IDB_STORE); };
+    req.onsuccess = function(){ resolve(req.result); };
+    req.onerror = function(){ reject(req.error); };
+  });
 }
-function loadState(){
+function saveFilesToIDB(periodId, files){
+  if(!periodId || !window.indexedDB) return Promise.resolve();
+  return openFilesDB().then(function(db){
+    return new Promise(function(resolve, reject){
+      var tx = db.transaction(IDB_STORE, 'readwrite');
+      tx.objectStore(IDB_STORE).put({ periodId: periodId, files: files || {}, updatedAt: Date.now() }, periodId);
+      tx.oncomplete = function(){ resolve(); };
+      tx.onerror = function(){ reject(tx.error); };
+    });
+  }).catch(function(e){ console.warn('saveFilesToIDB', e); });
+}
+function loadFilesFromIDB(periodId){
+  if(!periodId || !window.indexedDB) return Promise.resolve(null);
+  return openFilesDB().then(function(db){
+    return new Promise(function(resolve, reject){
+      var tx = db.transaction(IDB_STORE, 'readonly');
+      var req = tx.objectStore(IDB_STORE).get(periodId);
+      req.onsuccess = function(){ resolve(req.result ? req.result.files : null); };
+      req.onerror = function(){ reject(req.error); };
+    });
+  }).catch(function(){ return null; });
+}
+function fetchPeriodDetail(periodId){
+  return fetch(getServerUrl() + '/api/periods/' + encodeURIComponent(periodId))
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .catch(function(){ return null; });
+}
+function pushSnapshotToServer(){
+  if(!state.period.currentId) return Promise.resolve();
+  var snap = snapshotWorkspace();
+  return fetch(getServerUrl() + '/api/periods/' + encodeURIComponent(state.period.currentId) + '/snapshot', {
+    method: 'PUT',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(snap)
+  }).catch(function(e){ console.warn('pushSnapshotToServer', e); });
+}
+function scheduleSnapshotPush(){
+  clearTimeout(_snapshotPushTimer);
+  _snapshotPushTimer = setTimeout(function(){ pushSnapshotToServer(); }, 600);
+}
+function loadPeriodWorkspaceLocal(periodId){
+  resetWorkspaceState();
+  if(!periodId) return false;
   try {
-    const raw = localStorage.getItem('signing_report_state');
+    var raw = localStorage.getItem(periodStorageKey(periodId));
     if(!raw) return false;
-    const saved = JSON.parse(raw);
-    state.validation = saved.validation || state.validation;
-    state.confirmation = saved.confirmation || state.confirmation;
-    state.serverUrl = saved.serverUrl || state.serverUrl;
-    // Files are too large for localStorage — just restore keys
-    state.files = {};
-    const fkeys = JSON.parse(localStorage.getItem('signing_report_files_keys') || '[]');
-    fkeys.forEach(k => { state.files[k] = []; }); // empty placeholders
-    console.log('State restored from localStorage (files omitted)');
-    refreshUIFromState();
+    applyWorkspaceSnapshot(JSON.parse(raw));
     return true;
-  } catch(e){ console.warn('loadState error:', e); return false; }
+  } catch(e){ return false; }
+}
+function loadPeriodWorkspaceFromServer(periodId){
+  resetWorkspaceState();
+  if(!periodId) return Promise.resolve();
+  return fetchPeriodDetail(periodId).then(function(detail){
+    if(detail && detail.period) state.period.current = detail.period;
+    if(detail && detail.snapshot) applyWorkspaceSnapshot(detail.snapshot);
+    else loadPeriodWorkspaceLocal(periodId);
+    return loadFilesFromIDB(periodId);
+  }).then(function(files){
+    if(files && Object.keys(files).length) state.files = files;
+  });
+}
+
+function resetWorkspaceState(){
+  state.validation = { data: [], filtered: [], page: 1, pageSize: 20, validated: false };
+  state.confirmation = { rows: [], loaded: false, currentBatchId: '', filter: { q: '', dept: '', status: '' }, orphanSent: [] };
+  state.files = {};
+  state._signEmp = state._signRows = state._punchByEmp = state._suppByEmp = state._leaveByEmp = state._busByEmp = state._tripByEmp = state._homeByEmp = undefined;
+}
+
+function snapshotWorkspace(){
+  return {
+    validation: { data: state.validation.data, filtered: [], page: 1, pageSize: state.validation.pageSize, validated: state.validation.validated },
+    confirmation: { rows: state.confirmation.rows, loaded: state.confirmation.loaded, currentBatchId: state.confirmation.currentBatchId || '', filter: state.confirmation.filter || { q:'', dept:'', status:'' } },
+    files: state.files,
+    engine: {
+      signEmp: state._signEmp, signRows: state._signRows, punchByEmp: state._punchByEmp,
+      suppByEmp: state._suppByEmp, leaveByEmp: state._leaveByEmp, busByEmp: state._busByEmp,
+      tripByEmp: state._tripByEmp, homeByEmp: state._homeByEmp
+    }
+  };
+}
+
+function applyWorkspaceSnapshot(saved){
+  resetWorkspaceState();
+  if(!saved) return;
+  state.validation = saved.validation || state.validation;
+  state.confirmation = saved.confirmation || state.confirmation;
+  if(saved.engine){
+    state._signEmp = saved.engine.signEmp;
+    state._signRows = saved.engine.signRows;
+    state._punchByEmp = saved.engine.punchByEmp;
+    state._suppByEmp = saved.engine.suppByEmp;
+    state._leaveByEmp = saved.engine.leaveByEmp;
+    state._busByEmp = saved.engine.busByEmp;
+    state._tripByEmp = saved.engine.tripByEmp;
+    state._homeByEmp = saved.engine.homeByEmp;
+  }
+  const fkeys = saved.files ? Object.keys(saved.files) : [];
+  if(saved.files && fkeys.length){
+    const hasRows = Object.values(saved.files).some(function(rows){ return Array.isArray(rows) && rows.length > 0; });
+    state.files = hasRows ? saved.files : {};
+  }
+}
+
+// ========== PERSISTENCE (IndexedDB files + server snapshot + local cache) ==========
+function saveState(){
+  if(!state.period.currentId) return;
+  try{
+    var cpy = snapshotWorkspace();
+    var lite = { validation: cpy.validation, confirmation: cpy.confirmation };
+    localStorage.setItem(periodStorageKey(state.period.currentId), JSON.stringify(lite));
+    localStorage.setItem(CURRENT_PERIOD_KEY, state.period.currentId);
+  } catch(e){ console.warn('saveState local', e); }
+  saveFilesToIDB(state.period.currentId, state.files);
+  scheduleSnapshotPush();
+}
+
+function loadPeriodWorkspace(periodId){
+  return loadPeriodWorkspaceFromServer(periodId);
+}
+
+function requirePeriod(actionLabel){
+  if(state.period.currentId) return true;
+  alert('请先点击顶栏「＋ 新建周期」' + (actionLabel ? '，再' + actionLabel : ''));
+  return false;
+}
+
+function isPeriodReadonly(){
+  return state.period.current && state.period.current.status === 'closed';
+}
+
+function periodStatusText(status){
+  return status === 'active' ? '进行中' : (status === 'closed' ? '已归档' : '草稿');
+}
+
+function periodStatusClass(status){
+  return status === 'active' ? 'status-active' : (status === 'closed' ? 'status-closed' : 'status-draft');
+}
+
+function fetchPeriods(){
+  return fetch(getServerUrl() + '/api/periods')
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      state.period.list = (data && data.periods) ? data.periods : [];
+      return state.period.list;
+    })
+    .catch(function(e){
+      console.warn('fetchPeriods:', e);
+      state.period.list = state.period.list || [];
+      return state.period.list;
+    });
+}
+
+function renderPeriodDropdown(){
+  var dd = document.getElementById('periodDropdown');
+  if(!state.period.list.length){
+    dd.innerHTML = '<div style="padding:14px;font-size:13px;color:#999;text-align:center">暂无周期，请新建</div>';
+    return;
+  }
+  dd.innerHTML = state.period.list.map(function(p){
+    var cls = p.period_id === state.period.currentId ? 'period-option active' : 'period-option';
+    var sub = p.period_id + (p.batch_count ? ' · '+p.batch_count+' 批次' : '');
+    return '<div class="'+cls+'" onclick="switchPeriod(\''+p.period_id+'\')">'+
+      '<div class="meta"><div class="title">'+esc(p.period_label || '未设置考勤周期')+'</div><div class="sub">'+esc(sub)+'</div></div>'+
+      '<span class="status-pill '+periodStatusClass(p.status)+'">'+periodStatusText(p.status)+'</span></div>';
+  }).join('');
+}
+
+function updatePeriodUI(){
+  var has = !!state.period.currentId;
+  var p = state.period.current;
+  document.getElementById('noPeriodState').style.display = has ? 'none' : 'block';
+  document.getElementById('mainWorkspace').style.display = has ? 'block' : 'none';
+  document.getElementById('periodReadonlyBanner').style.display = (has && isPeriodReadonly()) ? 'block' : 'none';
+
+  var trigger = document.getElementById('periodTrigger');
+  var label = document.getElementById('periodTriggerLabel');
+  var pill = document.getElementById('periodTriggerStatus');
+  if(!has){
+    label.textContent = '未选择';
+    pill.style.display = 'none';
+    trigger.classList.add('disabled');
+    document.getElementById('btnArchivePeriod').disabled = true;
+  } else {
+    label.textContent = p ? (p.period_label || '未设置考勤周期') : state.period.currentId;
+    pill.textContent = p ? periodStatusText(p.status) : '';
+    pill.className = 'status-pill ' + (p ? periodStatusClass(p.status) : 'status-draft');
+    pill.style.display = 'inline-block';
+    trigger.classList.remove('disabled');
+    document.getElementById('btnArchivePeriod').disabled = !p || p.status !== 'active';
+    document.getElementById('btnEditPeriod').disabled = !p || isPeriodReadonly();
+  }
+
+  var sub = document.querySelector('.header .sub');
+  if(sub && has){
+    sub.innerHTML = isPeriodReadonly() ? '历史只读' : ('综合看板 · 手动校验模式 · <code style="font-size:11px">'+esc(state.period.currentId)+'</code>');
+  }
+
+  renderPeriodDropdown();
+  var dz = document.getElementById('dropZoneV');
+  if(dz){
+    dz.style.pointerEvents = (has && isPeriodReadonly()) ? 'none' : '';
+    dz.style.opacity = (has && isPeriodReadonly()) ? '.55' : '';
+  }
+}
+
+function togglePeriodDropdown(e){
+  e.stopPropagation();
+  if(!state.period.list.length) return;
+  document.getElementById('periodDropdown').classList.toggle('open');
+}
+document.addEventListener('click', function(){
+  var dd = document.getElementById('periodDropdown');
+  if(dd) dd.classList.remove('open');
+});
+
+function switchPeriod(periodId, silent){
+  if(!periodId || periodId === state.period.currentId) return Promise.resolve();
+  if(state.period.currentId) saveState();
+  state.period.currentId = periodId;
+  localStorage.setItem(CURRENT_PERIOD_KEY, periodId);
+  var params = new URLSearchParams(location.search);
+  params.set('period', periodId);
+  history.replaceState(null, '', '?' + params.toString());
+  return loadPeriodWorkspaceFromServer(periodId).then(function(){
+    return fetchPeriods();
+  }).then(function(){
+    state.period.current = state.period.list.find(function(p){ return p.period_id === periodId; }) || state.period.current;
+    updatePeriodUI();
+    refreshUIFromState();
+    if(!silent) showSyncToast('已切换周期：' + (state.period.current ? state.period.current.period_label : periodId), false);
+    initReplySyncForPeriod();
+    maybeSyncPeriodDatesAfterDataLoad();
+  });
+}
+
+function createNewPeriod(){
+  fetch(getServerUrl() + '/api/periods', { method: 'POST', headers: {'Content-Type':'application/json'}, body: '{}' })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(!data || !data.period) throw new Error((data && data.error) || '创建失败');
+      return fetchPeriods().then(function(){ return data.period; });
+    })
+    .then(function(period){
+      return switchPeriod(period.period_id, true).then(function(){
+        showSyncToast('已新建周期 ' + period.period_id, false);
+      });
+    })
+    .catch(function(e){
+      alert('新建周期失败：' + e.message + '\n请确认 server.py 已启动');
+    });
+}
+
+function closeCurrentPeriod(){
+  if(!state.period.currentId || !state.period.current) return;
+  if(state.period.current.status !== 'active') return;
+  if(!confirm('归档「' + (state.period.current.period_label || state.period.currentId) + '」？\n归档后变为只读，需新建周期开始下一轮。')) return;
+  fetch(getServerUrl() + '/api/periods/' + encodeURIComponent(state.period.currentId) + '/close', { method: 'POST' })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(!data || !data.period) throw new Error((data && data.error) || '归档失败');
+      state.period.current = data.period;
+      var idx = state.period.list.findIndex(function(p){ return p.period_id === data.period.period_id; });
+      if(idx >= 0) state.period.list[idx] = data.period;
+      updatePeriodUI();
+      refreshUIFromState();
+      showSyncToast('已归档当前周期', false);
+    })
+    .catch(function(e){ alert('归档失败：' + e.message); });
+}
+
+function openPeriodHistory(){
+  renderPeriodHistoryList();
+  document.getElementById('periodHistoryOverlay').style.display = 'flex';
+}
+function closePeriodHistory(){
+  document.getElementById('periodHistoryOverlay').style.display = 'none';
+}
+function renderPeriodHistoryList(){
+  var el = document.getElementById('periodHistoryList');
+  if(!state.period.list.length){
+    el.innerHTML = '<div class="empty">暂无历史周期</div>';
+    return;
+  }
+  el.innerHTML = state.period.list.map(function(p){
+    var cur = p.period_id === state.period.currentId ? ' style="border:2px solid #0E66FB;background:#eef4ff"' : '';
+    return '<div class="dept-card"'+cur+' onclick="switchPeriod(\''+p.period_id+'\');closePeriodHistory();" style="cursor:pointer;margin-bottom:8px">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
+      '<div><div class="dept-name">'+esc(p.period_label || '未设置考勤周期')+'</div>'+
+      '<div style="font-size:11px;color:#888;margin-top:4px">'+esc(p.period_id)+'</div></div>'+
+      '<span class="status-pill '+periodStatusClass(p.status)+'">'+periodStatusText(p.status)+'</span></div>'+
+      '<div style="font-size:11px;color:#666;margin-top:8px">批次 '+ (p.batch_count||0) +' · 更新 '+esc(p.updated_at||'')+'</div></div>';
+  }).join('');
+}
+
+function initPeriodSystem(){
+  var urlPeriod = new URLSearchParams(location.search).get('period');
+  var storedPeriod = localStorage.getItem(CURRENT_PERIOD_KEY) || '';
+  var target = urlPeriod || storedPeriod || '';
+  return fetchPeriods().then(function(){
+    if(target && !state.period.list.some(function(p){ return p.period_id === target; })){
+      target = '';
+    }
+    if(target){
+      state.period.currentId = target;
+      return loadPeriodWorkspaceFromServer(target);
+    }
+    state.period.currentId = '';
+    state.period.current = null;
+    resetWorkspaceState();
+    return Promise.resolve();
+  }).then(function(){
+    if(state.period.currentId){
+      state.period.current = state.period.list.find(function(p){ return p.period_id === state.period.currentId; }) || state.period.current;
+    }
+    updatePeriodUI();
+    refreshUIFromState();
+    initReplySyncForPeriod();
+    maybeSyncPeriodDatesAfterDataLoad();
+  });
+}
+
+function openEditPeriodModal(){
+  if(!state.period.current || isPeriodReadonly()) return;
+  var p = state.period.current;
+  document.getElementById('editPeriodStart').value = (p.start_date || '').slice(0, 10);
+  document.getElementById('editPeriodEnd').value = (p.end_date || '').slice(0, 10);
+  document.getElementById('editPeriodOverlay').style.display = 'flex';
+}
+function closeEditPeriodModal(){
+  document.getElementById('editPeriodOverlay').style.display = 'none';
+}
+function saveEditPeriodDates(){
+  if(!state.period.currentId) return;
+  var start = document.getElementById('editPeriodStart').value;
+  var end = document.getElementById('editPeriodEnd').value;
+  if(!start || !end){ alert('请填写完整的起止日期'); return; }
+  if(start > end){ alert('开始日期不能晚于结束日期'); return; }
+  fetch(getServerUrl() + '/api/periods/' + encodeURIComponent(state.period.currentId), {
+    method: 'PUT',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ start_date: start, end_date: end, status: 'active' })
+  }).then(function(r){ return r.json().then(function(d){ return { ok: r.ok, data: d }; }); })
+    .then(function(res){
+      if(!res.ok || (res.data && res.data.error)){
+        alert((res.data && res.data.message) || '保存失败');
+        return;
+      }
+      state.period.current = res.data.period;
+      var idx = state.period.list.findIndex(function(p){ return p.period_id === res.data.period.period_id; });
+      if(idx >= 0) state.period.list[idx] = res.data.period;
+      updatePeriodUI();
+      closeEditPeriodModal();
+      showSyncToast('周期已更新为 ' + res.data.period.period_label, false);
+    })
+    .catch(function(e){ alert('保存失败：' + e.message); });
+}
+
+function applySendDiffMarkers(newRows){
+  var oldRows = (state.confirmation.rows && state.confirmation.rows.length) ? state.confirmation.rows : [];
+  var oldSent = {};
+  oldRows.forEach(function(r){
+    if(r._sendStatus === 'ok') oldSent[r.emp_id] = r;
+  });
+  var newIds = new Set(newRows.map(function(r){ return r.emp_id; }));
+  state.confirmation.orphanSent = [];
+  Object.keys(oldSent).forEach(function(eid){
+    if(!newIds.has(eid)) state.confirmation.orphanSent.push(oldSent[eid]);
+  });
+  newRows.forEach(function(r){
+    var prev = oldSent[r.emp_id];
+    if(prev){
+      r._sendStatus = prev._sendStatus;
+      r._sendTime = prev._sendTime;
+      r.batch_id = prev.batch_id;
+      r.replies = prev.replies || r.replies;
+      r.reply_count = prev.reply_count || r.reply_count;
+      if(prev.status && prev.status !== '待确认') r.status = prev.status;
+      r._sendDiff = '已发送·仍在名单';
+    } else {
+      r._sendDiff = '未发送';
+    }
+  });
+}
+
+function initReplySyncForPeriod(){
+  if(!state.period.currentId) return;
+  var urlBatch = new URLSearchParams(location.search).get('batch');
+  if(urlBatch){
+    loadBatchFromServer(urlBatch);
+    return;
+  }
+  if(state.confirmation && state.confirmation.currentBatchId){
+    loadBatchFromServer(state.confirmation.currentBatchId);
+    return;
+  }
+  if(state.confirmation && state.confirmation.rows && state.confirmation.rows.length){
+    return;
+  }
+}
+function restoreValidationUI(){
+  if(!state.validation || !state.validation.validated || !(state.validation.data || []).length) return;
+  state.validation.filtered = state.validation.data.slice();
+  const n = state.validation.data.length;
+  const w = state.validation.data.filter(function(r){ return r.level === 'warning'; }).length;
+  const e = state.validation.data.filter(function(r){ return r.level === 'error'; }).length;
+  const progressWrap = document.getElementById('progressWrap');
+  const progressFill = document.getElementById('progressFill');
+  const progressText = document.getElementById('progressText');
+  if(progressWrap){
+    progressWrap.style.display = 'block';
+    if(progressFill) progressFill.style.width = '100%';
+    if(progressText) progressText.innerHTML = '&#10003; 已恢复上次校验结果 · 共 <strong>'+n+'</strong> 条异常 (Warning: '+w+' / Error: '+e+')';
+  }
+  document.getElementById('overviewPanel').classList.add('open');
+  document.getElementById('detailPanel').classList.add('open');
+  document.getElementById('btnExportCSV').disabled = false;
+  const btn = document.getElementById('btnStartValidation');
+  if(btn){ btn.disabled = false; btn.innerHTML = '&#9654; 重新校验'; }
+  applyFilters();
 }
 function refreshUIFromState(){
   try {
     updateFileUI();
-    if(state.validation && state.validation.validated){
-      if(!state.validation.filtered || !state.validation.filtered.length){
-        state.validation.filtered = (state.validation.data || []).slice();
-      }
-      if(state.validation.filtered.length){
-        renderTable();
-        const statsV = document.getElementById('statsV');
-        if(statsV) statsV.style.display = 'grid';
-        const btnExport = document.getElementById('btnExportCSV');
-        if(btnExport) btnExport.disabled = false;
-        const btnStart = document.getElementById('btnStartValidation');
-        if(btnStart) btnStart.disabled = true;
-      }
-    }
+    restoreValidationUI();
     if(state.confirmation && state.confirmation.rows && state.confirmation.rows.length){
+      if(!state.confirmation.filter) state.confirmation.filter = { q:'', dept:'', status:'' };
       renderConfirmation();
     }
   } catch(e){ console.warn('refreshUIFromState:', e); }
@@ -346,15 +947,73 @@ function refreshUIFromState(){
 function getServerUrl(){ return state.serverUrl || 'http://localhost:8899'; }
 
 // ========== TAB SWITCH ==========
-document.querySelectorAll('.tab').forEach(t=>{
-  t.addEventListener('click',()=>{
-    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-    t.classList.add('active');
-    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-    const panel = document.getElementById('panel-'+t.dataset.panel);
-    if(panel) panel.classList.add('active');
+function gotoStep(panel){
+  document.querySelectorAll('.tab').forEach(function(x){
+    x.classList.toggle('active', x.dataset.panel === panel);
   });
+  document.querySelectorAll('.panel').forEach(function(p){
+    p.classList.toggle('active', p.id === 'panel-' + panel);
+  });
+}
+document.querySelectorAll('.tab').forEach(function(t){
+  t.addEventListener('click', function(){ gotoStep(t.dataset.panel); });
 });
+
+function getDeptGroupKey(row){
+  var d3 = (row.dept3 || '').trim();
+  return d3 || '未填写三级部门';
+}
+
+function updateStepper(){
+  var el = document.getElementById('stepper');
+  if(!el) return;
+  var validated = state.validation.validated;
+  var fileCount = Object.keys(state.files || {}).filter(function(k){ return state.files[k] && state.files[k].loaded; }).length;
+  var hasList = state.confirmation.loaded && (state.confirmation.rows || []).length;
+  var rows = state.confirmation.rows || [];
+  var sentCount = rows.filter(function(r){ return r._sendStatus === 'ok'; }).length;
+  var pendingCount = rows.filter(function(r){ return normalizeConfirmStatus(r.status) === '待确认'; }).length;
+  var anomalyCount = (state.validation.data || []).length;
+
+  var s1 = validated ? 'done' : (fileCount > 0 ? 'active' : 'pending');
+  var s2 = hasList ? 'done' : (validated ? 'active' : 'pending');
+  var s3 = sentCount > 0 ? (pendingCount === 0 && hasList ? 'done' : 'active') : (hasList ? 'active' : 'pending');
+
+  var steps = el.querySelectorAll('.step');
+  var classes = [s1, s2, s3];
+  var nums = [validated ? '✓' : '1', hasList ? '✓' : '2', sentCount > 0 && pendingCount === 0 && hasList ? '✓' : '3'];
+  steps.forEach(function(step, i){
+    step.className = 'step ' + classes[i];
+    var numEl = step.querySelector('.step-num');
+    if(numEl) numEl.textContent = nums[i];
+  });
+
+  var sub1 = document.getElementById('stepSub1');
+  var sub2 = document.getElementById('stepSub2');
+  var sub3 = document.getElementById('stepSub3');
+  if(sub1) sub1.textContent = validated ? (anomalyCount + ' 条异常 · ' + fileCount + ' 份文件') : (fileCount ? fileCount + ' 份文件已上传' : '等待上传');
+  if(sub2) sub2.textContent = hasList ? (rows.length + ' 人 · 已生成') : (validated ? '可生成名单' : '未生成');
+  if(sub3) sub3.textContent = sentCount ? ('已发 ' + sentCount + ' · 待确认 ' + pendingCount) : '未发送';
+}
+
+function updateTabBadges(){
+  var valTab = document.querySelector('.tab[data-panel="validation"]');
+  var confTab = document.querySelector('.tab[data-panel="confirmation"]');
+  var n = (state.validation.data || []).length;
+  if(valTab){
+    valTab.innerHTML = '数据校验' + (n ? ' <span class="dot warn"></span><span style="font-size:11px;color:#888">' + n + '</span>' : '');
+  }
+  var rows = state.confirmation.rows || [];
+  if(confTab){
+    if(rows.length){
+      var confirmed = rows.filter(function(r){ return normalizeConfirmStatus(r.status) === '已确认'; }).length;
+      var pct = Math.round(confirmed / rows.length * 100);
+      confTab.innerHTML = '员工确认 <span class="dot ' + (pct >= 100 ? 'ok' : 'warn') + '"></span><span style="font-size:11px;color:#888">' + pct + '%</span>';
+    } else {
+      confTab.innerHTML = '员工确认';
+    }
+  }
+}
 
 // ========== FILE INPUT ==========
 const fileInput = document.getElementById('fileInput');
@@ -380,6 +1039,8 @@ document.getElementById('dropZoneV').addEventListener('click', openFilePicker);
 
 // ========== FILE LOADING ==========
 function loadFiles(files){
+  if(!requirePeriod('上传文件')) return;
+  if(isPeriodReadonly()){ alert('已归档周期不可上传'); return; }
   document.getElementById('dataStatus').textContent='加载中...';
   document.getElementById('dataStatus').className='badge badge-info';
   document.getElementById('uploadLoadingV').style.display='block';
@@ -394,6 +1055,7 @@ function loadFiles(files){
       document.getElementById('dataStatus').className='badge badge-success';
       updateFileUI();
       saveState();
+      maybeSyncPeriodDatesAfterDataLoad();
     }
   }
 
@@ -445,24 +1107,59 @@ function loadFiles(files){
 }
 
 function updateFileUI(){
-  const fCount = Object.keys(state.files).length;
-  const hasFile = fCount > 0;
-  document.getElementById('fileCountBadge').textContent = fCount + ' 个文件';
-  document.getElementById('actionBarV').style.display = hasFile ? 'flex' : 'none';
-  document.getElementById('actionBarC').style.display = hasFile ? 'flex' : 'none';
+  const names = Object.keys(state.files);
+  const fCount = names.length;
+  const totalRows = names.reduce(function(s, n){ return s + (state.files[n] ? state.files[n].length : 0); }, 0);
+  const hasFile = fCount > 0 && totalRows > 0;
+  const hasGhostNames = fCount > 0 && totalRows === 0;
 
-  ['dropZoneV'].forEach(id=>{
-    const el=document.getElementById(id);
+  document.getElementById('fileCountBadge').textContent = hasFile ? (fCount + ' 个文件') : '0 个文件';
+  document.getElementById('actionBarV').style.display = hasFile ? 'flex' : 'none';
+  document.getElementById('actionBarC').style.display = (hasFile || (state.confirmation.rows && state.confirmation.rows.length)) ? 'flex' : 'none';
+
+  const dataStatus = document.getElementById('dataStatus');
+  if(hasFile){
+    dataStatus.textContent = '已上传 ' + fCount + ' 个文件';
+    dataStatus.className = 'badge badge-success';
+  } else if(state.validation && state.validation.validated && (state.validation.data || []).length){
+    dataStatus.textContent = '需重新上传文件';
+    dataStatus.className = 'badge badge-warning';
+  } else {
+    dataStatus.textContent = '未上传文件';
+    dataStatus.className = 'badge badge-pending';
+  }
+
+  ['dropZoneV'].forEach(function(id){
+    const el = document.getElementById(id);
     if(hasFile) el.classList.add('has-data'); else el.classList.remove('has-data');
   });
 
-  ['fileStatusV'].forEach(id=>{
-    const el=document.getElementById(id);
-    el.innerHTML='';
-    Object.keys(state.files).forEach(name=>{
-      const div=document.createElement('div');
-      div.className='file-item loaded';
-      div.innerHTML='<span class="dot"></span>'+esc(name)+' <span style="color:#888;font-size:11px">('+state.files[name].length+'行)</span>';
+  let noticeEl = document.getElementById('fileRestoreNotice');
+  if(hasGhostNames || (!hasFile && state.validation && state.validation.validated && (state.validation.data || []).length)){
+    if(!noticeEl){
+      noticeEl = document.createElement('div');
+      noticeEl.id = 'fileRestoreNotice';
+      noticeEl.style.cssText = 'margin:8px 0;padding:10px 12px;background:#fff7e6;border:1px solid #ffd591;border-radius:8px;font-size:13px;color:#614700';
+      document.getElementById('fileStatusV').parentNode.insertBefore(noticeEl, document.getElementById('fileStatusV').nextSibling);
+    }
+    noticeEl.style.display = 'block';
+    noticeEl.innerHTML = '⚠️ 页面刷新后 <strong>Excel 内容不会保留</strong>（体积过大）。请重新上传 7 份文件后再点「开始校验」。'+
+      ((state.validation.data || []).length ? ' 下方可查看<strong>上次缓存的校验结果</strong>。' : '');
+  } else if(noticeEl){
+    noticeEl.style.display = 'none';
+  }
+
+  ['fileStatusV'].forEach(function(id){
+    const el = document.getElementById(id);
+    el.innerHTML = '';
+    if(!hasFile){
+      if(hasGhostNames) return;
+      return;
+    }
+    names.forEach(function(name){
+      const div = document.createElement('div');
+      div.className = 'file-item loaded';
+      div.innerHTML = '<span class="dot"></span>'+esc(name)+' <span style="color:#888;font-size:11px">('+state.files[name].length+'行)</span>';
       el.appendChild(div);
     });
   });
@@ -470,6 +1167,8 @@ function updateFileUI(){
 
 // ========== CLEAR ALL ==========
 function clearAllData(){
+  if(!requirePeriod('清空数据')) return;
+  if(isPeriodReadonly()){ alert('已归档周期不可修改'); return; }
   state.files = {};
   state.validation.data = [];
   state.validation.filtered = [];
@@ -477,6 +1176,7 @@ function clearAllData(){
   state.validation.page = 1;
   state.confirmation.rows = [];
   state.confirmation.loaded = false;
+  state.confirmation.filter = { q:'', dept:'', status:'' };
 
   document.getElementById('actionBarV').style.display = 'none';
   document.getElementById('actionBarC').style.display = 'none';
@@ -487,14 +1187,25 @@ function clearAllData(){
     document.getElementById(id).innerHTML = '';
   });
   document.getElementById('statsV').innerHTML = '';
-  document.getElementById('statsV').style.display = 'none';
+  var valRow = document.getElementById('valStatsRow');
+  if(valRow) valRow.style.display = 'none';
   document.getElementById('ruleBarsV').innerHTML = '';
   document.getElementById('tbodyV').innerHTML = '';
   document.getElementById('tableWrapV').style.display = 'none';
   document.getElementById('filterBarV').style.display = 'none';
+  var valViewToggle = document.getElementById('valViewToggle');
+  if(valViewToggle) valViewToggle.style.display = 'none';
+  var valChips = document.getElementById('valChips');
+  if(valChips) valChips.innerHTML = '';
   document.getElementById('progressWrap').style.display = 'none';
-  document.getElementById('statsC').style.display = 'none';
-  document.getElementById('progressSection').style.display = 'none';
+  var csp = document.getElementById('confirmStatsPanel');
+  if(csp) csp.style.display = 'none';
+  document.getElementById('statsC').innerHTML = '';
+  var objStrip = document.getElementById('objectionStrip');
+  if(objStrip) objStrip.style.display = 'none';
+  document.getElementById('filterBarC').style.display = 'none';
+  var confirmPag = document.getElementById('confirmPagination');
+  if(confirmPag) confirmPag.style.display = 'none';
   document.getElementById('btnExportCSV').disabled = true;
   document.getElementById('dataStatus').textContent = '未上传文件';
   document.getElementById('dataStatus').className = 'badge badge-pending';
@@ -550,7 +1261,98 @@ function findFile(patterns){
   return null;
 }
 
+function normalizeAttendanceDate(v){
+  if(v === undefined || v === null || v === '') return '';
+  var s = String(v).trim();
+  if(!s) return '';
+  var m = s.match(/(\d{4})[-\/年](\d{1,2})[-\/月](\d{1,2})/);
+  if(m){
+    return m[1] + '-' + String(parseInt(m[2], 10)).padStart(2, '0') + '-' + String(parseInt(m[3], 10)).padStart(2, '0');
+  }
+  if(/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
+  return '';
+}
+
+function detectPeriodDatesFromSigningReport(){
+  var signFile = findFile([['计薪出勤', 'REG', '工号'], ['签字', '考勤日期']]);
+  if(!signFile || !signFile.rows || !signFile.rows.length) return null;
+  var dates = [];
+  signFile.rows.forEach(function(r){
+    var dt = '';
+    Object.keys(r).forEach(function(k){
+      if((k.indexOf('考勤日期') >= 0 || k === '日期') && !dt) dt = normalizeAttendanceDate(r[k]);
+    });
+    if(dt) dates.push(dt);
+  });
+  if(!dates.length) return null;
+  dates.sort();
+  return { start_date: dates[0], end_date: dates[dates.length - 1] };
+}
+
+function formatPeriodLabel(start, end){
+  if(!start || !end) return '未设置考勤周期';
+  var s = start.split('-'), e = end.split('-');
+  return s[0] + '/' + parseInt(s[1], 10) + '/' + parseInt(s[2], 10) + ' – ' + parseInt(e[1], 10) + '/' + parseInt(e[2], 10);
+}
+
+function autoSyncPeriodDates(options){
+  options = options || {};
+  if(!state.period.currentId || isPeriodReadonly()) return Promise.resolve(false);
+  var detected = detectPeriodDatesFromSigningReport();
+  if(!detected) return Promise.resolve(false);
+  var cur = state.period.current || {};
+  var curStart = (cur.start_date || '').slice(0, 10);
+  var curEnd = (cur.end_date || '').slice(0, 10);
+  if(curStart && curEnd){
+    if(curStart === detected.start_date && curEnd === detected.end_date){
+      showSyncToast('周期与数据一致', false);
+      return Promise.resolve(false);
+    }
+    if(options.confirm !== false && !confirm('数据对应周期为 ' + formatPeriodLabel(detected.start_date, detected.end_date) + '，与当前「' + (cur.period_label || '') + '」不一致，是否更新？')){
+      return Promise.resolve(false);
+    }
+  }
+  return fetch(getServerUrl() + '/api/periods/' + encodeURIComponent(state.period.currentId), {
+    method: 'PUT',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      start_date: detected.start_date,
+      end_date: detected.end_date,
+      status: 'active'
+    })
+  }).then(function(r){ return r.json().then(function(data){ return { ok: r.ok, data: data }; }); })
+    .then(function(res){
+      var data = res.data;
+      if(!res.ok || (data && data.error)){
+        alert((data && data.message) || (data && data.error) || '更新考勤周期失败');
+        return false;
+      }
+      if(data && data.period){
+        state.period.current = data.period;
+        var idx = state.period.list.findIndex(function(p){ return p.period_id === data.period.period_id; });
+        if(idx >= 0) state.period.list[idx] = data.period;
+        updatePeriodUI();
+        showSyncToast('已识别考勤周期 ' + data.period.period_label, false);
+        return true;
+      }
+      return false;
+    })
+    .catch(function(e){
+      console.warn('autoSyncPeriodDates:', e);
+      return false;
+    });
+}
+
+function maybeSyncPeriodDatesAfterDataLoad(){
+  if(!state.period.currentId) return;
+  var cur = state.period.current;
+  if(cur && cur.start_date && cur.end_date) return;
+  autoSyncPeriodDates({ confirm: false });
+}
+
 function startValidation(){
+  if(!requirePeriod('执行校验')) return;
+  if(isPeriodReadonly()){ alert('已归档周期不可校验'); return; }
   // Reset
   state.validation.data = [];
   state.validation.filtered = [];
@@ -593,6 +1395,7 @@ function startValidation(){
       document.getElementById('detailPanel').classList.add('open');
       applyFilters();
       saveState();
+      autoSyncPeriodDates({ confirm: false });
       return;
     }
 
@@ -612,23 +1415,23 @@ function startValidation(){
           ['打卡记录']
         ]);
         const suppFile = findFile([
-          ['补签日期', '补签事由'],
+          ['标题', '补签日期', '补签事由'],
           ['补签管理']
         ]);
         const leaveFile = findFile([
-          ['休假类型', '销假'],
+          ['标题', '休假类型', '审批状态'],
           ['休假流程']
         ]);
         const busFile = findFile([
-          ['公出时长', '公出事由'],
+          ['标题', '公出事由', '审批状态'],
           ['公出管理']
         ]);
         const tripFile = findFile([
-          ['出差时长', '出差事由'],
+          ['标题', '出差事由', '审批状态'],
           ['出差管理']
         ]);
         const homeFile = findFile([
-          ['居家办公'],
+          ['标题', '事由', '审批状态'],
           ['导出居家办公']
         ]);
 
@@ -742,8 +1545,12 @@ function startValidation(){
           b.rows.forEach(r=>{
             const eid = cv(r,['工号','emp_id']).trim();
             if(!eid) return;
+            const start = cv(r,['开始时间','start','开始日期']);
+            const reason = cv(r,['公出事由','事由','说明','reason']);
+            const status = cv(r,['审批状态','status']);
+            if(!hasProcessFieldValue(start) && !hasProcessFieldValue(reason) && !hasProcessFieldValue(status)) return;
             if(!busByEmp[eid]) busByEmp[eid]=[];
-            busByEmp[eid].push({start: cv(r,['开始时间','start']), status: cv(r,['审批状态','status'])});
+            busByEmp[eid].push({start, reason, status});
           });
         }
 
@@ -753,8 +1560,12 @@ function startValidation(){
           t.rows.forEach(r=>{
             const eid = cv(r,['工号','emp_id']).trim();
             if(!eid) return;
+            const start = cv(r,['开始时间','start','开始日期']);
+            const reason = cv(r,['出差事由','事由','说明','reason']);
+            const status = cv(r,['审批状态','status']);
+            if(!hasProcessFieldValue(start) && !hasProcessFieldValue(reason) && !hasProcessFieldValue(status)) return;
             if(!tripByEmp[eid]) tripByEmp[eid]=[];
-            tripByEmp[eid].push({start: cv(r,['开始时间','start']), status: cv(r,['审批状态','status'])});
+            tripByEmp[eid].push({start, reason, status});
           });
         }
 
@@ -764,8 +1575,13 @@ function startValidation(){
           h.rows.forEach(r=>{
             const eid = cv(r,['工号','emp_id']).trim();
             if(!eid) return;
+            const start = cv(r,['开始时间','start','开始日期','居家办公时间段开始1（完成）','居家办公时间段开始1']);
+            const end = cv(r,['结束时间','end','结束日期','居家办公时间段结束1（完成）','居家办公时间段结束1']);
+            const reason = cv(r,['居家办公','事由','说明','reason','备注']);
+            const status = cv(r,['审批状态','status']);
+            if(!hasProcessFieldValue(start) && !hasProcessFieldValue(end) && !hasProcessFieldValue(reason) && !hasProcessFieldValue(status)) return;
             if(!homeByEmp[eid]) homeByEmp[eid]=[];
-            homeByEmp[eid].push({start: cv(r,['开始时间','start']), status: cv(r,['审批状态','status'])});
+            homeByEmp[eid].push({start, end, reason, status});
           });
         }
 
@@ -875,11 +1691,11 @@ function startValidation(){
         // ---- R7 居家办公审批中 ----
         Object.entries(signEmp).forEach(([eid, s])=>{
           (homeByEmp[eid]||[]).forEach(h=>{
-            if(h.status.includes('审批中')&&s.home_off===0){
-              results.push({rule:'R7', emp_id:eid, level:'warning',
-                message:'居家办公审批',
-                detail:'考勤日期: '+h.start.slice(0,10)+'（居家办公审批中但签字报表居家时长=0h，REG='+s.reg.toFixed(1)+'h）'});
-            }
+            if(!h.status || !h.status.includes('审批中') || s.home_off!==0) return;
+            const ds = (h.start || h.end || '').slice(0,10) || '未知日期';
+            results.push({rule:'R7', emp_id:eid, level:'warning',
+              message:'居家办公审批',
+              detail:'考勤日期: '+ds+'（居家办公审批中但签字报表居家时长=0h，REG='+s.reg.toFixed(1)+'h）'});
           });
         });
 
@@ -888,6 +1704,15 @@ function startValidation(){
         state._punchByEmp = punchByEmp; state._suppByEmp = suppByEmp;
         state._leaveByEmp = leaveByEmp; state._busByEmp = busByEmp; state._tripByEmp = tripByEmp;
         state._homeByEmp = homeByEmp;
+
+        // 缓存引擎数据，刷新后生成确认名单仍可用（若 Excel 未保留则需重新校验）
+        state._signEmp = signEmp;
+        state._signRows = signRows;
+        state._punchByEmp = punchByEmp;
+        state._suppByEmp = suppByEmp;
+        state._leaveByEmp = leaveByEmp;
+        state._busByEmp = busByEmp;
+        state._tripByEmp = tripByEmp;
 
         // Enrich results with employee info + signing report raw data
         const signReportFields = ['考勤日期','姓名','工号','三级部门','四级部门','五级部门',
@@ -908,8 +1733,9 @@ function startValidation(){
               let match = null;
               // Match by emp_id + date from signRows
               if(signRows[r.emp_id] && signRows[r.emp_id].length){
-                // Find the row matching the target date
-                const matchedRow = signRows[r.emp_id].find(sr => targetDate && sr.date === targetDate);
+                const matchedRow = signRows[r.emp_id].find(function(sr){
+                  return targetDate && normalizeDateStr(sr.date) === normalizeDateStr(targetDate);
+                });
                 if(matchedRow) match = matchedRow._rawRow;
               }
               if(!match){
@@ -951,129 +1777,247 @@ function startValidation(){
 }
 
 // ========== VALIDATION RENDERING ==========
+function getFilteredValidationData(){
+  if(!state.validation.filters) state.validation.filters = { level:'', rule:'' };
+  var levelEl = document.getElementById('levelFilter');
+  var ruleEl = document.getElementById('ruleFilter');
+  var searchEl = document.getElementById('searchInput');
+  var level = (levelEl && levelEl.value) || state.validation.filters.level || '';
+  var rule = (ruleEl && ruleEl.value) || state.validation.filters.rule || '';
+  var search = (searchEl && searchEl.value || '').toLowerCase();
+  state.validation.filters.level = level;
+  state.validation.filters.rule = rule;
+  return (state.validation.data || []).filter(function(r){
+    if(level && r.level !== level) return false;
+    if(rule && r.rule !== rule) return false;
+    if(search){
+      var hay = ((r.emp_id || '') + ' ' + (r.name || '')).toLowerCase();
+      if(hay.indexOf(search) < 0) return false;
+    }
+    return true;
+  });
+}
+
 function applyFilters(){
-  const rule=document.getElementById('ruleFilter').value;
-  const search=document.getElementById('searchInput').value.toLowerCase();
-  let data=state.validation.data;
-  if(rule) data=data.filter(r=>r.level===rule);
-  if(search) data=data.filter(r=>
-    (r.emp_id||'').toLowerCase().includes(search)||
-    (r.name||'').toLowerCase().includes(search)
-  );
-  state.validation.filtered=data;
-  state.validation.page=1;
+  state.validation.filtered = getFilteredValidationData();
+  state.validation.page = 1;
+  renderValidationDashboard();
+}
+
+function renderValidationDashboard(){
   renderStats();
-  renderTable();
   renderRuleBars();
-  document.getElementById('filterBarV').style.display='flex';
-  document.getElementById('tableWrapV').style.display='block';
+  renderTable();
+  updateValChips();
+  updateOverviewSummary();
+  updateTabBadges();
+  updateStepper();
+  document.getElementById('filterBarV').style.display = 'flex';
+  document.getElementById('tableWrapV').style.display = 'block';
+  var vvt = document.getElementById('valViewToggle');
+  if(vvt) vvt.style.display = 'flex';
+  var vsr = document.getElementById('valStatsRow');
+  if(vsr) vsr.style.display = 'flex';
+}
+
+function updateOverviewSummary(){
+  var d = state.validation.filtered || [];
+  var w = d.filter(function(r){ return r.level === 'warning'; }).length;
+  var e = d.filter(function(r){ return r.level === 'error'; }).length;
+  var uniq = new Set(d.map(function(r){ return r.emp_id; })).size;
+  var el = document.getElementById('overviewSummary');
+  if(el) el.textContent = '需关注 ' + w + ' · 需处理 ' + e + ' · 涉及 ' + uniq + ' 人';
+  var ds = document.getElementById('detailSummary');
+  if(ds) ds.textContent = '显示 ' + d.length + ' / ' + (state.validation.data || []).length + ' 条';
+}
+
+function filterValCard(el, filter){
+  document.querySelectorAll('#statsV .stat-mini').forEach(function(c){ c.classList.remove('active'); });
+  if(filter === 'level:warning'){
+    state.validation.filters.level = state.validation.filters.level === 'warning' ? '' : 'warning';
+    state.validation.filters.rule = '';
+    document.getElementById('levelFilter').value = state.validation.filters.level;
+    document.getElementById('ruleFilter').value = '';
+    if(state.validation.filters.level && el) el.classList.add('active');
+  } else if(filter === 'level:error'){
+    state.validation.filters.level = state.validation.filters.level === 'error' ? '' : 'error';
+    state.validation.filters.rule = '';
+    document.getElementById('levelFilter').value = state.validation.filters.level;
+    document.getElementById('ruleFilter').value = '';
+    if(state.validation.filters.level && el) el.classList.add('active');
+  } else {
+    state.validation.filters.level = '';
+    state.validation.filters.rule = '';
+    document.getElementById('levelFilter').value = '';
+    document.getElementById('ruleFilter').value = '';
+  }
+  state.validation.page = 1;
+  state.validation.filtered = getFilteredValidationData();
+  renderValidationDashboard();
+}
+
+function filterRule(rule){
+  state.validation.filters.rule = state.validation.filters.rule === rule ? '' : rule;
+  document.getElementById('ruleFilter').value = state.validation.filters.rule;
+  state.validation.page = 1;
+  state.validation.filtered = getFilteredValidationData();
+  renderValidationDashboard();
+}
+
+function updateValChips(){
+  var chips = [];
+  if(state.validation.filters && state.validation.filters.level){
+    chips.push({ k:'level', l: state.validation.filters.level === 'error' ? '需处理' : '需关注' });
+  }
+  if(state.validation.filters && state.validation.filters.rule){
+    chips.push({ k:'rule', l: state.validation.filters.rule });
+  }
+  var q = document.getElementById('searchInput');
+  if(q && q.value) chips.push({ k:'q', l:'"' + q.value + '"' });
+  var el = document.getElementById('valChips');
+  if(!el) return;
+  el.innerHTML = chips.length ? chips.map(function(c){
+    return '<span class="chip">' + esc(c.l) + '<button onclick="clearValChip(\'' + c.k + '\')">×</button></span>';
+  }).join('') : '';
+}
+
+function clearValChip(k){
+  if(k === 'level'){ state.validation.filters.level = ''; document.getElementById('levelFilter').value = ''; }
+  if(k === 'rule'){ state.validation.filters.rule = ''; document.getElementById('ruleFilter').value = ''; }
+  if(k === 'q') document.getElementById('searchInput').value = '';
+  document.querySelectorAll('#statsV .stat-mini').forEach(function(c){ c.classList.remove('active'); });
+  state.validation.page = 1;
+  state.validation.filtered = getFilteredValidationData();
+  renderValidationDashboard();
+}
+
+function setValView(v){
+  state.validation.view = v;
+  state.validation.page = 1;
+  document.getElementById('viewRowBtn').classList.toggle('active', v === 'row');
+  document.getElementById('viewEmpBtn').classList.toggle('active', v === 'emp');
+  renderTable();
 }
 
 function renderStats(){
-  const d=state.validation.filtered;
-  const uniq=new Set(d.map(r=>r.emp_id));
-  document.getElementById('statsV').innerHTML=
-    '<div class="stat-card orange"><div class="num">'+d.filter(r=>r.level==='warning').length+'</div><div class="label">Warning</div><div class="sub">需关注</div></div>'+
-    '<div class="stat-card red"><div class="num">'+d.filter(r=>r.level==='error').length+'</div><div class="label">Error</div><div class="sub">需处理</div></div>'+
-    '<div class="stat-card blue"><div class="num">'+uniq.size+'</div><div class="label">异常员工数</div><div class="sub">去重</div></div>'+
-    '<div class="stat-card"><div class="num">'+d.length+'</div><div class="label">明细记录数</div><div class="sub">总行数</div></div>';
-  document.getElementById('statsV').style.display='grid';
-
-  // Render rule reference table
-  const RULE_DEFS = [
-    {rule:'R1.1', risk:'warning', desc:'周末考勤 — 周末有打卡但休假/年假未涵盖'},
-    {rule:'R1.2', risk:'warning', desc:'打卡重卡 — 同一人同一日打卡间隔<10分钟'},
-    {rule:'R3', risk:'warning', desc:'加班偏差 — 签字报表OT与系统估算偏差超过5%'},
-    {rule:'R4', risk:'warning', desc:'补签审批 — 补签申请尚未审批完成'},
-    {rule:'R5', risk:'error', desc:'REG归零 — 计薪出勤=0但存在打卡记录'},
-    {rule:'R6', risk:'warning', desc:'公出/出差审批 — 公出/出差审批中但REG=0'},
-    {rule:'R7', risk:'warning', desc:'居家办公审批 — 居家办公审批中但签字报表未体现'},
-  ];
-  const rdiv = document.getElementById('ruleDetailV');
-  rdiv.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'+
-    '<h3 style="font-size:14px;margin:0;color:#333">规则说明</h3>'+
-    '<button class="btn btn-sm" onclick="showAllRules()" style="font-size:12px">📋 查看全部规则</button></div>'+
-    '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="background:#f5f5f5">'+
-    '<th style="padding:6px 8px;text-align:left;border:1px solid #ddd">规则</th>'+
-    '<th style="padding:6px 8px;text-align:left;border:1px solid #ddd">风险</th>'+
-    '<th style="padding:6px 8px;text-align:left;border:1px solid #ddd">说明</th></tr></thead><tbody>'+
-    RULE_DEFS.map(d =>
-      '<tr><td style="padding:5px 8px;border:1px solid #ddd;font-weight:600">'+esc(d.rule)+'</td>'+
-      '<td style="padding:5px 8px;border:1px solid #ddd"><span class="'+(d.risk==='error'?'badge badge-error':'badge badge-warning')+'">'+esc(d.risk)+'</span></td>'+
-      '<td style="padding:5px 8px;border:1px solid #ddd;color:#666">'+esc(d.desc)+'</td></tr>'
-    ).join('')+'</tbody></table>';
+  var d = state.validation.filtered || [];
+  var uniq = new Set(d.map(function(r){ return r.emp_id; }));
+  var w = d.filter(function(r){ return r.level === 'warning'; }).length;
+  var e = d.filter(function(r){ return r.level === 'error'; }).length;
+  var actW = state.validation.filters && state.validation.filters.level === 'warning' ? ' active' : '';
+  var actE = state.validation.filters && state.validation.filters.level === 'error' ? ' active' : '';
+  document.getElementById('statsV').innerHTML =
+    '<div class="stat-mini orange' + actW + '" onclick="filterValCard(this,\'level:warning\')"><div class="num">' + w + '</div><div class="label">需关注</div></div>' +
+    '<div class="stat-mini red' + actE + '" onclick="filterValCard(this,\'level:error\')"><div class="num">' + e + '</div><div class="label">需处理</div></div>' +
+    '<div class="stat-mini blue" onclick="filterValCard(this,\'all\')"><div class="num">' + uniq.size + '</div><div class="label">涉及员工</div></div>' +
+    '<div class="stat-mini gray" onclick="filterValCard(this,\'all\')"><div class="num">' + d.length + '</div><div class="label">明细条数</div></div>';
 }
 
 function renderRuleBars(){
-  const d=state.validation.filtered;
-  const grp={};
-  d.forEach(r=>{
-    const key = r.rule || (r.detail||r.message||'').match(/^(R\d+\.?\d*)/)?.[1] || '其他';
-    grp[key]=(grp[key]||0)+1;
+  var d = state.validation.filtered || [];
+  var grp = {};
+  d.forEach(function(r){
+    var key = r.rule || (r.detail || r.message || '').match(/^(R\d+\.?\d*)/)?.[1] || '其他';
+    grp[key] = (grp[key] || 0) + 1;
   });
-  const el=document.getElementById('ruleBarsV');
-  el.innerHTML='<h3 style="font-size:14px;margin:0 0 8px;color:#333">按规则分布</h3>'+
-    '<div id="ruleBars"></div>';
-  const rb=document.getElementById('ruleBars');
-  const max=Math.max(...Object.values(grp),1);
-  Object.entries(grp).sort((a,b)=>b[1]-a[1]).forEach(([rule,cnt])=>{
-    const row=document.createElement('div');row.className='bar-row';
-    const pct=cnt/max*100;
-    row.innerHTML='<span class="bar-label">'+esc(rule)+'</span><div style="flex:1;background:#f0f0f0;border-radius:3px"><div class="bar-fill" style="width:'+pct+'%;background:'+(COLORS[rule]||'#0E66FB')+'"></div></div><span class="bar-num">'+cnt+'条</span>';
-    rb.appendChild(row);
-  });
+  var el = document.getElementById('ruleBarsV');
+  var max = Math.max.apply(null, Object.values(grp).concat([1]));
+  var actRule = state.validation.filters ? state.validation.filters.rule : '';
+  el.innerHTML = Object.entries(grp).sort(function(a,b){ return b[1]-a[1]; }).map(function(entry){
+    var rule = entry[0], cnt = entry[1];
+    var pct = cnt / max * 100;
+    var act = actRule === rule ? ' active' : '';
+    return '<div class="bar-row' + act + '" onclick="filterRule(\'' + esc(rule).replace(/'/g, "\\'") + '\')">' +
+      '<span class="bar-label">' + esc(rule) + '</span>' +
+      '<div class="bar-track"><div class="bar-fill" style="width:' + pct + '%;background:' + (COLORS[rule] || '#0E66FB') + '"></div></div>' +
+      '<span class="bar-num">' + cnt + '条</span></div>';
+  }).join('');
 }
 
 function renderTable(){
-  const d=state.validation.filtered;
-  const ps=parseInt(document.getElementById('pageSize').value);
-  state.validation.pageSize=ps;
-  const total=Math.ceil(d.length/ps)||1;
-  const p=Math.min(state.validation.page,total);
-  const start=(p-1)*ps;
-  const page=d.slice(start,start+ps);
-  const tbody=document.getElementById('tbodyV');
-  tbody.innerHTML='';
-  page.forEach(r=>{
-    const tr=document.createElement('tr');
-    const badgeClass = r.level==='error'?'badge badge-error':'badge badge-warning';
-    const dept = [r.dept3||'',r.dept4||'',r.dept5||''].filter(Boolean).join(' / ');
-    const detail = (r.detail||r.message||'');
-    // Build raw data snippet from signing report
-    let rawHtml = '';
-    if(r.rawData){
-      const rd = r.rawData;
-      const parts = [];
-      const keyOrder = ['考勤日期','姓名','工号','三级部门','四级部门','五级部门',
-        '计薪出勤时长合计(REG)','REG','OT1.5合计','OT1.5','OT2.0合计','OT2.0',
-        '每日总工时','居家办公合计','公出合计','出差合计','年假合计','病假合计','事假合计'];
-      keyOrder.forEach(k => {
-        if(rd[k] !== undefined && rd[k] !== '') parts.push(k+': '+rd[k]);
-      });
-      if(parts.length) rawHtml = '<div style="font-size:11px;background:#f8f9fa;padding:5px 8px;border-radius:3px;margin-bottom:3px;color:#555;line-height:1.6">📄 签字报表：<br>'+parts.join(' | ')+'</div>';
-    }
-    tr.innerHTML='<td>'+esc(r.emp_id)+'</td>'+
-      '<td>'+esc(r.name||'')+'</td>'+
-      '<td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(dept)+'">'+esc(dept)+'</td>'+
-      '<td>'+esc(r.date||'')+'</td>'+
-      '<td><span class="'+badgeClass+'" style="margin-right:4px">'+esc(r.rule||'')+'</span><span style="font-size:11px;color:'+(r.level==='error'?'#D9001B':'#E67E00')+'">'+esc(r.message||'')+'</span></td>'+
-      '<td style="max-width:300px;overflow:hidden" title="'+esc(detail)+'">'+
-        rawHtml+'<span style="font-size:12px;color:#D9001B">⚠ '+esc(detail.substring(0,120))+'</span></td>';
+  var d = state.validation.filtered || [];
+  var ps = parseInt(document.getElementById('pageSize').value, 10) || 20;
+  state.validation.pageSize = ps;
+
+  if(state.validation.view === 'emp'){
+    var map = {};
+    d.forEach(function(r){
+      if(!map[r.emp_id]) map[r.emp_id] = { emp_id: r.emp_id, name: r.name, dept3: r.dept3, dept4: r.dept4, dept5: r.dept5, count: 0, rules: {}, hasError: false };
+      map[r.emp_id].count++;
+      if(r.rule) map[r.emp_id].rules[r.rule] = 1;
+      if(r.level === 'error') map[r.emp_id].hasError = true;
+    });
+    var rows = Object.values(map);
+    var total = Math.ceil(rows.length / ps) || 1;
+    var p = Math.min(state.validation.page, total);
+    var start = (p - 1) * ps;
+    var page = rows.slice(start, start + ps);
+    document.getElementById('valThead').innerHTML = '<tr><th>工号</th><th>员工</th><th>部门</th><th>异常数</th><th>规则</th><th>最高级别</th></tr>';
+    document.getElementById('tbodyV').innerHTML = page.map(function(r){
+      var dept = [r.dept3, r.dept4, r.dept5].filter(Boolean).join(' / ');
+      var rules = Object.keys(r.rules).join(', ');
+      return '<tr style="cursor:pointer" onclick="openDrawer(\'' + esc(r.emp_id) + '\')">' +
+        '<td><strong>' + esc(r.emp_id) + '</strong></td><td>' + esc(r.name) + '</td><td>' + esc(dept) + '</td>' +
+        '<td><span class="badge badge-warning">' + r.count + ' 条</span></td>' +
+        '<td>' + esc(rules) + '</td>' +
+        '<td><span class="badge ' + (r.hasError ? 'badge-error' : 'badge-warning') + '">' + (r.hasError ? '需处理' : '需关注') + '</span></td></tr>';
+    }).join('') || '<tr><td colspan="6" class="empty">无匹配数据</td></tr>';
+    var end = Math.min(start + ps, rows.length);
+    document.getElementById('tableInfo').textContent = '共 ' + rows.length + ' 人，显示 ' + (rows.length ? (start + 1) : 0) + '-' + end;
+    document.getElementById('pageInfo').textContent = p + '/' + total;
+    document.getElementById('prevBtn').disabled = p <= 1;
+    document.getElementById('nextBtn').disabled = p >= total;
+    updateOverviewSummary();
+    return;
+  }
+
+  document.getElementById('valThead').innerHTML = '<tr><th>工号</th><th>员工</th><th>部门</th><th>考勤日期</th><th>规则</th><th>级别</th><th>说明</th><th style="text-align:center">操作</th></tr>';
+  var totalPages = Math.ceil(d.length / ps) || 1;
+  var p2 = Math.min(state.validation.page, totalPages);
+  var start2 = (p2 - 1) * ps;
+  var page2 = d.slice(start2, start2 + ps);
+  var tbody = document.getElementById('tbodyV');
+  tbody.innerHTML = '';
+  page2.forEach(function(r){
+    var badgeClass = r.level === 'error' ? 'badge badge-error' : 'badge badge-warning';
+    var dept = [r.dept3 || '', r.dept4 || '', r.dept5 || ''].filter(Boolean).join(' / ');
+    var detail = (r.detail || r.message || '');
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td>' + esc(r.emp_id) + '</td>' +
+      '<td>' + esc(r.name || '') + '</td>' +
+      '<td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + esc(dept) + '">' + esc(dept) + '</td>' +
+      '<td>' + esc(r.date || '') + '</td>' +
+      '<td><span class="badge badge-info">' + esc(r.rule || '') + '</span></td>' +
+      '<td><span class="' + badgeClass + '">' + (r.level === 'error' ? '需处理' : '需关注') + '</span></td>' +
+      '<td style="max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + esc(detail) + '">' + esc(detail) + '</td>' +
+      '<td style="text-align:center;white-space:nowrap">' +
+        '<button class="btn btn-sm" onclick="openSigningRaw(\'' + esc(r.emp_id) + '\',\'' + esc(r.date || '') + '\',\'' + esc(r.rule || '') + '\')">查看</button>' +
+      '</td>';
     tbody.appendChild(tr);
   });
-  if(!page.length) tbody.innerHTML='<tr><td colspan="6" class="empty">无匹配数据</td></tr>';
-  const end = Math.min(start+ps, d.length);
-  document.getElementById('tableInfo').textContent='共 '+d.length+' 条，显示 '+(d.length?(start+1):0)+'-'+end;
-  document.getElementById('pageInfo').textContent=p+'/'+total;
-  document.getElementById('prevBtn').disabled=p<=1;
-  document.getElementById('nextBtn').disabled=p>=total;
+  if(!page2.length) tbody.innerHTML = '<tr><td colspan="8" class="empty">无匹配数据</td></tr>';
+  var end2 = Math.min(start2 + ps, d.length);
+  document.getElementById('tableInfo').textContent = '共 ' + d.length + ' 条，显示 ' + (d.length ? (start2 + 1) : 0) + '-' + end2;
+  document.getElementById('pageInfo').textContent = p2 + '/' + totalPages;
+  document.getElementById('prevBtn').disabled = p2 <= 1;
+  document.getElementById('nextBtn').disabled = p2 >= totalPages;
+  updateOverviewSummary();
 }
-function prevPage(){if(state.validation.page>1){state.validation.page--;renderTable()}}
-function nextPage(){const t=Math.ceil(state.validation.filtered.length/state.validation.pageSize)||1;if(state.validation.page<t){state.validation.page++;renderTable()}}
 
-document.getElementById('ruleFilter').addEventListener('change',applyFilters);
-document.getElementById('searchInput').addEventListener('input',applyFilters);
-document.getElementById('pageSize').addEventListener('change',renderTable);
+function prevPage(){ if(state.validation.page > 1){ state.validation.page--; renderTable(); } }
+function nextPage(){
+  var ps = state.validation.pageSize || 20;
+  var d = state.validation.filtered || [];
+  var total = state.validation.view === 'emp'
+    ? Math.ceil(Object.keys(d.reduce(function(m,r){ m[r.emp_id]=1; return m; }, {})).length / ps) || 1
+    : Math.ceil(d.length / ps) || 1;
+  if(state.validation.page < total){ state.validation.page++; renderTable(); }
+}
+
+document.getElementById('levelFilter').addEventListener('change', applyFilters);
+document.getElementById('ruleFilter').addEventListener('change', applyFilters);
+document.getElementById('searchInput').addEventListener('input', applyFilters);
+document.getElementById('pageSize').addEventListener('change', function(){ state.validation.page = 1; renderTable(); });
 
 // ========== EXPORT CSV ==========
 function exportCSV(){
@@ -1152,39 +2096,68 @@ function showAllRules(){
 }
 
 // ========== CONFIRMATION ==========
+function normalizeConfirmStatus(status){
+  if(status === '无异常') return '待确认';
+  if(status === '已确认' || status === '有异议' || status === '待确认') return status;
+  return '待确认';
+}
+function getConfirmationFilter(){
+  if(!state.confirmation.filter) state.confirmation.filter = { q:'', dept:'', status:'' };
+  return state.confirmation.filter;
+}
+function getFilteredConfirmationRows(){
+  const f = getConfirmationFilter();
+  const q = (f.q || '').trim().toLowerCase();
+  return (state.confirmation.rows || []).filter(function(r){
+    const status = normalizeConfirmStatus(r.status);
+    if(f.status && status !== f.status) return false;
+    if(f.dept && getDeptGroupKey(r) !== f.dept) return false;
+    if(q){
+      const hay = ((r.emp_id || '') + ' ' + (r.name || '')).toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  });
+}
+function updateConfirmFilterDeptOptions(){
+  const sel = document.getElementById('confirmDeptFilter');
+  if(!sel) return;
+  const current = sel.value;
+  const depts = [...new Set((state.confirmation.rows || []).map(function(r){ return getDeptGroupKey(r); }))].sort();
+  sel.innerHTML = '<option value="">全部部门</option>' + depts.map(function(d){
+    return '<option value="'+esc(d)+'">'+esc(d)+'</option>';
+  }).join('');
+  if(depts.indexOf(current) >= 0) sel.value = current;
+}
+function onConfirmFilterChange(){
+  const f = getConfirmationFilter();
+  const qEl = document.getElementById('confirmSearchInput');
+  const dEl = document.getElementById('confirmDeptFilter');
+  const sEl = document.getElementById('confirmStatusFilter');
+  if(qEl) f.q = qEl.value;
+  if(dEl) f.dept = dEl.value;
+  if(sEl) f.status = sEl.value;
+  state.confirmation.page = 1;
+  renderConfirmation();
+}
 function buildConfirmationList(){
+  if(!requirePeriod('生成确认名单')) return;
+  if(isPeriodReadonly()){ /* 只读仍允许查看已有名单 */ }
   if(!state.validation.validated){
     alert('请先在「数据校验」面板上传文件并点击「开始校验」');
     return;
   }
 
-  // 从签字报表获取全部员工（无校验异常时也应能发确认）
   const signEmp = state._signEmp || {};
   if(!Object.keys(signEmp).length){
     alert('签字报表无员工数据，请确认已上传美区签字报表并完成校验');
     return;
   }
-  const allEmps = Object.keys(signEmp);
 
-  // 从校验结果统计异常
-  const anomalyMap = {};
-  state.validation.data.forEach(r => {
-    const key = r.emp_id;
-    if(!key) return;
-    if(!anomalyMap[key]){
-      anomalyMap[key] = { count: 0, rules: [], errors: [] };
-    }
-    anomalyMap[key].count++;
-    anomalyMap[key].rules.push(r.rule || '未知');
-    anomalyMap[key].errors.push(r.message || r.detail || '');
-  });
-
-  // 合并：所有签字报表员工 + 有异常但不在签字报表中的员工（兜底）
-  const empMap = {};
-  allEmps.forEach(eid => {
+  // 确认名单：签字报表全员，初始均为「待确认」，不携带校验异常
+  var newRows = Object.keys(signEmp).map(function(eid){
     const emp = signEmp[eid];
-    const a = anomalyMap[eid];
-    empMap[eid] = {
+    return {
       emp_id: eid,
       name: emp.name || '',
       dept3: emp.dept3 || '',
@@ -1195,10 +2168,7 @@ function buildConfirmationList(){
       ot20: emp.ot20 || 0,
       home_off: emp.home_off || 0,
       days: emp.days || [],
-      count: a ? a.count : 0,
-      status: a ? '待确认' : '无异常',
-      rules: a ? a.rules : [],
-      errors: a ? a.errors : [],
+      status: '待确认',
       dailyRows: (state._signRows && state._signRows[eid]) ? state._signRows[eid].slice(0, 31) : [],
       punches: (state._punchByEmp && state._punchByEmp[eid]) ? state._punchByEmp[eid].slice(0, 62) : [],
       supps: (state._suppByEmp && state._suppByEmp[eid]) ? state._suppByEmp[eid] : [],
@@ -1206,78 +2176,260 @@ function buildConfirmationList(){
       buses: (state._busByEmp && state._busByEmp[eid]) ? state._busByEmp[eid] : [],
       trips: (state._tripByEmp && state._tripByEmp[eid]) ? state._tripByEmp[eid] : [],
       homes: (state._homeByEmp && state._homeByEmp[eid]) ? state._homeByEmp[eid] : [],
-      _selected: true, // default checked
-      _sendStatus: 'pending' // 'pending' | 'ok' | 'fail' | 'sending'
+      replies: [],
+      reply_count: 0,
+      _selected: true,
+      _sendStatus: 'pending'
     };
-    delete anomalyMap[eid]; // remove handled
   });
-  // 添加有异常但不在签字报表中的（兜底）
-  Object.entries(anomalyMap).forEach(([eid, a]) => {
-    if(!empMap[eid] && eid){
-      empMap[eid] = {
-        emp_id: eid,
-        name: '',
-        dept3: '', dept4: '', dept5: '',
-        count: a.count,
-        status: '待确认',
-        rules: a.rules,
-        errors: a.errors
-      };
-    }
-  });
-
-  state.confirmation.rows = Object.values(empMap);
+  applySendDiffMarkers(newRows);
+  state.confirmation.rows = newRows;
   state.confirmation.loaded = true;
+  getConfirmationFilter().q = '';
+  getConfirmationFilter().dept = '';
+  getConfirmationFilter().status = '';
   renderConfirmation();
+}
+
+function filterConfirmByStatus(status){
+  var f = getConfirmationFilter();
+  f.status = f.status === status ? '' : status;
+  document.getElementById('confirmStatusFilter').value = f.status;
+  state.confirmation.page = 1;
+  renderConfirmation();
+}
+
+function filterConfirmStat(el, status){
+  document.querySelectorAll('#statsC .stat-mini').forEach(function(c){ c.classList.remove('active'); });
+  var f = getConfirmationFilter();
+  if(status === ''){
+    f.status = '';
+  } else {
+    f.status = f.status === status ? '' : status;
+    if(f.status && el) el.classList.add('active');
+  }
+  document.getElementById('confirmStatusFilter').value = f.status;
+  state.confirmation.page = 1;
+  renderConfirmation();
+}
+
+function filterDeptBar(dept){
+  var f = getConfirmationFilter();
+  f.dept = f.dept === dept ? '' : dept;
+  document.getElementById('confirmDeptFilter').value = f.dept;
+  state.confirmation.page = 1;
+  renderConfirmation();
+}
+
+function renderDeptBars(){
+  var depts = {};
+  (state.confirmation.rows || []).forEach(function(r){
+    var k = getDeptGroupKey(r);
+    if(!depts[k]) depts[k] = { ok: 0, pending: 0, obj: 0, total: 0 };
+    depts[k].total++;
+    var st = normalizeConfirmStatus(r.status);
+    if(st === '已确认') depts[k].ok++;
+    else if(st === '有异议') depts[k].obj++;
+    else depts[k].pending++;
+  });
+  var f = getConfirmationFilter();
+  var el = document.getElementById('deptBars');
+  if(!el) return;
+  el.innerHTML = Object.entries(depts).sort(function(a,b){ return b[1].total - a[1].total; }).map(function(entry){
+    var d = entry[0], s = entry[1];
+    var act = f.dept === d ? ' active' : '';
+    var t = s.total || 1;
+    var safe = esc(d).replace(/'/g, "\\'");
+    return '<div class="dept-bar-row' + act + '" onclick="filterDeptBar(\'' + safe + '\')" title="' + esc(d) + '">' +
+      '<span class="dept-bar-name">' + esc(d) + '</span>' +
+      '<div class="dept-bar-stack">' +
+        '<div class="s seg-ok" style="width:' + (s.ok/t*100) + '%"></div>' +
+        '<div class="s seg-pending" style="width:' + (s.pending/t*100) + '%"></div>' +
+        '<div class="s seg-obj" style="width:' + (s.obj/t*100) + '%"></div>' +
+      '</div>' +
+      '<span class="dept-bar-num">' + s.ok + '/' + s.pending + '/' + s.obj + '</span></div>';
+  }).join('');
+}
+
+function updateConfirmChips(){
+  var f = getConfirmationFilter();
+  var chips = [];
+  if(f.status) chips.push({ k:'status', l: f.status });
+  if(f.dept) chips.push({ k:'dept', l: f.dept });
+  if(f.q) chips.push({ k:'q', l:'"' + f.q + '"' });
+  var el = document.getElementById('confirmChips');
+  if(!el) return;
+  el.innerHTML = chips.length ? chips.map(function(c){
+    return '<span class="chip">' + esc(c.l) + '<button onclick="clearConfirmChip(\'' + c.k + '\')">×</button></span>';
+  }).join('') : '';
+}
+
+function clearConfirmChip(k){
+  var f = getConfirmationFilter();
+  if(k === 'status'){ f.status = ''; document.getElementById('confirmStatusFilter').value = ''; }
+  if(k === 'dept'){ f.dept = ''; document.getElementById('confirmDeptFilter').value = ''; }
+  if(k === 'q'){ f.q = ''; document.getElementById('confirmSearchInput').value = ''; }
+  document.querySelectorAll('#statsC .stat-mini').forEach(function(c){ c.classList.remove('active'); });
+  state.confirmation.page = 1;
+  renderConfirmation();
+}
+
+function confirmPage(d){
+  state.confirmation.page = Math.max(1, (state.confirmation.page || 1) + d);
+  renderConfirmation();
+}
+
+function openDrawer(eid){
+  var emp = (state.confirmation.rows || []).find(function(r){ return r.emp_id === eid; });
+  var errs = (state.validation.data || []).filter(function(r){ return r.emp_id === eid; });
+  if(!emp && !errs.length){ showSyncToast('未找到员工 ' + eid, false); return; }
+  var name = emp ? emp.name : (errs[0] && errs[0].name) || eid;
+  var dept = emp ? [emp.dept3, emp.dept4, emp.dept5].filter(Boolean).join(' / ') : '';
+  var status = emp ? normalizeConfirmStatus(emp.status) : '—';
+  document.getElementById('drawerTitle').textContent = name + ' · ' + eid;
+  var errHtml = errs.slice(0, 5).map(function(v){
+    return '<div style="font-size:12px;padding:8px;background:#f8f9fa;border-radius:6px;margin-top:6px">' + esc(v.rule) + ' · ' + esc(v.detail || v.message || '') + '</div>';
+  }).join('');
+  document.getElementById('drawerBody').innerHTML =
+    (dept ? '<p style="font-size:13px;color:#666;margin-bottom:12px">' + esc(dept) + '</p>' : '') +
+    (emp ? '<div style="margin-bottom:16px"><strong style="font-size:13px">确认状态</strong><div style="margin-top:6px"><span class="badge ' +
+      (status === '已确认' ? 'badge-success' : status === '有异议' ? 'badge-error' : 'badge-pending') + '">' + esc(status) + '</span></div></div>' : '') +
+    '<div style="margin-bottom:16px"><strong style="font-size:13px">校验异常 (' + errs.length + ')</strong>' +
+      (errHtml || '<div style="font-size:12px;color:#888;margin-top:6px">无异常</div>') + '</div>' +
+    '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
+      (emp && status === '待确认' ? '<button class="btn btn-sm btn-success" onclick="markConfirmed(\'' + esc(eid) + '\');closeDrawer()">标记已确认</button>' : '') +
+      (emp ? '<button class="btn btn-sm" onclick="showCardPreview(\'' + esc(eid) + '\')">卡片预览</button>' : '') +
+      (emp && (status === '有异议' || (emp.replies && emp.replies.length)) ? '<button class="btn btn-sm btn-warning" onclick="showObjectionDetail(\'' + esc(eid) + '\')">查看回复</button>' : '') +
+      '<button class="btn btn-sm" onclick="showEmpClock(\'' + esc(eid) + '\')">考勤记录</button>' +
+    '</div>';
+  document.getElementById('drawer').classList.add('open');
+}
+
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('open');
 }
 
 function renderConfirmation(){
   const rows = state.confirmation.rows;
   if(!rows.length){
-    document.getElementById('confirmTbody').innerHTML = '<tr><td colspan="8" class="empty">暂无数据</td></tr>';
+    document.getElementById('confirmTbody').innerHTML = '<tr><td colspan="7" class="empty">暂无数据</td></tr>';
+    document.getElementById('filterBarC').style.display = 'none';
+    var csp0 = document.getElementById('confirmStatsPanel');
+    if(csp0) csp0.style.display = 'none';
+    updateTabBadges();
+    updateStepper();
     return;
   }
 
+  if(!state.confirmation.page) state.confirmation.page = 1;
+  var pageSizeEl = document.getElementById('confirmPageSize');
+  var cps = pageSizeEl ? parseInt(pageSizeEl.value, 10) || 20 : 20;
+  state.confirmation.pageSize = cps;
+
+  updateConfirmFilterDeptOptions();
+  document.getElementById('filterBarC').style.display = 'flex';
+  const f = getConfirmationFilter();
+  const qEl = document.getElementById('confirmSearchInput');
+  const dEl = document.getElementById('confirmDeptFilter');
+  const sEl = document.getElementById('confirmStatusFilter');
+  if(qEl && document.activeElement !== qEl) qEl.value = f.q || '';
+  if(dEl && document.activeElement !== dEl) dEl.value = f.dept || '';
+  if(sEl && document.activeElement !== sEl) sEl.value = f.status || '';
+
   const total = rows.length;
-  const confirmed = rows.filter(r => r.status === '已确认').length;
-  const objection = rows.filter(r => r.status === '有异议').length;
-  const clean = rows.filter(r => r.status === '无异常').length;
-  const pending = total - confirmed - objection - clean;
+  const confirmed = rows.filter(function(r){ return normalizeConfirmStatus(r.status) === '已确认'; }).length;
+  const objection = rows.filter(function(r){ return normalizeConfirmStatus(r.status) === '有异议'; }).length;
+  const pending = total - confirmed - objection;
 
-  document.getElementById('totalEmp').textContent = total;
-  document.getElementById('confirmedCount').textContent = confirmed;
-  document.getElementById('pendingCount').textContent = pending;
-  document.getElementById('objectionCount').textContent = objection;
-  document.getElementById('cleanCount').textContent = clean;
-  document.getElementById('statsC').style.display = 'grid';
+  var actSt = f.status || '';
+  document.getElementById('statsC').innerHTML =
+    '<div class="stat-mini blue' + (actSt === '' ? ' active' : '') + '" onclick="filterConfirmStat(this,\'\')"><div class="num">' + total + '</div><div class="label">总人数</div></div>' +
+    '<div class="stat-mini green' + (actSt === '已确认' ? ' active' : '') + '" onclick="filterConfirmStat(this,\'已确认\')"><div class="num">' + confirmed + '</div><div class="label">已确认</div></div>' +
+    '<div class="stat-mini gray' + (actSt === '待确认' ? ' active' : '') + '" onclick="filterConfirmStat(this,\'待确认\')"><div class="num">' + pending + '</div><div class="label">待确认</div></div>' +
+    '<div class="stat-mini red' + (actSt === '有异议' ? ' active' : '') + '" onclick="filterConfirmStat(this,\'有异议\')"><div class="num">' + objection + '</div><div class="label">有异议</div></div>';
+  document.getElementById('confirmStatsPanel').style.display = 'flex';
 
-  document.getElementById('confirmBadge').innerHTML = '👥 共 <strong>'+total+'</strong> 人（签字报表总人数） · 待确认 <strong>'+pending+'</strong> 人 · 已确认 <strong>'+confirmed+'</strong> 人 · 有异议 <strong>'+objection+'</strong> 人 · 无异常 <strong>'+clean+'</strong> 人';
+  var pc = { ok: confirmed/total*100, pend: pending/total*100, obj: objection/total*100 };
+  document.getElementById('confirmStackBar').innerHTML =
+    '<div class="seg seg-ok" style="width:' + pc.ok + '%" onclick="filterConfirmStat(null,\'已确认\')" title="已确认"></div>' +
+    '<div class="seg seg-pending" style="width:' + pc.pend + '%" onclick="filterConfirmStat(null,\'待确认\')" title="待确认"></div>' +
+    '<div class="seg seg-obj" style="width:' + pc.obj + '%" onclick="filterConfirmStat(null,\'有异议\')" title="有异议"></div>';
+  document.getElementById('confirmLegend').innerHTML =
+    '<span onclick="filterConfirmStat(null,\'已确认\')"><i style="background:#12CC7E"></i>已确认 ' + confirmed + '</span>' +
+    '<span onclick="filterConfirmStat(null,\'待确认\')"><i style="background:#94a3b8"></i>待确认 ' + pending + '</span>' +
+    '<span onclick="filterConfirmStat(null,\'有异议\')"><i style="background:#D9001B"></i>有异议 ' + objection + '</span>';
+  renderDeptBars();
 
-  // progress bar
-  const pb = document.getElementById('progressBar');
-  const pc = [confirmed/total*100, pending/total*100, objection/total*100, clean/total*100];
-  pb.innerHTML = '<div class="seg success" style="width:'+pc[0]+'%"></div><div class="seg warning" style="width:'+pc[1]+'%"></div><div class="seg danger" style="width:'+pc[2]+'%"></div><div class="seg clean" style="width:'+pc[3]+'%"></div>';
-  document.getElementById('progressLabels').innerHTML =
-    '<span>&#9989; 已确认 '+confirmed+' ('+Math.round(pc[0])+'%)</span>'+
-    '<span>&#9203; 待确认 '+pending+' ('+Math.round(pc[1])+'%)</span>'+
-    '<span>&#9888;&#65039; 有异议 '+objection+' ('+Math.round(pc[2])+'%)</span>'+
-    '<span>&#9989; 无异常 '+clean+' ('+Math.round(pc[3])+'%)</span>';
-  document.getElementById('progressSection').style.display = 'block';
+  document.getElementById('confirmBadge').innerHTML =
+    '👥 共 <strong>' + total + '</strong> 人 · 待确认 <strong>' + pending + '</strong> · 已确认 <strong>' + confirmed + '</strong>';
 
-  // Update all-checked state and send count
+  var objStrip = document.getElementById('objectionStrip');
+  if(objStrip){
+    var latestObj = rows.filter(function(r){ return normalizeConfirmStatus(r.status) === '有异议'; })[0];
+    if(latestObj){
+      var preview = (latestObj.replies && latestObj.replies.length) ? (latestObj.replies[latestObj.replies.length-1].content || '').slice(0, 60) : '点击查看有异议员工';
+      objStrip.style.display = 'block';
+      objStrip.innerHTML = '<div class="title">⚠ 异议 · ' + esc(latestObj.name) + ' ' + esc(latestObj.emp_id) + '</div>' +
+        '<div class="preview">' + esc(preview) + (latestObj.reply_count ? ' · ' + latestObj.reply_count + ' 条回复' : '') + '</div>';
+    } else {
+      objStrip.style.display = 'none';
+    }
+  }
+
   updateSendCount();
+  updateConfirmChips();
+  updateTabBadges();
+  updateStepper();
 
-  // table rows
+  var orphanEl = document.getElementById('orphanSentBanner');
+  if(orphanEl){
+    var orphans = state.confirmation.orphanSent || [];
+    if(orphans.length){
+      orphanEl.style.display = 'block';
+      orphanEl.innerHTML = '⚠ 已发送但不在新名单（'+orphans.length+' 人）：'+
+        orphans.slice(0,8).map(function(r){ return esc(r.emp_id)+' '+esc(r.name||''); }).join('、')+
+        (orphans.length > 8 ? '…' : '')+' — 回复仍保留在服务器';
+    } else {
+      orphanEl.style.display = 'none';
+      orphanEl.innerHTML = '';
+    }
+  }
+
+  const filtered = getFilteredConfirmationRows();
+  const infoEl = document.getElementById('confirmTableInfo');
+  if(infoEl){
+    infoEl.textContent = filtered.length === total
+      ? ('共 '+total+' 人')
+      : ('显示 '+filtered.length+' / '+total+' 人');
+  }
+
+  const chkAll = document.getElementById('chkAll');
+  if(chkAll && filtered.length){
+    const selCount = filtered.filter(function(r){ return r._selected; }).length;
+    chkAll.checked = selCount === filtered.length;
+    chkAll.indeterminate = selCount > 0 && selCount < filtered.length;
+  }
+
+  var totalPages = Math.ceil(filtered.length / cps) || 1;
+  state.confirmation.page = Math.min(state.confirmation.page, totalPages);
+  var start = (state.confirmation.page - 1) * cps;
+  var pageRows = filtered.slice(start, start + cps);
+
   const tbody = document.getElementById('confirmTbody');
-  tbody.innerHTML = rows.map(r => {
+  if(!filtered.length){
+    tbody.innerHTML = '<tr><td colspan="7" class="empty">无匹配员工，请调整筛选条件</td></tr>';
+    document.getElementById('confirmPagination').style.display = 'none';
+    document.getElementById('sendAllBtn').disabled = false;
+    saveState();
+    return;
+  }
+
+  tbody.innerHTML = pageRows.map(function(r){
     const dept = [r.dept3, r.dept4, r.dept5].filter(Boolean).join(' / ');
-    const isClean = r.status === '无异常';
-    const statusBadge = r.status === '已确认' ? 'badge-success' : r.status === '有异议' ? 'badge-error' : r.status === '无异常' ? 'badge-success' : 'badge-pending';
-    const statusLabel = r.status === '待确认' ? '⏳ 待确认' : r.status === '已确认' ? '✅ 已确认' : r.status === '无异常' ? '✅ 无异常' : '⚠️ 有异议';
+    const status = normalizeConfirmStatus(r.status);
+    const statusBadge = status === '已确认' ? 'badge-success' : status === '有异议' ? 'badge-error' : 'badge-pending';
+    const statusLabel = status === '待确认' ? '⏳ 待确认' : status === '已确认' ? '✅ 已确认' : '⚠️ 有异议';
     const replyBadge = r.reply_count ? '<div style="font-size:10px;color:#888;margin-top:2px">'+r.reply_count+' 条回复</div>' : '';
-    const countStyle = isClean ? 'color:#27AE60' : 'color:#D9001B;font-weight:600';
-    const cleanClass = isClean ? 'row-clean' : '';
-    // Send status display
     let sendDisplay = '';
     if(r._sendStatus === 'pending'){
       sendDisplay = '<span class="status-badge status-badge-pending">— 未发送</span>';
@@ -1288,27 +2440,33 @@ function renderConfirmation(){
     } else if(r._sendStatus === 'sending'){
       sendDisplay = '<span class="status-badge status-badge-sending">⏳ 发送中...</span>';
     }
-    return '<tr class="'+cleanClass+'">'+
+    var diffTag = '';
+    if(r._sendDiff === '未发送'){
+      diffTag = '<div style="font-size:10px;color:#1565c0;margin-top:2px">新名单·未发送</div>';
+    } else if(r._sendDiff === '已发送·仍在名单'){
+      diffTag = '<div style="font-size:10px;color:#2e7d32;margin-top:2px">已发送·仍在名单</div>';
+    }
+    return '<tr>'+
       '<td class="chk-col" style="padding:8px 4px;text-align:center;border-bottom:1px solid #f0f0f0">'+
-        '<input type="checkbox" class="confirm-chk" '+(r._selected?'checked':'')+' onchange="toggleRowSelect(\''+esc(r.emp_id)+'\',this.checked)">'+
+        '<input type="checkbox" class="confirm-chk" data-eid="'+esc(r.emp_id)+'" '+(r._selected?'checked':'')+' onchange="toggleRowSelect(\''+esc(r.emp_id)+'\',this.checked)">'+
       '</td>'+
-      '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-weight:600'+(isClean?';color:#27AE60':'')+'">'+esc(r.emp_id)+'</td>'+
+      '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-weight:600">'+esc(r.emp_id)+'</td>'+
       '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0">'+esc(r.name)+'</td>'+
       '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-size:12px;color:#666">'+esc(dept)+'</td>'+
-      '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:center;'+countStyle+'">'+(isClean?'—':r.count)+'</td>'+
       '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:center"><span class="badge '+statusBadge+'">'+statusLabel+'</span>'+replyBadge+'</td>'+
-      '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:center">'+sendDisplay+'</td>'+
-      '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:center">'+
-        '<button class="btn btn-sm" onclick="showEmpClock(\''+esc(r.emp_id)+'\')" style="margin-right:4px">⏰ 考勤记录</button>'+
-        (isClean ? '' :
-          '<button class="btn btn-sm" onclick="showEmpErrors(\''+esc(r.emp_id)+'\')" style="margin-right:4px">📋 异常明细</button>')+
-        (r.status === '待确认' || r.status === '无异常' ?
-          '<button class="btn btn-sm btn-success" onclick="markConfirmed(\''+esc(r.emp_id)+'\')">✅ 标记已确认</button>' : '')+
-        (r.status === '有异议' || (r.replies && r.replies.length) ?
-          '<button class="btn btn-sm btn-warning" onclick="showObjectionDetail(\''+esc(r.emp_id)+'\')" style="margin-left:4px">📋 查看回复</button>' : '')+
-        '<button class="btn btn-sm" onclick="showCardPreview(\''+esc(r.emp_id)+'\')" style="margin-left:4px">📨 卡片预览</button>'+
+      '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:center">'+sendDisplay+diffTag+'</td>'+
+      '<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:center;white-space:nowrap">'+
+        '<button class="btn btn-sm" onclick="openDrawer(\''+esc(r.emp_id)+'\')">详情</button>'+
+        '<button class="btn btn-sm" onclick="showEmpClock(\''+esc(r.emp_id)+'\')" style="margin-left:4px">⏰</button>'+
+        (status === '有异议' || (r.replies && r.replies.length) ?
+          '<button class="btn btn-sm btn-warning" onclick="showObjectionDetail(\''+esc(r.emp_id)+'\')" style="margin-left:4px">📋</button>' : '')+
       '</td></tr>';
   }).join('');
+
+  document.getElementById('confirmPagination').style.display = 'flex';
+  document.getElementById('cPageInfo').textContent = state.confirmation.page + ' / ' + totalPages;
+  document.getElementById('cPrev').disabled = state.confirmation.page <= 1;
+  document.getElementById('cNext').disabled = state.confirmation.page >= totalPages;
 
   document.getElementById('sendAllBtn').disabled = false;
   saveState();
@@ -1330,10 +2488,11 @@ function toggleRowSelect(eid, checked){
 
 // Helper: toggle select all
 function toggleSelectAll(checked){
-  state.confirmation.rows.forEach(r => r._selected = checked);
-  // Update all row checkboxes visually
-  document.querySelectorAll('#confirmTbody .confirm-chk').forEach(cb => cb.checked = checked);
+  getFilteredConfirmationRows().forEach(function(r){ r._selected = checked; });
+  document.querySelectorAll('#confirmTbody .confirm-chk').forEach(function(cb){ cb.checked = checked; });
   updateSendCount();
+  const chkAll = document.getElementById('chkAll');
+  if(chkAll) chkAll.indeterminate = false;
 }
 
 // Helper: update send count badge
@@ -1421,6 +2580,7 @@ function syncRepliesFromServer(batchId, doPoll){
     });
 }
 function loadBatchFromServer(batchId){
+  if(!requirePeriod('同步回复')) return;
   showSyncToast('正在同步服务器回复…', true);
   if(batchId){
     return fetchBatchSync(batchId, true)
@@ -1444,30 +2604,30 @@ function loadBatchFromServer(batchId){
   }
   var batchIds = collectBatchIds();
   if(!batchIds.length){
-    return fetch(getServerUrl() + '/api/status')
+    return fetch(getServerUrl() + '/api/periods/' + encodeURIComponent(state.period.currentId) + '/batches')
       .then(function(r){ return r.json(); })
-      .then(function(s){
-        var ids = (s.batch_ids && s.batch_ids.length) ? s.batch_ids.slice(-5) : (s.latest_batch_id ? [s.latest_batch_id] : []);
+      .then(function(data){
+        var ids = (data && data.batch_ids) ? data.batch_ids : [];
         if(!ids.length){
-          showSyncToast('暂无批次', false);
-          alert('服务器暂无批次记录，请先发送卡片');
+          showSyncToast('本周期暂无批次', false);
+          alert('当前考勤周期尚未发送卡片，暂无回复可同步');
           return;
         }
         return ids.reduce(function(chain, id){
           return chain.then(function(){
-            return fetchBatchSync(id, true).then(function(data){
-              if(data && data.batch_id) applyReplySync(data, { keepCurrentBatch: true });
+            return fetchBatchSync(id, true).then(function(d){
+              if(d && d.batch_id) applyReplySync(d, { keepCurrentBatch: true });
             });
           });
         }, Promise.resolve()).then(function(){
-          var primary = getBatchFromUrl() || ids[ids.length - 1];
+          var primary = getBatchFromUrl() || state.confirmation.currentBatchId || ids[ids.length - 1];
           if(primary){
             state.confirmation.currentBatchId = primary;
             startReplyPolling(primary);
           }
           var rows = state.confirmation.rows || [];
           var withReplies = rows.filter(function(r){ return r.replies && r.replies.length; }).length;
-          showSyncToast('已同步最近 ' + ids.length + ' 个批次 · ' + withReplies + ' 人有回复', false);
+          showSyncToast('已同步本周期 ' + ids.length + ' 个批次 · ' + withReplies + ' 人有回复', false);
           updateServerBatchBadge({ batch_id: primary, batch: { label: ids.join(', ') }, stats: { total: rows.length } });
           renderConfirmation();
           saveState();
@@ -1562,10 +2722,7 @@ function applyReplySync(data, opts){
         dept3: info.dept3 || '',
         dept4: info.dept4 || '',
         dept5: info.dept5 || '',
-        count: '—',
         status: '待确认',
-        rules: [],
-        errors: [],
         dailyRows: [],
         punches: [],
         replies: [],
@@ -1577,14 +2734,11 @@ function applyReplySync(data, opts){
       };
       rows.push(row);
     }
-    // 有飞书回复时始终更新（即使本地标记为无异常）
-    const hasServerReply = (info.reply_count || 0) > 0 || info.delivery_status === 'objection' || info.delivery_status === 'confirmed';
-    if(row.status === '无异常' && !hasServerReply) return;
     if(info.status === '已确认') row.status = '已确认';
     else if(info.status === '有异议') row.status = '有异议';
     else if(info.delivery_status === 'confirmed') row.status = '已确认';
     else if(info.delivery_status === 'objection') row.status = '有异议';
-    else if(!row.status || row.status === '待确认') row.status = info.status || '待确认';
+    else if(info.delivery_status === 'pending' || !row.status) row.status = row.status || '待确认';
     row.replies = info.replies || [];
     row.reply_count = info.reply_count || 0;
     row.objection = info.objection_summary || '';
@@ -1638,13 +2792,6 @@ function showObjectionDetail(eid){
   const row = state.confirmation.rows.find(r => r.emp_id === eid);
   if(!row) return;
   const dept = [row.dept3, row.dept4, row.dept5].filter(Boolean).join(' / ');
-  const errors = row.errors || [];
-  const rules = row.rules || [];
-  const errorsHtml = errors.length
-    ? errors.map((e, i) =>
-        '<div style="padding:4px 0;font-size:12px"><span class="badge badge-error" style="margin-right:4px">'+esc(rules[i]||'—')+'</span>'+esc(e)+'</div>'
-      ).join('')
-    : '<div style="font-size:12px;color:#888;padding:4px 0">（无本地校验明细'+(row.batch_id?' · 名单来自服务器同步':'')+'）</div>';
   const replies = row.replies || [];
   const repliesHtml = replies.length
     ? replies.map(formatReplyItem).join('')
@@ -1659,15 +2806,12 @@ function showObjectionDetail(eid){
   overlay.innerHTML =
     '<div class="modal-box" style="max-width:600px;max-height:85vh;overflow-y:auto">'+
     '<button class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</button>'+
-    '<h2>⚠️ 异议详情</h2>'+
+    '<h2>📋 员工回复</h2>'+
     '<div style="background:#fef9ef;border:1px solid #fce5cd;border-radius:8px;padding:12px;margin-bottom:12px">'+
     '<div style="font-weight:600;font-size:14px">'+esc(row.name)+' ('+esc(row.emp_id)+')</div>'+
     '<div style="font-size:12px;color:#666;margin:4px 0">'+esc(dept)+'</div>'+
-    '<div style="font-size:12px;color:#888">异常条数：<strong style="color:#D9001B">'+row.count+'</strong> 条'+
-    (batchHint ? ' · 批次 <code style="font-size:11px">'+esc(batchHint)+'</code>' : '')+'</div>'+
+    (batchHint ? '<div style="font-size:12px;color:#888">批次 <code style="font-size:11px">'+esc(batchHint)+'</code></div>' : '')+
     '</div>'+
-    '<div style="font-size:13px;font-weight:600;margin-bottom:6px;color:#333">员工异常明细</div>'+
-    '<div style="margin-bottom:12px">'+errorsHtml+'</div>'+
     '<div style="background:#f4f4f4;border-radius:8px;padding:12px">'+
     '<div style="font-size:12px;font-weight:600;color:#888;margin-bottom:4px">员工反馈（共 '+(replies.length|| (row.objection?1:0))+' 条）</div>'+
     '<div style="font-size:13px;color:#333">'+repliesHtml+'</div>'+
@@ -1731,6 +2875,21 @@ function formatClockTime(v){
   return '';
 }
 
+function hasProcessFieldValue(v){
+  if(v === null || v === undefined) return false;
+  const s = String(v).trim();
+  return s.length > 0 && s !== '-';
+}
+
+function isMeaningfulProcessRow(row){
+  if(hasProcessFieldValue(row.status) || hasProcessFieldValue(row.detail)) return true;
+  const parts = String(row.date || '').split('~').map(function(s){ return s.trim(); });
+  return parts.some(function(p){
+    if(!hasProcessFieldValue(p)) return false;
+    return !!normalizeDateKey(p).match(/^\d{4}-\d{2}-\d{2}$/);
+  });
+}
+
 function buildProcessTableRows(emp){
   const rows = [];
   if(emp.leave && (emp.leave.type || emp.leave.start || emp.leave.end)){
@@ -1773,7 +2932,7 @@ function buildProcessTableRows(emp){
       status: h.status || '-'
     });
   });
-  return rows;
+  return rows.filter(isMeaningfulProcessRow);
 }
 function feishuMarkdown(content){
   return { tag: 'markdown', content: content, margin: '4px 0px 0px 0px' };
@@ -1944,7 +3103,7 @@ function buildCardViewModel(emp){
     empId: emp.emp_id || '-',
     name: emp.name || '-',
     dept: dept,
-    isClean: emp.status === '无异常',
+    isClean: false,
     dailyRows: allDailyRows,
     dailyTotal: allDailyRows.length,
     dailyHiddenCount: 0,
@@ -2025,6 +3184,9 @@ function renderCardContent(emp){
 }
 
 function sendAllFeishuCards(){
+  if(!requirePeriod('发送卡片')) return;
+  if(isPeriodReadonly()){ alert('已归档周期不可发送'); return; }
+  if(!state.period.currentId){ return; }
   const rows = state.confirmation.rows;
   if(!rows || !rows.length){
     alert('请先生成确认名单');
@@ -2129,6 +3291,7 @@ function doSendFeishuCards(){
     body: JSON.stringify({
       cards: cardsData,
       batch_id: batchId,
+      period_id: state.period.currentId,
       batch_label: '考勤确认 ' + new Date().toLocaleString('zh-CN'),
       test_mode: testMode,
       test_emp_id: testEmpId,
@@ -2279,6 +3442,98 @@ function showEmpClock(eid){
   document.body.appendChild(overlay);
 }
 
+const SIGN_RAW_KEY_ORDER = [
+  '考勤日期','姓名','工号','三级部门','四级部门','五级部门',
+  '星期（week）','班次属性','班次上班时间','班次下班时间',
+  '首打卡时间','打卡时间2','打卡时间3','打卡时间4','打卡时间5','打卡时间6','打卡时间7','末打卡时间',
+  '计薪出勤时长合计（REG)','计薪出勤时长合计(REG)','REG','计薪出勤',
+  'OT1.5合计','OT1.5','OT2.0合计','OT2.0',
+  '每日总工时(公式：末打卡-首打卡-班次午休时间+居家办公时长)','每日总工时','每日工时',
+  '居家办公合计','居家办公合计（审批中）','公出时间合计','公出合计','出差时长','出差合计',
+  '带薪年假时长','带薪病假时长','带薪假时长','年假合计','病假合计','事假合计',
+  '备注（GF）','员工签字核实（GF）'
+];
+const SIGN_RAW_ALWAYS_SHOW = [
+  '班次上班时间','班次下班时间',
+  '首打卡时间','打卡时间2','打卡时间3','打卡时间4','打卡时间5','打卡时间6','打卡时间7','末打卡时间'
+];
+
+function normalizeDateStr(d){
+  if(!d) return '';
+  return String(d).trim().slice(0, 10).replace(/\//g, '-');
+}
+
+function buildSigningRawHtml(rd){
+  if(!rd) return '';
+  var keys = SIGN_RAW_KEY_ORDER.slice();
+  Object.keys(rd).forEach(function(k){ if(keys.indexOf(k) < 0) keys.push(k); });
+  var rows = keys.filter(function(k){
+    if(rd[k] === undefined) return false;
+    if(rd[k] !== '' && rd[k] !== null) return true;
+    return SIGN_RAW_ALWAYS_SHOW.indexOf(k) >= 0;
+  }).map(function(k){
+    var val = rd[k];
+    if(val === '' || val === null || val === undefined) val = '—';
+    return '<tr><td style="color:#666;width:38%;padding:6px 8px;border-bottom:1px solid #f0f0f0">'+esc(k)+'</td>'+
+      '<td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;word-break:break-all">'+esc(String(val))+'</td></tr>';
+  }).join('');
+  if(!rows) return '<div style="color:#999;font-size:13px">暂无源数据字段</div>';
+  return '<table class="modal-table" style="margin-top:8px"><tbody>'+rows+'</tbody></table>';
+}
+
+function buildPunchFileHtml(record){
+  var eid = record.emp_id;
+  var dt = normalizeDateStr(record.date);
+  var punches = (state._punchByEmp && state._punchByEmp[eid]) ? state._punchByEmp[eid] : [];
+  var dayPunches = punches.filter(function(p){
+    var pd = normalizeDateStr(p.date || p.datetime || '');
+    return dt && pd === dt;
+  });
+  if(!dayPunches.length) return '';
+  var items = dayPunches.map(function(p){ return esc(p.datetime || p.date || ''); }).join(' · ');
+  return '<div style="margin-top:14px;padding-top:12px;border-top:1px solid #eee">'+
+    '<div style="font-weight:600;font-size:13px;margin-bottom:6px;color:#333">🕐 打卡记录文件（当日 '+dayPunches.length+' 次）</div>'+
+    '<div style="font-size:12px;color:#555;line-height:1.7;background:#f8f9fa;padding:10px;border-radius:6px">'+items+'</div></div>';
+}
+
+function resolveSigningRaw(record){
+  if(record && record.rawData && Object.keys(record.rawData).length) return record.rawData;
+  if(!record) return null;
+  var eid = record.emp_id, dt = normalizeDateStr(record.date || '');
+  var signRows = state._signRows && state._signRows[eid];
+  if(signRows && signRows.length){
+    var matched = signRows.find(function(sr){ return dt && normalizeDateStr(sr.date) === dt; });
+    if(matched && matched._rawRow) return matched._rawRow;
+    if(signRows[0]._rawRow) return signRows[0]._rawRow;
+  }
+  return null;
+}
+
+function openSigningRaw(empId, date, rule){
+  var pool = state.validation.filtered.length ? state.validation.filtered : (state.validation.data || []);
+  var rec = pool.find(function(r){
+    return r.emp_id === empId && normalizeDateStr(r.date) === normalizeDateStr(date) && (r.rule || '') === (rule || '');
+  }) || pool.find(function(r){ return r.emp_id === empId; });
+  if(!rec){ alert('未找到对应记录'); return; }
+  var rd = resolveSigningRaw(rec) || rec.rawData;
+  var punchHtml = buildPunchFileHtml(rec);
+  var overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.onclick = function(e){ if(e.target === overlay) overlay.remove(); };
+  var detail = rec.detail || rec.message || '';
+  overlay.innerHTML =
+    '<div class="modal-box" style="max-width:720px">'+
+    '<button class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</button>'+
+    '<h2>📄 签字报表源数据 — '+esc(rec.name || '')+' ('+esc(empId)+')</h2>'+
+    '<div style="font-size:12px;color:#888;margin-bottom:10px">考勤日期 '+esc(rec.date || '-')+
+    ' · 规则 '+esc(rec.rule || '-')+' · '+(rec.level === 'error' ? '需处理' : '需关注')+'</div>'+
+    (detail ? '<div style="font-size:12px;color:#D9001B;background:#fff5f5;padding:8px 10px;border-radius:6px;margin-bottom:10px">⚠ '+esc(detail)+'</div>' : '')+
+    (rd ? buildSigningRawHtml(rd) : '<div style="padding:16px;color:#999;font-size:13px;text-align:center">未找到签字报表原始行，请重新上传 Excel 后校验</div>')+
+    punchHtml+
+    '</div>';
+  document.body.appendChild(overlay);
+}
+
 function showEmpErrors(eid){
   const all = state.validation.data || [];
   const errs = all.filter(r => r.emp_id === eid);
@@ -2344,23 +3599,8 @@ function showEmpErrors(eid){
 
 function esc(s){if(!s) return ''; const d=document.createElement('div'); d.textContent=s; return d.innerHTML;}
 
-// Restore state from localStorage on page load
-loadState();
-(function initReplySync(){
-  const urlBatch = new URLSearchParams(location.search).get('batch');
-  if(urlBatch){
-    loadBatchFromServer(urlBatch);
-    return;
-  }
-  if(state.confirmation && state.confirmation.currentBatchId){
-    loadBatchFromServer(state.confirmation.currentBatchId);
-    return;
-  }
-  // 本地无名单时（脚本/API 发卡），自动拉取服务器最新批次
-  if(!state.confirmation || !state.confirmation.rows || !state.confirmation.rows.length){
-    loadBatchFromServer();
-  }
-})();
+// Restore state on page load (period-aware, empty until user creates period)
+initPeriodSystem();
 </script>
 </body>
 </html>
