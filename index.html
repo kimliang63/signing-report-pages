@@ -262,6 +262,10 @@ tr:hover td{background:#fafbfc}
   <div class="readonly-banner-inner">🔒 已归档周期 — 可查看校验与回复，不可上传、校验或发送</div>
 </div>
 
+<div class="readonly-banner" id="serverDownBanner" style="display:none">
+  <div class="readonly-banner-inner" id="serverDownBannerInner" style="background:#fee2e2;border-color:#fca5a5;color:#991b1b;display:flex;align-items:center;gap:10px;flex-wrap:wrap"></div>
+</div>
+
 <div id="noPeriodState" class="container">
   <div class="no-period-wrap">
     <div style="font-size:40px;margin-bottom:12px">📅</div>
@@ -278,6 +282,8 @@ tr:hover td{background:#fafbfc}
       <div class="sub">综合看板 &middot; 手动校验模式</div>
     </div>
     <div style="display:flex;gap:8px;align-items:center">
+      <span id="apiStatusBadge" class="badge badge-pending" title="后端连接" style="cursor:pointer" onclick="openApiSettingsModal()">后端未连</span>
+      <button class="btn btn-sm" onclick="openApiSettingsModal()" title="配置远程后端 / 复制分享链接">🔗 后端</button>
       <span id="dataStatus" class="badge badge-pending">未上传文件</span>
     </div>
   </div>
@@ -471,6 +477,27 @@ tr:hover td{background:#fafbfc}
   </div>
 </div>
 
+<div class="modal-overlay" id="apiSettingsOverlay" style="display:none" onclick="if(event.target===this)closeApiSettingsModal()">
+  <div class="modal" style="max-width:520px">
+    <button class="modal-close" onclick="closeApiSettingsModal()">&times;</button>
+    <h3 style="margin-bottom:12px">后端连接设置</h3>
+    <p style="font-size:13px;color:#666;margin-bottom:12px;line-height:1.5">
+      页面可部署在公网（GitHub Pages），数据仍走你电脑上的 <code>server.py</code>。
+      在本机开启穿透后，把分享链接发给同事即可。
+    </p>
+    <label style="font-size:12px;color:#888;display:block;margin-bottom:4px">后端 API 地址</label>
+    <input id="apiUrlInput" type="text" placeholder="https://xxxx.trycloudflare.com" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:10px">
+    <div id="apiSettingsHint" style="font-size:12px;color:#666;margin-bottom:12px"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="saveApiSettings()">保存并连接</button>
+      <button class="btn" id="btnStartTunnel" onclick="startTunnelFromUI()" style="display:none">🌐 开启外网穿透</button>
+      <button class="btn" onclick="copyShareLink()">📋 复制分享链接</button>
+      <button class="btn" onclick="closeApiSettingsModal()">关闭</button>
+    </div>
+    <div id="shareLinkPreview" style="margin-top:12px;font-size:11px;color:#888;word-break:break-all"></div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="periodHistoryOverlay" style="display:none" onclick="if(event.target===this)closePeriodHistory()">
   <div class="modal-box" style="max-width:520px">
     <button class="modal-close" onclick="closePeriodHistory()">&times;</button>
@@ -497,6 +524,9 @@ const state = {
 };
 window.state = state;
 const COLORS = {'R1.1':'#0E66FB','R1.2':'#0E66FB','R3':'#FFAA0E','R4':'#9C27B0','R5':'#D9001B','R6':'#E67E22','R7':'#2ECC71'};
+const LAUNCHER_URL = 'http://127.0.0.1:8898';
+const PAGES_SHARE_BASE = 'https://kimliang63.github.io/signing-report-pages/';
+const API_URL_STORAGE_KEY = 'signing_report_api_url';
 const CURRENT_PERIOD_KEY = 'signing_report_current_period_id';
 
 function periodStorageKey(id){ return 'signing_report_period_' + id; }
@@ -832,6 +862,7 @@ function initPeriodSystem(){
     refreshUIFromState();
     initReplySyncForPeriod();
     maybeSyncPeriodDatesAfterDataLoad();
+    checkBackendHealth();
   });
 }
 
@@ -945,6 +976,232 @@ function refreshUIFromState(){
   } catch(e){ console.warn('refreshUIFromState:', e); }
 }
 function getServerUrl(){ return state.serverUrl || 'http://localhost:8899'; }
+
+function normalizeApiUrl(url){
+  if(!url) return '';
+  url = String(url).trim();
+  if(!url) return '';
+  if(!/^https?:\/\//i.test(url)) url = 'https://' + url;
+  return url.replace(/\/+$/, '');
+}
+
+function initServerUrl(){
+  var params = new URLSearchParams(location.search);
+  var fromQuery = params.get('api') || params.get('server');
+  if(fromQuery){
+    setServerUrl(normalizeApiUrl(fromQuery), true);
+    return;
+  }
+  try {
+    var saved = localStorage.getItem(API_URL_STORAGE_KEY);
+    if(saved) state.serverUrl = normalizeApiUrl(saved);
+  } catch(e){}
+}
+
+function setServerUrl(url, skipSave){
+  url = normalizeApiUrl(url);
+  if(!url) return;
+  state.serverUrl = url;
+  if(!skipSave){
+    try { localStorage.setItem(API_URL_STORAGE_KEY, url); } catch(e){}
+  }
+  updateApiStatusBadge();
+  updateShareLinkPreview();
+}
+
+function updateApiStatusBadge(){
+  var el = document.getElementById('apiStatusBadge');
+  if(!el) return;
+  var url = getServerUrl();
+  var isLocal = /localhost|127\.0\.0\.1/.test(url);
+  el.textContent = isLocal ? '本机后端' : '远程后端';
+  el.className = 'badge ' + (isLocal ? 'badge-pending' : 'badge-success');
+}
+
+function buildShareLink(){
+  var api = getServerUrl();
+  if(!api || /localhost|127\.0\.0\.1/.test(api)) return '';
+  return PAGES_SHARE_BASE + '?api=' + encodeURIComponent(api);
+}
+
+function updateShareLinkPreview(){
+  var el = document.getElementById('shareLinkPreview');
+  if(!el) return;
+  var link = buildShareLink();
+  el.textContent = link ? ('分享链接：' + link) : '开启穿透并保存外网地址后，可生成分享链接';
+}
+
+function openApiSettingsModal(){
+  var input = document.getElementById('apiUrlInput');
+  var hint = document.getElementById('apiSettingsHint');
+  var btnTunnel = document.getElementById('btnStartTunnel');
+  if(input) input.value = getServerUrl();
+  if(btnTunnel) btnTunnel.style.display = isLocalFrontend() ? 'inline-flex' : 'none';
+  if(hint){
+    hint.textContent = isLocalFrontend()
+      ? '本机模式：可点「开启外网穿透」自动获取公网地址，再复制分享链接发给同事。'
+      : '远程模式：请向管理员索取带 ?api= 的完整链接，或手动填入后端地址。';
+  }
+  updateShareLinkPreview();
+  document.getElementById('apiSettingsOverlay').style.display = 'flex';
+}
+
+function closeApiSettingsModal(){
+  document.getElementById('apiSettingsOverlay').style.display = 'none';
+}
+
+function saveApiSettings(){
+  var input = document.getElementById('apiUrlInput');
+  var url = normalizeApiUrl(input && input.value);
+  if(!url){ alert('请填写后端地址'); return; }
+  setServerUrl(url);
+  closeApiSettingsModal();
+  checkBackendHealth();
+}
+
+function copyShareLink(){
+  var link = buildShareLink();
+  if(!link){
+    alert('请先配置外网可访问的后端地址（本机点「开启外网穿透」）');
+    return;
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(link).then(function(){
+      showSyncToast('分享链接已复制', false);
+    }).catch(function(){ prompt('复制此链接发给同事：', link); });
+  } else {
+    prompt('复制此链接发给同事：', link);
+  }
+}
+
+function startTunnelFromUI(){
+  if(!isLocalFrontend()){
+    alert('外网穿透只能在本机操作');
+    return;
+  }
+  var hint = document.getElementById('apiSettingsHint');
+  if(hint) hint.textContent = '⏳ 正在建立隧道（约 10–30 秒）…';
+  fetch(LAUNCHER_URL + '/tunnel/start', { method: 'POST' })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(data && data.url){
+        setServerUrl(data.url);
+        var input = document.getElementById('apiUrlInput');
+        if(input) input.value = data.url;
+        if(hint) hint.textContent = '✅ 隧道已就绪：' + data.url;
+        updateShareLinkPreview();
+        checkBackendHealth();
+        if(data.share_link && navigator.clipboard){
+          navigator.clipboard.writeText(data.share_link).catch(function(){});
+        }
+        showSyncToast((data.message || '隧道已建立') + '，分享链接已更新', false);
+        return;
+      }
+      if(hint) hint.textContent = '❌ ' + ((data && data.message) || '隧道启动失败');
+      alert((data && data.message) || '隧道启动失败。请先执行：brew install cloudflared');
+    })
+    .catch(function(){
+      if(hint) hint.textContent = '❌ 找不到启动器，请先运行 install_launch_agent.sh';
+      alert('找不到本机启动器 (8898)。请先执行：\nbash scripts/install_launch_agent.sh');
+    });
+}
+
+function tryLoadTunnelUrlOnLocal(){
+  if(!isLocalFrontend()) return Promise.resolve();
+  if(!/localhost|127\.0\.0\.1/.test(getServerUrl())) return Promise.resolve();
+  return fetch(LAUNCHER_URL + '/tunnel')
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(data && data.url){
+        setServerUrl(data.url);
+      }
+    })
+    .catch(function(){});
+}
+
+function isLocalFrontend(){
+  var h = location.hostname;
+  return h === 'localhost' || h === '127.0.0.1';
+}
+
+function setServerBanner(html, show){
+  var banner = document.getElementById('serverDownBanner');
+  var inner = document.getElementById('serverDownBannerInner');
+  if(!banner || !inner) return;
+  if(show){
+    inner.innerHTML = html;
+    banner.style.display = 'block';
+  } else {
+    banner.style.display = 'none';
+    inner.innerHTML = '';
+  }
+}
+
+function checkBackendHealth(){
+  return fetch(getServerUrl() + '/api/status', { method: 'GET' })
+    .then(function(r){
+      if(!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    })
+    .then(function(data){
+      if(data && data.ok){
+        setServerBanner('', false);
+        updateApiStatusBadge();
+        var badge = document.getElementById('apiStatusBadge');
+        if(badge) badge.className = 'badge badge-success';
+        if(badge) badge.textContent = /localhost|127\.0\.0\.1/.test(getServerUrl()) ? '本机已连' : '远程已连';
+        return true;
+      }
+      throw new Error('status not ok');
+    })
+    .catch(function(){
+      var msg = '⚠️ 后端未连接（' + getServerUrl() + '）— 发卡、同步回复、周期保存不可用';
+      if(isLocalFrontend()){
+        msg += ' <button class="btn btn-sm btn-primary" onclick="startBackendServer()">启动后端</button>' +
+          ' <button class="btn btn-sm" onclick="openApiSettingsModal()">配置 / 穿透</button>' +
+          ' <button class="btn btn-sm" onclick="checkBackendHealth()">重试</button>';
+      } else {
+        msg += ' <button class="btn btn-sm btn-primary" onclick="openApiSettingsModal()">配置后端地址</button>' +
+          ' <button class="btn btn-sm" onclick="checkBackendHealth()">重试</button>' +
+          ' <span style="font-size:11px">请使用管理员提供的带 ?api= 的分享链接</span>';
+      }
+      setServerBanner(msg, true);
+      return false;
+    });
+}
+
+function startBackendServer(){
+  if(!isLocalFrontend()){
+    alert('线上页面无法启动本机服务。请在电脑终端执行：\ncd ~/projects/signing-report && python3 server.py');
+    return Promise.resolve(false);
+  }
+  setServerBanner('⏳ 正在启动后端…', true);
+  return fetch(LAUNCHER_URL + '/start', { method: 'POST' })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(data && data.ok){
+        showSyncToast(data.message || '后端已启动', false);
+        return checkBackendHealth();
+      }
+      var hint = (data && data.message) || '启动失败';
+      setServerBanner(
+        '⚠️ ' + hint +
+        ' <button class="btn btn-sm btn-primary" onclick="startBackendServer()">重试</button>' +
+        ' <span style="font-size:11px">或终端执行：cd ~/projects/signing-report && python3 server.py</span>',
+        true
+      );
+      return false;
+    })
+    .catch(function(){
+      setServerBanner(
+        '⚠️ 找不到启动器（' + LAUNCHER_URL + '）。请先运行：<code style="font-size:11px">python3 scripts/server_launcher.py</code>' +
+        ' 或 <code style="font-size:11px">bash scripts/install_launch_agent.sh</code>' +
+        ' <button class="btn btn-sm btn-primary" onclick="startBackendServer()">重试</button>',
+        true
+      );
+      return false;
+    });
+}
 
 // ========== TAB SWITCH ==========
 function gotoStep(panel){
@@ -3600,7 +3857,10 @@ function showEmpErrors(eid){
 function esc(s){if(!s) return ''; const d=document.createElement('div'); d.textContent=s; return d.innerHTML;}
 
 // Restore state on page load (period-aware, empty until user creates period)
-initPeriodSystem();
+initServerUrl();
+tryLoadTunnelUrlOnLocal().finally(function(){
+  initPeriodSystem();
+});
 </script>
 </body>
 </html>
