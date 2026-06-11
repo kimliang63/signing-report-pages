@@ -401,6 +401,10 @@ tr:hover td{background:#fafbfc}
       <div class="row2">
         <button class="btn btn-success btn-sm" onclick="sendAllFeishuCards()" id="sendAllBtn" disabled>📨 发送飞书卡片</button>
         <div class="test-mode-bar">
+          <select id="feishuProfileSelect" onchange="onProfileChange()" style="font-size:12px;padding:2px 4px;border:1px solid #ccc;border-radius:4px" title="选择飞书应用">
+            <option value="default">飞书应用</option>
+          </select>
+          <button class="btn btn-sm" onclick="openFeishuProfileModal()" title="管理飞书应用配置">⚙️</button>
           <input type="checkbox" id="testModeSwitch" onchange="toggleTestMode()">
           <label for="testModeSwitch" style="cursor:pointer;user-select:none">🧪 测试</label>
           <input type="text" class="test-emp-input" id="testEmpIdInline" value="zt28219" readonly title="测试模式固定收件人，不可修改">
@@ -2445,8 +2449,8 @@ function buildConfirmationList(){
       home_off: emp.home_off || 0,
       days: emp.days || [],
       status: '待确认',
-      dailyRows: (state._signRows && state._signRows[eid]) ? state._signRows[eid].slice(0, 31) : [],
-      punches: (state._punchByEmp && state._punchByEmp[eid]) ? state._punchByEmp[eid].slice(0, 62) : [],
+      dailyRows: (state._signRows && state._signRows[eid]) ? state._signRows[eid] : [],
+      punches: (state._punchByEmp && state._punchByEmp[eid]) ? state._punchByEmp[eid] : [],
       supps: (state._suppByEmp && state._suppByEmp[eid]) ? state._suppByEmp[eid] : [],
       leave: (state._leaveByEmp && state._leaveByEmp[eid]) ? state._leaveByEmp[eid] : null,
       buses: (state._busByEmp && state._busByEmp[eid]) ? state._busByEmp[eid] : [],
@@ -3102,12 +3106,174 @@ function showObjectionDetail(eid){
 }
 
 // ========== 飞书卡片预览与发送 ==========
-const FEISHU_CONFIG = {
-  APP_ID: 'cli_aa8ef6308ae41cb6',
-  APP_SECRET: 'qVdoVV7M4QMPsBAhm5ETucG6VVwIcAja'
-};
-/** 测试模式唯一允许收件人工号 */
-const TEST_RECIPIENT_EMP_ID = 'zt28219';
+function loadFeishuProfiles(){
+  fetch(getServerUrl()+'/api/feishu/profiles').then(r=>r.json()).then(function(data){
+    var profiles = data.profiles || [];
+    var sel = document.getElementById('feishuProfileSelect');
+    if(sel){
+      sel.innerHTML = '';
+      profiles.forEach(function(p){
+        if(!p.enabled) return;
+        var opt = document.createElement('option');
+        opt.value = p.id;
+        opt.textContent = p.name;
+        sel.appendChild(opt);
+      });
+      var saved = localStorage.getItem('feishu_profile_id');
+      if(saved && sel.querySelector('option[value="'+saved+'"]')){
+        sel.value = saved;
+      } else if(data.active_profile_id){
+        sel.value = data.active_profile_id;
+      }
+    }
+  }).catch(function(e){ console.warn('[feishu] load profiles failed', e); });
+}
+function onProfileChange(){
+  var sel = document.getElementById('feishuProfileSelect');
+  if(sel) localStorage.setItem('feishu_profile_id', sel.value);
+}
+function getSelectedProfileId(){
+  var sel = document.getElementById('feishuProfileSelect');
+  return sel ? sel.value : 'default';
+}
+function openFeishuProfileModal(){
+  fetch(getServerUrl()+'/api/feishu/profiles').then(r=>r.json()).then(function(data){
+    var profiles = data.profiles || [];
+    var html = '<div style="max-height:60vh;overflow-y:auto">'+
+      '<table style="width:100%;border-collapse:collapse;font-size:12px">'+
+      '<thead><tr><th style="text-align:left;padding:6px;border-bottom:1px solid #ddd">名称</th>'+
+      '<th style="text-align:left;padding:6px;border-bottom:1px solid #ddd">App ID</th>'+
+      '<th style="text-align:center;padding:6px;border-bottom:1px solid #ddd">启用</th>'+
+      '<th style="text-align:center;padding:6px;border-bottom:1px solid #ddd">操作</th></tr></thead><tbody>';
+    profiles.forEach(function(p){
+      var actions = '';
+      if(p.locked){
+        actions = '<span style="color:#999;font-size:11px">🔒 固定</span>';
+      } else {
+        actions = '<button class="btn btn-sm" onclick="editFeishuProfile(\''+esc(p.id)+'\')">编辑</button> '+
+          '<button class="btn btn-sm btn-danger" onclick="deleteFeishuProfile(\''+esc(p.id)+'\')">删除</button>';
+      }
+      html += '<tr data-pid="'+esc(p.id)+'">'+
+        '<td style="padding:6px;border-bottom:1px solid #eee">'+esc(p.name)+'</td>'+
+        '<td style="padding:6px;border-bottom:1px solid #eee;font-family:monospace">****'+esc(p.app_id_suffix||'')+'</td>'+
+        '<td style="text-align:center;padding:6px;border-bottom:1px solid #eee">'+(p.enabled?'✅':'—')+'</td>'+
+        '<td style="text-align:center;padding:6px;border-bottom:1px solid #eee">'+actions+'</td></tr>';
+    });
+    html += '</tbody></table></div>';
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = '<div class="modal-box" style="max-width:560px">'+
+      '<button class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</button>'+
+      '<div style="font-size:14px;font-weight:600;margin-bottom:12px">⚙️ 飞书应用管理</div>'+
+      html+'</div>';
+    document.body.appendChild(overlay);
+  });
+}
+function editFeishuProfile(pid){
+  fetch(getServerUrl()+'/api/feishu/profiles').then(r=>r.json()).then(function(data){
+    var p = null;
+    if(pid){
+      (data.profiles||[]).forEach(function(x){ if(x.id===pid) p=x; });
+    }
+    var isNew = !p;
+    var isLocked = p && p.locked;
+    var name = p ? p.name : '';
+    var appId = p ? p.app_id : '';
+    var secret = '';
+    var enabled = p ? p.enabled : true;
+    var html;
+    if(isLocked){
+      html = '<div style="display:flex;flex-direction:column;gap:10px">'+
+        '<div style="font-size:12px;color:#666">🔒 此应用为系统固定配置，不可编辑</div>'+
+        '<div style="font-size:12px"><strong>名称：</strong>'+esc(name)+'</div>'+
+        '<div style="font-size:12px"><strong>App ID：</strong><span style="font-family:monospace">****'+esc(p.app_id_suffix||'')+'</span></div>'+
+        '<div style="font-size:12px"><strong>状态：</strong>'+(enabled?'✅ 已启用':'— 未启用')+'</div>'+
+        '<div style="display:flex;gap:8px;margin-top:8px">'+
+        '<button class="btn btn-sm" onclick="testFeishuProfile(\''+esc(pid)+'\')">测试连接</button>'+
+        '<button class="btn btn-sm" onclick="this.closest(\'.modal-overlay\').remove()">关闭</button>'+
+        '</div></div>'+
+        '<div id="fpTestResult" style="margin-top:8px;font-size:12px"></div>';
+    } else {
+      html = '<div style="display:flex;flex-direction:column;gap:10px">'+
+        '<label style="font-size:12px">名称<input type="text" id="fpName" value="'+esc(name)+'" style="width:100%;margin-top:2px;padding:4px;border:1px solid #ccc;border-radius:4px"></label>'+
+        '<label style="font-size:12px">App ID<input type="text" id="fpAppId" value="'+esc(appId)+'" style="width:100%;margin-top:2px;padding:4px;border:1px solid #ccc;border-radius:4px" placeholder="cli_xxx"></label>'+
+        '<label style="font-size:12px">App Secret<input type="password" id="fpSecret" value="'+esc(secret)+'" style="width:100%;margin-top:2px;padding:4px;border:1px solid #ccc;border-radius:4px" placeholder="'+(pid?'留空不修改':'')+'"></label>'+
+        '<label style="font-size:12px"><input type="checkbox" id="fpEnabled" '+(enabled?'checked':'')+'> 启用</label>'+
+        '<div style="display:flex;gap:8px">'+
+        '<button class="btn btn-sm btn-primary" onclick="saveFeishuProfile(\''+(pid||'new')+'\')">保存</button>'+
+        '<button class="btn btn-sm" onclick="testFeishuProfile(\''+(pid||'new')+'\')">测试连接</button>'+
+        '<button class="btn btn-sm" onclick="this.closest(\'.modal-overlay\').remove()">取消</button>'+
+        '</div></div>'+
+        '<div id="fpTestResult" style="margin-top:8px;font-size:12px"></div>';
+    }
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = '<div class="modal-box" style="max-width:420px">'+
+      '<button class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</button>'+
+      '<div style="font-size:14px;font-weight:600;margin-bottom:12px">'+(isNew?'新增':isLocked?'查看':'编辑')+'飞书应用</div>'+
+      html+'</div>';
+    document.body.appendChild(overlay);
+  });
+}
+function saveFeishuProfile(pid){
+  var name = document.getElementById('fpName').value.trim();
+  var appId = document.getElementById('fpAppId').value.trim();
+  var secret = document.getElementById('fpSecret').value;
+  var enabled = document.getElementById('fpEnabled').checked;
+  if(!name || !appId){ alert('名称和 App ID 不能为空'); return; }
+  fetch(getServerUrl()+'/api/feishu/profiles').then(r=>r.json()).then(function(data){
+    var profiles = data.profiles || [];
+    var existing = null;
+    profiles.forEach(function(p){ if(p.id===pid) existing=p; });
+    if(pid && pid!=='new' && existing){
+      existing.name = name;
+      existing.app_id = appId;
+      if(secret) existing.app_secret = secret;
+      existing.enabled = enabled;
+    } else {
+      var newId = 'profile_' + Date.now().toString(36);
+      profiles.push({id:newId, name:name, app_id:appId, app_secret:secret, enabled:enabled});
+    }
+    return fetch(getServerUrl()+'/api/feishu/profiles',{
+      method:'PUT', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({active_profile_id:data.active_profile_id, test_recipient_emp_id:data.test_recipient_emp_id, profiles:profiles})
+    });
+  }).then(function(){
+    document.querySelector('.modal-overlay:last-child')?.remove();
+    loadFeishuProfiles();
+  });
+}
+function deleteFeishuProfile(pid){
+  if(!confirm('确定删除此应用配置？')) return;
+  fetch(getServerUrl()+'/api/feishu/profiles').then(r=>r.json()).then(function(data){
+    var profiles = (data.profiles||[]).filter(function(p){ return p.id!==pid; });
+    return fetch(getServerUrl()+'/api/feishu/profiles',{
+      method:'PUT', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({active_profile_id:data.active_profile_id, test_recipient_emp_id:data.test_recipient_emp_id, profiles:profiles})
+    });
+  }).then(function(){
+    document.querySelector('.modal-overlay:last-child')?.remove();
+    loadFeishuProfiles();
+    openFeishuProfileModal();
+  });
+}
+function testFeishuProfile(pid){
+  var appId = document.getElementById('fpAppId').value.trim();
+  var resultDiv = document.getElementById('fpTestResult');
+  resultDiv.innerHTML = '⏳ 测试中...';
+  fetch(getServerUrl()+'/api/feishu/profiles/test',{
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({profile_id: pid==='new' ? appId : pid})
+  }).then(r=>r.json()).then(function(res){
+    if(res.ok){
+      resultDiv.innerHTML = '✅ 连接成功 · 测试收件人: '+esc(res.test_emp_id)+' (open_id: '+esc(res.open_id)+')';
+    } else {
+      resultDiv.innerHTML = '❌ '+esc(res.error||'测试失败');
+    }
+  }).catch(function(e){
+    resultDiv.innerHTML = '❌ 请求失败: '+esc(e.message);
+  });
+}
 function getTestEmpId(){
   return TEST_RECIPIENT_EMP_ID;
 }
@@ -3249,6 +3415,64 @@ function feishuTextColumn(name, displayName, width){
   };
 }
 
+function sortClockTimesAsc(times){
+  return times.slice().sort(function(a, b){
+    var toSec = function(t){
+      var p = String(t).split(':').map(Number);
+      return (p[0] || 0) * 3600 + (p[1] || 0) * 60 + (p[2] || 0);
+    };
+    return toSec(a) - toSec(b);
+  });
+}
+
+function pickRawField(raw, aliases, fallback){
+  if(!raw) return fallback !== undefined ? fallback : '—';
+  for(var i = 0; i < aliases.length; i++){
+    var v = raw[aliases[i]];
+    if(v !== undefined && v !== null && String(v).trim() !== '') return String(v).trim();
+  }
+  return fallback !== undefined ? fallback : '—';
+}
+
+function extractDailyMetrics(raw){
+  return {
+    dayTotal: pickRawField(raw, ['每日总工时(公式：末打卡-首打卡-班次午休时间+居家办公时长)', '每日总工时', '每日工时']),
+    reg: pickRawField(raw, ['计薪出勤时长合计(REG)', '计薪出勤时长合计（REG)', 'REG', '计薪出勤']),
+    ot: pickRawField(raw, ['OT1.5合计', 'OT1.5', 'OT']),
+    dt: pickRawField(raw, ['OT2.0合计', 'OT2.0', 'DT'])
+  };
+}
+
+function escapeMdCell(v){
+  return String(v === undefined || v === null || v === '' ? '—' : v).replace(/\|/g, '\\|').replace(/\n/g, ' ');
+}
+
+function buildDailyPunchMarkdown(vm){
+  var subtitle = vm.dailyTotal
+    ? '考勤日期范围: ' + vm.dateRange + ' · 共 ' + vm.dailyTotal + ' 天'
+    : '';
+  var header = '📋 **每日打卡明细**' + (subtitle ? '\n' + subtitle : '');
+  if(!vm.dailyRows.length) return header + '\n无签字报表明细数据';
+  var lines = [
+    header,
+    '',
+    '| 考勤日期 | 打卡时间 | 每日总工时 | REG | OT | DT |',
+    '| --- | --- | --- | --- | --- | --- |'
+  ];
+  vm.dailyRows.forEach(function(row){
+    var times = row.clockText === '—' ? '无打卡记录' : row.clockText;
+    lines.push(
+      '| ' + escapeMdCell(row.date) +
+      ' | ' + escapeMdCell(times) +
+      ' | ' + escapeMdCell(row.dayTotal) +
+      ' | ' + escapeMdCell(row.reg) +
+      ' | ' + escapeMdCell(row.ot) +
+      ' | ' + escapeMdCell(row.dt) + ' |'
+    );
+  });
+  return lines.join('\n');
+}
+
 function feishuConfirmButtons(empId, batchId){
   const payload = function(action){
     return { action: action, emp_id: empId, batch_id: batchId || '' };
@@ -3291,6 +3515,33 @@ function feishuConfirmButtons(empId, batchId){
   };
 }
 
+function computePeriodSummary(emp){
+  const rows = (state._signRows && state._signRows[emp.emp_id]) || emp.dailyRows || [];
+  let totalHours = 0, hasTotal = false;
+  rows.forEach(r => {
+    const raw = r._rawRow || r;
+    const m = extractDailyMetrics(raw);
+    const v = parseFloat(m.dayTotal);
+    if(!isNaN(v)){ totalHours += v; hasTotal = true; }
+  });
+  const period = state.period && state.period.current;
+  return {
+    periodLabel: period ? (period.period_label || '未设置考勤周期') : '未设置考勤周期',
+    totalHours: hasTotal ? totalHours.toFixed(1) : '—',
+    reg: (emp.reg || 0).toFixed(1),
+    ot: (emp.ot15 || 0).toFixed(1),
+    dt: (emp.ot20 || 0).toFixed(1),
+    dayCount: rows.length
+  };
+}
+
+function buildPeriodSummaryMarkdown(vm){
+  var ps = vm.periodSummary;
+  return '**📅 考勤周期汇总**\n'+
+    '周期：'+ps.periodLabel+'\n'+
+    '**总工时** '+ps.totalHours+' h · **REG** '+ps.reg+' h · **OT** '+ps.ot+' h · **DT** '+ps.dt+' h';
+}
+
 function buildCardContent(emp, batchId){
   const vm = buildCardViewModel(emp);
   const elements = [];
@@ -3298,24 +3549,11 @@ function buildCardContent(emp, batchId){
   elements.push(feishuMarkdown('**员工信息**\n'+vm.empId+' · '+vm.name+' · '+vm.dept));
   elements.push(feishuHr());
 
-  const dailySubtitle = vm.dailyTotal
-    ? '考勤日期范围: '+vm.dateRange+' · 共 '+vm.dailyTotal+' 天'
-    : '';
-  elements.push(feishuMarkdown('📋 **每日打卡明细**'+(dailySubtitle ? '\n'+dailySubtitle : '')));
+  elements.push(feishuMarkdown(buildPeriodSummaryMarkdown(vm)));
+  elements.push(feishuHr());
 
-  if(vm.dailyRows.length){
-    elements.push(feishuTable('daily_punch', [
-      feishuTextColumn('date', '考勤日期', '120px'),
-      feishuTextColumn('times', '打卡时间', 'auto')
-    ], vm.dailyRows.map(function(row){
-      return {
-        date: row.date,
-        times: row.clockText === '—' ? '无打卡记录' : row.clockText
-      };
-    }), 10));
-  } else {
-    elements.push(feishuMarkdown('无签字报表明细数据'));
-  }
+  // 飞书 table 组件最多 3 列，6 列明细改用 markdown 表格
+  elements.push(feishuMarkdown(buildDailyPunchMarkdown(vm)));
 
   if(vm.processTableRows.length){
     elements.push(feishuHr());
@@ -3362,16 +3600,28 @@ function buildCardViewModel(emp){
     punchByDate[dateKey].push(time);
   });
   Object.keys(punchByDate).forEach(k => {
-    punchByDate[k] = [...new Set(punchByDate[k])];
+    punchByDate[k] = sortClockTimesAsc([...new Set(punchByDate[k])]);
   });
 
   const allDailyRows = (emp.dailyRows || []).map(dr => {
     const dateKey = normalizeDateKey(dr.date);
     const clocks = punchByDate[dateKey] || [];
+    var raw = dr._rawRow;
+    if(!raw && state._signRows && state._signRows[emp.emp_id]){
+      var matched = state._signRows[emp.emp_id].find(function(sr){
+        return normalizeDateKey(sr.date) === dateKey;
+      });
+      if(matched) raw = matched._rawRow;
+    }
+    const metrics = extractDailyMetrics(raw);
     return {
       dateKey: dateKey,
       date: formatDateForCard(dateKey || dr.date),
-      clockText: clocks.length ? clocks.join(', ') : '—'
+      clockText: clocks.length ? clocks.join(', ') : '—',
+      dayTotal: metrics.dayTotal,
+      reg: metrics.reg,
+      ot: metrics.ot,
+      dt: metrics.dt
     };
   }).filter(r => r.dateKey || r.date).sort((a,b) => String(a.dateKey).localeCompare(String(b.dateKey)));
 
@@ -3385,7 +3635,8 @@ function buildCardViewModel(emp){
     dailyHiddenCount: 0,
     dateRange: allDailyRows.length ? allDailyRows[0].date+' ~ '+allDailyRows[allDailyRows.length-1].date : '-',
     processTableRows: buildProcessTableRows(emp),
-    footer: '请确认以上考勤数据是否正确。如有问题，请点击「有异议」并回复原因。'
+    footer: '请确认以上考勤数据是否正确。如有问题，请点击「有异议」并回复原因。',
+    periodSummary: computePeriodSummary(emp)
   };
 }
 
@@ -3413,9 +3664,13 @@ function renderCardContent(emp){
         '<tr>'+
         '<td style="padding:4px 6px;border-bottom:1px solid #f0f0f0;color:#555;white-space:nowrap">'+esc(row.date)+'</td>'+
         '<td style="padding:4px 6px;border-bottom:1px solid #f0f0f0;color:#333">'+esc(row.clockText === '—' ? '无打卡记录' : row.clockText)+'</td>'+
+        '<td style="padding:4px 6px;border-bottom:1px solid #f0f0f0;color:#333;text-align:right">'+esc(row.dayTotal)+'</td>'+
+        '<td style="padding:4px 6px;border-bottom:1px solid #f0f0f0;color:#333;text-align:right">'+esc(row.reg)+'</td>'+
+        '<td style="padding:4px 6px;border-bottom:1px solid #f0f0f0;color:#333;text-align:right">'+esc(row.ot)+'</td>'+
+        '<td style="padding:4px 6px;border-bottom:1px solid #f0f0f0;color:#333;text-align:right">'+esc(row.dt)+'</td>'+
         '</tr>'
       ).join('')
-    : '<tr><td colspan="2" style="padding:6px;color:#999;text-align:center">无签字报表明细数据</td></tr>';
+    : '<tr><td colspan="6" style="padding:6px;color:#999;text-align:center">无签字报表明细数据</td></tr>';
   const previewProcessHtml = previewVm.processTableRows.length
     ? '<div style="border-top:1px solid #eee;margin:10px 0"></div>'+
       '<div class="card-section-title" style="font-weight:600;margin-bottom:4px">其他考勤流程 <span style="font-size:11px;color:#888;font-weight:400">共'+previewVm.processTableRows.length+'条</span></div>'+
@@ -3438,12 +3693,20 @@ function renderCardContent(emp){
       '<span style="margin-left:auto;font-size:12px;color:#888">'+esc(previewVm.dept)+'</span>'+
     '</div>'+
     '<div class="card-preview-body" style="padding:12px">'+
+      '<div class="card-section-title" style="font-weight:600;margin-bottom:4px">📅 考勤周期汇总</div>'+
+      '<div style="font-size:12px;color:#333;margin-bottom:2px">周期：'+esc(previewVm.periodSummary.periodLabel)+'</div>'+
+      '<div style="font-size:12px;color:#333;margin-bottom:8px"><strong>总工时</strong> '+esc(previewVm.periodSummary.totalHours)+' h · <strong>REG</strong> '+esc(previewVm.periodSummary.reg)+' h · <strong>OT</strong> '+esc(previewVm.periodSummary.ot)+' h · <strong>DT</strong> '+esc(previewVm.periodSummary.dt)+' h</div>'+
+      '<div style="border-top:1px solid #eee;margin:8px 0"></div>'+
       '<div class="card-section-title" style="font-weight:600;margin-bottom:4px">📋 每日打卡明细</div>'+
       '<div style="font-size:11px;color:#888;margin-bottom:4px">考勤日期范围: '+esc(previewVm.dateRange)+' · 共 '+previewVm.dailyTotal+' 天</div>'+
       '<table class="card-table" style="width:100%;border-collapse:collapse;font-size:11px">'+
       '<thead><tr>'+
-      '<th style="text-align:left;padding:4px 6px;border-bottom:1px solid #ddd;background:#f8f9fb;width:120px">考勤日期</th>'+
+      '<th style="text-align:left;padding:4px 6px;border-bottom:1px solid #ddd;background:#f8f9fb;width:100px">考勤日期</th>'+
       '<th style="text-align:left;padding:4px 6px;border-bottom:1px solid #ddd;background:#f8f9fb">打卡时间</th>'+
+      '<th style="text-align:right;padding:4px 6px;border-bottom:1px solid #ddd;background:#f8f9fb;width:72px">每日总工时</th>'+
+      '<th style="text-align:right;padding:4px 6px;border-bottom:1px solid #ddd;background:#f8f9fb;width:48px">REG</th>'+
+      '<th style="text-align:right;padding:4px 6px;border-bottom:1px solid #ddd;background:#f8f9fb;width:48px">OT</th>'+
+      '<th style="text-align:right;padding:4px 6px;border-bottom:1px solid #ddd;background:#f8f9fb;width:48px">DT</th>'+
       '</tr></thead><tbody>'+
       previewDailyHtml+
       '</tbody></table>'+
@@ -3571,8 +3834,7 @@ function doSendFeishuCards(){
       batch_label: '考勤确认 ' + new Date().toLocaleString('zh-CN'),
       test_mode: testMode,
       test_emp_id: testEmpId,
-      app_id: FEISHU_CONFIG.APP_ID,
-      app_secret: FEISHU_CONFIG.APP_SECRET
+      feishu_profile_id: getSelectedProfileId()
     })
   }).then(async function(res){
     if(!res.ok) throw new Error('服务器返回 '+res.status);
@@ -3630,6 +3892,9 @@ function doSendFeishuCards(){
           row._sendStatus = 'fail';
           row._sendTime = ts;
           fail++;
+          if(r.msg){
+            detailEl.innerHTML += '<div style="color:#D9001B;font-size:12px">'+esc(row.name || r.emp_id)+'：'+esc(r.msg)+'</div>';
+          }
         }
       }
     });
@@ -3877,6 +4142,7 @@ function esc(s){if(!s) return ''; const d=document.createElement('div'); d.textC
 
 // Restore state on page load (period-aware, empty until user creates period)
 initServerUrl();
+loadFeishuProfiles();
 tryLoadTunnelUrlOnLocal().finally(function(){
   initPeriodSystem();
 });
