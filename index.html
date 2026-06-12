@@ -407,7 +407,7 @@ tr:hover td{background:#fafbfc}
           <button class="btn btn-sm" onclick="openFeishuProfileModal()" title="管理飞书应用配置">⚙️</button>
           <input type="checkbox" id="testModeSwitch" onchange="toggleTestMode()">
           <label for="testModeSwitch" style="cursor:pointer;user-select:none">🧪 测试</label>
-          <input type="text" class="test-emp-input" id="testEmpIdInline" value="zt28219" readonly title="测试模式固定收件人，不可修改">
+          <input type="text" class="test-emp-input" id="testEmpIdInline" value="zt28219" title="测试模式收件人工号，可修改">
         </div>
         <span class="file-badge" id="confirmBadge" style="margin-left:auto">0 个待确认员工</span>
       </div>
@@ -3742,7 +3742,7 @@ function sendAllFeishuCards(){
   // Test mode: show all selected cards, preview normally
   // Test mode ONLY changes who receives — not what data is shown
   const testMode = document.getElementById('testModeSwitch') ? document.getElementById('testModeSwitch').checked : false;
-  const testEmpId = testMode ? getTestEmpId() : '';
+  const testEmpId = testMode ? (document.getElementById('testEmpIdInline').value.trim() || 'zt28219') : '';
 
   const finalToSend = toSend;
   const testModeLabel = testMode
@@ -3777,7 +3777,7 @@ function doSendFeishuCards(){
 
   // Read test mode from inline controls
   const testMode = document.getElementById('testModeSwitch') ? document.getElementById('testModeSwitch').checked : false;
-  const testEmpId = testMode ? getTestEmpId() : '';
+  const testEmpId = testMode ? (document.getElementById('testEmpIdInline').value.trim() || 'zt28219') : '';
 
   // Get selected rows
   const toSend = state.confirmation.rows.filter(r => r._selected);
